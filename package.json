@@ -6,12 +6,9 @@
     "deps:update": "yarn dlx npm-check-updates@latest -u --deep --mergeConfig",
     "check:install": "yarn dlx @yarnpkg/doctor@3.1.4 ."
   },
-  "workspaces": {
-    "packages": [
-      "packages/*",
-      "apps/*"
-    ]
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
     "node": "^14.13.1 || >=16.0.0",
     "yarn": ">=1.22.0",
