@@ -77,6 +77,7 @@ RCT_EXPORT_MODULE();
         @"willAppear",
         @"willDisappear",
         @"buttonPressed",
+        @"poppedToRoot",
         // grid
         @"gridButtonPressed",
         // information
@@ -536,6 +537,7 @@ RCT_EXPORT_METHOD(setRootTemplate:(NSString *)templateId animated:(BOOL)animated
     CPTemplate *template = [store findTemplateById:templateId];
 
     store.interfaceController.delegate = self;
+    store.rootTemplateId = templateId;
 
     if (template) {
         [store.interfaceController setRootTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
@@ -577,7 +579,14 @@ RCT_EXPORT_METHOD(popToRootTemplate:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
     [store.interfaceController popToRootTemplateAnimated:animated completion:^(BOOL done, NSError * _Nullable err) {
         NSLog(@"error %@", err);
-        // noop
+        if (done) {
+            for (NSString *templateId in store.getTemplateIds) {
+                if (templateId == store.rootTemplateId) {
+                    continue;
+                }
+                [self sendEventWithName:@"poppedToRoot" body:@{ @"templateId": templateId }];
+            }
+        }
     }];
 }
 
@@ -926,6 +935,21 @@ RCT_EXPORT_METHOD(updateMapTemplateMapButtons:(NSString*) templateId mapButtons:
         }
         [mapTemplate setMapButtons:result];
     }
+}
+
+RCT_EXPORT_METHOD(getTopTemplate: (RCTResponseSenderBlock)callback) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    CPTemplate *topTemplate = store.interfaceController.topTemplate;
+    if (topTemplate == nil || topTemplate.userInfo == nil || topTemplate.userInfo[@"templateId"] == nil) {
+        callback(@[]);
+    } else {
+        callback(@[topTemplate.userInfo[@"templateId"]]);
+    }
+}
+
+RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    callback(@[store.rootTemplateId]);
 }
 
 # pragma parsers

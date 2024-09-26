@@ -128,7 +128,7 @@ export class ListTemplate extends Template<ListTemplateConfig> {
   constructor(public config: ListTemplateConfig) {
     super(config);
 
-    CarPlay.emitter.addListener('didSelectListItem', (e: { templateId: string; index: number }) => {
+    let subscription = CarPlay.emitter.addListener('didSelectListItem', (e: { templateId: string; index: number }) => {
       if (config.onItemSelect && e.templateId === this.id) {
         void Promise.resolve(config.onItemSelect(e)).then(() => {
           if (Platform.OS === 'ios') {
@@ -138,7 +138,9 @@ export class ListTemplate extends Template<ListTemplateConfig> {
       }
     });
 
-    CarPlay.emitter.addListener(
+    this.listenerSubscriptions.push(subscription);
+
+    subscription = CarPlay.emitter.addListener(
       'didSelectListItemRowImage',
       (e: { templateId: string; index: number; imageIndex: number }) => {
         if (config.onImageRowItemSelect && e.templateId === this.id) {
@@ -150,6 +152,8 @@ export class ListTemplate extends Template<ListTemplateConfig> {
         }
       },
     );
+
+    this.listenerSubscriptions.push(subscription);
   }
 
   public updateSections = (sections: ListSection[]) => {

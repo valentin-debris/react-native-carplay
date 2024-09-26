@@ -4,10 +4,12 @@
 @interface RNCPStore : NSObject {
     CPInterfaceController *interfaceController;
     CPWindow *window;
+    NSString *rootTemplateId;
 }
 
 @property (nonatomic, retain) CPInterfaceController *interfaceController;
 @property (nonatomic, retain) CPWindow *window;
+@property (nonatomic, retain) NSString *rootTemplateId;
 
 + (id)sharedManager;
 - (CPTemplate*) findTemplateById: (NSString*)templateId;
@@ -18,5 +20,6 @@
 - (NSString*) setNavigationSession:(NSString*)navigationSessionId navigationSession:(CPNavigationSession*)navigationSession;
 - (Boolean) isConnected;
 - (void) setConnected:(Boolean) isConnected;
+- (NSArray*) getTemplateIds;
 
 @end

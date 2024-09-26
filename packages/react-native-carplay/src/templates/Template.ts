@@ -1,4 +1,4 @@
-import { ImageSourcePropType, Platform } from 'react-native';
+import { EmitterSubscription, ImageSourcePropType, Platform } from 'react-native';
 import { CarPlay } from '../CarPlay';
 import { BarButton } from '../interfaces/BarButton';
 
@@ -77,6 +77,11 @@ export interface TemplateConfig {
    * @param e Event
    */
   onBarButtonPressed?(e: BarButtonEvent): void;
+
+  /**
+   * Fired when popToRootTemplate finished
+   */
+  onPoppedToRoot?(e: BaseEvent): void;
 }
 
 export class Template<P> {
@@ -84,10 +89,13 @@ export class Template<P> {
     return 'unset';
   }
   public id!: string;
+  public listenerSubscriptions: EmitterSubscription[] = [];
 
   public get eventMap() {
     return {};
   }
+
+  onDisconnectCallback = () => this.destroy();
 
   constructor(public config: TemplateConfig & P) {
     if (config.id) {
@@ -104,12 +112,13 @@ export class Template<P> {
       didDisappear: 'onDidDisappear',
       willAppear: 'onWillAppear',
       willDisappear: 'onWillDisappear',
+      poppedToRoot: 'onPoppedToRoot',
       ...(this.eventMap || {}),
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Object.entries(eventMap).forEach(([eventName, callbackName]: [string, any]) => {
-      CarPlay.emitter.addListener(eventName, (e: { id: string; templateId: string }) => {
+      const subscription = CarPlay.emitter.addListener(eventName, (e: { id: string; templateId: string }) => {
         const configEventName = callbackName as keyof Pick<
           TemplateConfig,
           | 'onWillAppear'
@@ -122,7 +131,11 @@ export class Template<P> {
           config[configEventName]?.(e);
         }
       });
+
+      this.listenerSubscriptions.push(subscription);
     });
+
+    CarPlay.registerOnDisconnect(this.onDisconnectCallback);
 
     if (this.type !== 'map') {
       const callbackFn = Platform.select({
@@ -160,5 +173,10 @@ export class Template<P> {
     const result = JSON.parse(JSON.stringify(config));
     traverse(result);
     return result;
+  }
+
+  public destroy() {
+    CarPlay.unregisterOnDisconnect(this.onDisconnectCallback);
+    this.listenerSubscriptions.forEach(listener => listener.remove());
   }
 }

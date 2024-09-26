@@ -29,6 +29,10 @@ export interface GridTemplateConfig extends TemplateConfig {
    * Fired when a button is pressed
    */
   onButtonPressed?(e: ButtonPressedEvent): void;
+  /**
+   * Fired when the back button is pressed
+   */
+  onBackButtonPressed?(): void;
 }
 
 export class GridTemplate extends Template<GridTemplateConfig> {

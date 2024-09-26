@@ -65,4 +65,8 @@
     return navigationSessionId;
 }
 
+- (NSArray*) getTemplateIds {
+    return [_templatesStore allKeys];
+}
+
 @end

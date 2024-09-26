@@ -39,7 +39,7 @@ export class SearchTemplate extends Template<SearchTemplateConfig> {
 
     super(config);
 
-    CarPlay.emitter.addListener(
+    let subscription = CarPlay.emitter.addListener(
       'updatedSearchText',
       (e: { searchText: string; templateId: string }) => {
         if (config.onSearch && e.templateId === this.id) {
@@ -56,7 +56,9 @@ export class SearchTemplate extends Template<SearchTemplateConfig> {
       },
     );
 
-    CarPlay.emitter.addListener(
+    this.listenerSubscriptions.push(subscription);
+
+    subscription = CarPlay.emitter.addListener(
       'selectedResult',
       (e: { templateId: string; index: number; id?: string }) => {
         if (config.onItemSelect && e.templateId === this.id) {
@@ -66,5 +68,7 @@ export class SearchTemplate extends Template<SearchTemplateConfig> {
         }
       },
     );
+
+    this.listenerSubscriptions.push(subscription);
   }
 }

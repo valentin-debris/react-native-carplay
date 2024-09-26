@@ -36,7 +36,7 @@ export class TabBarTemplate extends Template<TabBarTemplateConfig> {
   constructor(public config: TabBarTemplateConfig) {
     super(config);
 
-    CarPlay.emitter.addListener(
+    const subscription = CarPlay.emitter.addListener(
       'didSelectTemplate',
       (e: { templateId: string; selectedTemplateId: string }) => {
         if (config.onTemplateSelect && e.templateId === this.id) {
@@ -47,6 +47,8 @@ export class TabBarTemplate extends Template<TabBarTemplateConfig> {
         }
       },
     );
+
+    this.listenerSubscriptions.push(subscription);
   }
 
   public updateTemplates = (config: TabBarTemplateConfig) => {
