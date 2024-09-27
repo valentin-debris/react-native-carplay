@@ -28,6 +28,11 @@ export interface PanEvent {
   direction: string;
 }
 
+export interface TripEvent {
+  tripId: string;
+  routeIndex: number;
+ }
+
 export interface MapTemplateConfig extends TemplateConfig {
   /**
    * The background color the map template uses when displaying guidance.
@@ -103,9 +108,9 @@ export interface MapTemplateConfig extends TemplateConfig {
   onPanBeganWithDirection?(e: PanEvent): void;
   onPanEndedWithDirection?(e: PanEvent): void;
   onDidUpdatePanGestureWithTranslation?(e: PanGestureWithTranslationEvent): void;
-  onSelectedPreviewForTrip?(e: { tripId: string; routeIndex: number }): void;
+  onSelectedPreviewForTrip?(e: TripEvent): void;
   onDidCancelNavigation?(): void;
-  onStartedTrip?(e: { tripId: string; routeIndex: number }): void;
+  onStartedTrip?(e: TripEvent): void;
 
   /**
    * Fired when the back button is pressed
