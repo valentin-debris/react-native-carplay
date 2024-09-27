@@ -48,3 +48,4 @@ export * from './interfaces/TextConfiguration';
 export * from './interfaces/TimeRemainingColor';
 export * from './interfaces/TravelEstimates';
 export * from './interfaces/VoiceControlState';
+export * from './interfaces/PanGestureWithTranslationEvent';

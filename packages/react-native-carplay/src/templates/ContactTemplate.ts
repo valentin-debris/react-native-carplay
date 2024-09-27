@@ -26,11 +26,17 @@ export interface ContactTemplateConfig extends TemplateConfig {
   subtitle?: string;
   informativeText?: string;
   actions?: ContactAction[];
+
   /**
    * Fired when bar button is pressed
    * @param e Event
    */
   onButtonPressed?(e: ContactButtonEvent): void;
+
+  /**
+   * Fired when the back button is pressed
+   */
+  onBackButtonPressed?(): void;
 }
 
 export class ContactTemplate extends Template<ContactTemplateConfig> {
@@ -40,6 +46,7 @@ export class ContactTemplate extends Template<ContactTemplateConfig> {
   get eventMap() {
     return {
       buttonPressed: 'onButtonPressed',
+      backButtonPressed: 'onBackButtonPressed',
     };
   }
 }

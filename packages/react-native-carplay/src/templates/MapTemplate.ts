@@ -1,4 +1,4 @@
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry, Platform, ProcessedColorValue } from 'react-native';
 import { CarPlay } from '../CarPlay';
 import { MapButton } from '../interfaces/MapButton';
 import { NavigationAlert } from '../interfaces/NavigationAlert';
@@ -12,13 +12,14 @@ import { ListItem } from '../interfaces/ListItem';
 import { Action } from '../interfaces/Action';
 import { Header } from '../interfaces/Header';
 import { Pane } from '../interfaces/Pane';
+import { PanGestureWithTranslationEvent } from 'src/interfaces/PanGestureWithTranslationEvent';
 
 export interface MapTemplateConfig extends TemplateConfig {
   /**
    * The background color the map template uses when displaying guidance.
    * @namespace iOS
    */
-  guidanceBackgroundColor?: string;
+  guidanceBackgroundColor?: ProcessedColorValue;
   /**
    * The style that the map template uses when displaying trip estimates during active nagivation.
    * @default dark
@@ -87,9 +88,15 @@ export interface MapTemplateConfig extends TemplateConfig {
   onPanWithDirection?(e: { direction: string }): void;
   onPanBeganWithDirection?(e: { direction: string }): void;
   onPanEndedWithDirection?(e: { direction: string }): void;
+  onDidUpdatePanGestureWithTranslation?(e: PanGestureWithTranslationEvent): void;
   onSelectedPreviewForTrip?(e: { tripId: string; routeIndex: number }): void;
   onDidCancelNavigation?(): void;
   onStartedTrip?(e: { tripId: string; routeIndex: number }): void;
+
+  /**
+   * Fired when the back button is pressed
+   */
+  onBackButtonPressed?(): void;
 }
 
 /**
@@ -115,9 +122,11 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       panWithDirection: 'onPanWithDirection',
       panBeganWithDirection: 'onPanBeganWithDirection',
       panEndedWithDirection: 'onPanEndedWithDirection',
+      didUpdatePanGestureWithTranslation: 'onDidUpdatePanGestureWithTranslation',
       selectedPreviewForTrip: 'onSelectedPreviewForTrip',
       didCancelNavigation: 'onDidCancelNavigation',
       startedTrip: 'onStartedTrip',
+      backButtonPressed: 'onBackButtonPressed',
     };
   }
 

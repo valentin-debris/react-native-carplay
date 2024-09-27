@@ -24,6 +24,10 @@ export interface PointOfInterestTemplateConfig extends TemplateConfig {
     latitudeDelta: number;
     longitudeDelta: number;
   }): void;
+  /**
+   * Fired when the back button is pressed
+   */
+  onBackButtonPressed?(): void;
 }
 
 export class PointOfInterestTemplate extends Template<PointOfInterestTemplateConfig> {
@@ -35,6 +39,7 @@ export class PointOfInterestTemplate extends Template<PointOfInterestTemplateCon
     return {
       didSelectPointOfInterest: 'onPointOfInterestSelect',
       didChangeMapRegion: 'onChangeMapRegion',
+      backButtonPressed: 'onBackButtonPressed',
     };
   }
 }

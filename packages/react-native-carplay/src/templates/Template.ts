@@ -171,6 +171,9 @@ export class Template<P> {
       }
     }
     const result = JSON.parse(JSON.stringify(config));
+    if (config.onBackButtonPressed) {
+      result.isBackButtonCustomized = true;
+    }
     traverse(result);
     return result;
   }

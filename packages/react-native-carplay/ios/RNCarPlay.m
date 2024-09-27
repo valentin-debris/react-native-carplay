@@ -183,7 +183,7 @@ RCT_EXPORT_MODULE();
     [task resume];
 }
 
-- (void)updateListRowItemImageWithURL:(CPListImageRowItem *)item imgUrl:(NSString *)imgUrlString index:(int)index {    
+- (void)updateListRowItemImageWithURL:(CPListImageRowItem *)item imgUrl:(NSString *)imgUrlString index:(int)index {
     NSURL *imgUrl = [NSURL URLWithString:imgUrlString];
     
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithURL:imgUrl completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
@@ -199,9 +199,9 @@ RCT_EXPORT_MODULE();
                 @catch (NSException *exception) {
                     // Best effort updating the array
                     NSLog(@"Failed to update images array of CPListImageRowItem");
-                }                
+                }
                 
-                [item updateImages:newImages];                
+                [item updateImages:newImages];
             });
         } else {
             NSLog(@"Failed to load image for CPListImageRowItem from URL: %@", imgUrl);
@@ -229,6 +229,10 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
     
     // Create a new CPTemplate object
     CPTemplate *carPlayTemplate = [[CPTemplate alloc] init];
+    
+    CPBarButton *backButton = config[@"isBackButtonCustomized"] ? [[CPBarButton alloc] initWithType:CPBarButtonTypeText handler:^(CPBarButton * _Nonnull barButton) {
+        [self sendEventWithName:@"backButtonPressed" body:@{@"templateId":templateId}];
+    }] : nil;
 
     if ([type isEqualToString:@"search"]) {
         CPSearchTemplate *searchTemplate = [[CPSearchTemplate alloc] init];
@@ -240,6 +244,7 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
         CPGridTemplate *gridTemplate = [[CPGridTemplate alloc] initWithTitle:title gridButtons:buttons];
         [gridTemplate setLeadingNavigationBarButtons:leadingNavigationBarButtons];
         [gridTemplate setTrailingNavigationBarButtons:trailingNavigationBarButtons];
+        [gridTemplate setBackButton:backButton];
         carPlayTemplate = gridTemplate;
     }
     else if ([type isEqualToString:@"list"]) {
@@ -291,6 +296,7 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
         [self applyConfigForMapTemplate:mapTemplate templateId:templateId config:config];
         [mapTemplate setLeadingNavigationBarButtons:leadingNavigationBarButtons];
         [mapTemplate setTrailingNavigationBarButtons:trailingNavigationBarButtons];
+        [mapTemplate setBackButton:backButton];
         [mapTemplate setUserInfo:@{ @"templateId": templateId }];
         mapTemplate.mapDelegate = self;
 
@@ -353,6 +359,7 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
         [contact setSubtitle:config[@"subtitle"]];
         [contact setActions:[self parseButtons:config[@"actions"] templateId:templateId]];
         CPContactTemplate *contactTemplate = [[CPContactTemplate alloc] initWithContact:contact];
+        [contactTemplate setBackButton:backButton];
         carPlayTemplate = contactTemplate;
     } else if ([type isEqualToString:@"actionsheet"]) {
         NSString *title = [RCTConvert NSString:config[@"title"]];
@@ -396,6 +403,7 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
         }
 
         CPPointOfInterestTemplate *poiTemplate = [[CPPointOfInterestTemplate alloc] initWithTitle:title pointsOfInterest:items selectedIndex:selectedIndex];
+        [poiTemplate setBackButton:backButton];
         poiTemplate.pointOfInterestDelegate = self;
         carPlayTemplate = poiTemplate;
     } else if ([type isEqualToString:@"information"]) {
@@ -753,7 +761,7 @@ RCT_EXPORT_METHOD(getMaximumListItemImageSize:(NSString *)templateId
             @"width": @(CPListItem.maximumImageSize.width),
             @"height": @(CPListItem.maximumImageSize.height)
         };
-        resolve(sizeDict);        
+        resolve(sizeDict);
     } else {
         NSLog(@"Failed to find template %@", template);
         reject(@"template_not_found", @"Template not found in store", nil);
@@ -799,7 +807,7 @@ RCT_EXPORT_METHOD(getMaximumListImageRowItemImageSize:(NSString *)templateId
             @"width": @(CPListImageRowItem.maximumImageSize.width),
             @"height": @(CPListImageRowItem.maximumImageSize.height)
         };
-        resolve(sizeDict);    
+        resolve(sizeDict);
     } else {
         NSLog(@"Failed to find template %@", template);
         reject(@"template_not_found", @"Template not found in store", nil);
@@ -1069,7 +1077,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
                 [self sendEventWithName:@"barButtonPressed" body:@{@"id": _id, @"templateId":templateId}];
             }
         }];
-        BOOL _disabled = [barButton objectForKey:@"disabled"];
+        BOOL _disabled = [[barButton objectForKey:@"disabled"] isEqualToNumber:[NSNumber numberWithInt:1]];
         [_barButton setEnabled:!_disabled];
 
         if (_type == CPBarButtonTypeText) {
@@ -1250,9 +1258,23 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
         unit = [NSUnitLength yards];
     }
 
-    NSMeasurement *distance = [[NSMeasurement alloc] initWithDoubleValue:value unit:unit];
     double time = [RCTConvert double:json[@"timeRemaining"]];
+    if (value < 0 && time >= 0) {
+        if (time >= 3600) {
+            unit = [NSUnitDuration hours];
+            value = lroundf(time / 3600);
+        }
+        else if (time < 60) {
+            unit = [NSUnitDuration seconds];
+            value = time;
+        }
+        else {
+            unit = [NSUnitDuration minutes];
+            value = lroundf(time / 60);
+        }
+    }
 
+    NSMeasurement *distance = [[NSMeasurement alloc] initWithDoubleValue:value unit:unit];
     return [[CPTravelEstimates alloc] initWithDistanceRemaining:distance timeRemaining:time];
 }
 
