@@ -7,12 +7,16 @@ import { TimeRemainingColor } from '../interfaces/TimeRemainingColor';
 import { TravelEstimates } from '../interfaces/TravelEstimates';
 import { NavigationSession } from '../navigation/NavigationSession';
 import { Trip } from '../navigation/Trip';
-import { Template, TemplateConfig } from './Template';
+import { BaseEvent, Template, TemplateConfig } from './Template';
 import { ListItem } from '../interfaces/ListItem';
 import { Action } from '../interfaces/Action';
 import { Header } from '../interfaces/Header';
 import { Pane } from '../interfaces/Pane';
 import { PanGestureWithTranslationEvent } from 'src/interfaces/PanGestureWithTranslationEvent';
+
+export interface MapButtonEvent extends BaseEvent {
+  id: string;
+}
 
 export interface MapTemplateConfig extends TemplateConfig {
   /**
@@ -84,7 +88,7 @@ export interface MapTemplateConfig extends TemplateConfig {
    * @param e Event
    */
   onAlertActionPressed?(e: { secondary?: boolean; primary?: boolean }): void;
-  onMapButtonPressed?(e: { id: string; template: string }): void;
+  onMapButtonPressed?(e: MapButtonEvent): void;
   onPanWithDirection?(e: { direction: string }): void;
   onPanBeganWithDirection?(e: { direction: string }): void;
   onPanEndedWithDirection?(e: { direction: string }): void;
