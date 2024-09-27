@@ -87,7 +87,7 @@ export interface MapTemplateConfig extends TemplateConfig {
    * Fired when Alert Action button is pressed
    * @param e Event
    */
-  onAlertActionPressed?(e: { secondary?: boolean; primary?: boolean }): void;
+  onAlertActionPressed?(e: { secondary?: boolean; primary?: boolean, actionId: string }): void;
   onMapButtonPressed?(e: MapButtonEvent): void;
   onPanWithDirection?(e: { direction: string }): void;
   onPanBeganWithDirection?(e: { direction: string }): void;

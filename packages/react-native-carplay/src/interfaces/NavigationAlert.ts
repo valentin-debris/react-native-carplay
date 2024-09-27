@@ -43,4 +43,8 @@ export interface NavigationAlert {
    * The amount of time, in seconds, that the alert is visible.
    */
   duration: number;
+  /**
+   * identifier passed to the onAlertActionPressed handler so you know which button was pressed
+   */
+  actionId: string;
 }
