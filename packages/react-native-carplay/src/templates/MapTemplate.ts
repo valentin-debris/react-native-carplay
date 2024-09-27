@@ -18,6 +18,12 @@ export interface MapButtonEvent extends BaseEvent {
   id: string;
 }
 
+export interface AlertActionEvent extends BaseEvent {
+  secondary?: boolean;
+  primary?: boolean;
+  actionId: string;
+}
+
 export interface MapTemplateConfig extends TemplateConfig {
   /**
    * The background color the map template uses when displaying guidance.
@@ -87,7 +93,7 @@ export interface MapTemplateConfig extends TemplateConfig {
    * Fired when Alert Action button is pressed
    * @param e Event
    */
-  onAlertActionPressed?(e: { secondary?: boolean; primary?: boolean, actionId: string }): void;
+  onAlertActionPressed?(e: AlertActionEvent): void;
   onMapButtonPressed?(e: MapButtonEvent): void;
   onPanWithDirection?(e: { direction: string }): void;
   onPanBeganWithDirection?(e: { direction: string }): void;
