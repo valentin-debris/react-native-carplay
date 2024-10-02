@@ -1392,18 +1392,16 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 - (NSDictionary*)navigationAlertToJson:(CPNavigationAlert*)navigationAlert dismissalContext:(CPNavigationAlertDismissalContext)dismissalContext {
     NSString *dismissalCtx = @"none";
-    if (dismissalContext) {
-        switch (dismissalContext) {
-            case CPNavigationAlertDismissalContextTimeout:
-                dismissalCtx = @"timeout";
-                break;
-            case CPNavigationAlertDismissalContextSystemDismissed:
-                dismissalCtx = @"system";
-                break;
-            case CPNavigationAlertDismissalContextUserDismissed:
-                dismissalCtx = @"user";
-                break;
-        }
+    switch (dismissalContext) {
+        case CPNavigationAlertDismissalContextTimeout:
+            dismissalCtx = @"timeout";
+            break;
+        case CPNavigationAlertDismissalContextSystemDismissed:
+            dismissalCtx = @"system";
+            break;
+        case CPNavigationAlertDismissalContextUserDismissed:
+            dismissalCtx = @"user";
+            break;
     }
 
     return @{
