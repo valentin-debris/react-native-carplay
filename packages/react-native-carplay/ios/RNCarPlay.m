@@ -13,6 +13,7 @@
 @synthesize searchResultBlock;
 @synthesize selectedResultBlock;
 @synthesize isNowPlayingActive;
+@synthesize navigationAlertWrappers;
 
 -(void)startObserving {
     hasListeners = YES;
@@ -1357,7 +1358,15 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     
     CPAlertAction *secondaryAction = [json objectForKey:@"secondaryAction"] ? [self parseAlertAction:json[@"secondaryAction"] body:@{ @"templateId": templateId, @"secondary": @(YES), @"actionId": actionId }] : nil;
 
-    return [[CPNavigationAlert alloc] initWithTitleVariants:[RCTConvert NSStringArray:json[@"titleVariants"]] subtitleVariants:[RCTConvert NSStringArray:json[@"subtitleVariants"]] imageSet:imageSet primaryAction:[self parseAlertAction:json[@"primaryAction"] body:@{ @"templateId": templateId, @"primary": @(YES), @"actionId": actionId }] secondaryAction:secondaryAction duration:[RCTConvert double:json[@"duration"]]];
+    CPNavigationAlert* alert = [[CPNavigationAlert alloc] initWithTitleVariants:[RCTConvert NSStringArray:json[@"titleVariants"]] subtitleVariants:[RCTConvert NSStringArray:json[@"subtitleVariants"]] imageSet:imageSet primaryAction:[self parseAlertAction:json[@"primaryAction"] body:@{ @"templateId": templateId, @"primary": @(YES), @"actionId": actionId }] secondaryAction:secondaryAction duration:[RCTConvert double:json[@"duration"]]];
+    
+    RNCarPlayNavigationAlertWrapper *wrapper = [[RNCarPlayNavigationAlertWrapper alloc] initWithAlert:alert userInfo:@{ @"actionId": actionId }];
+    if (navigationAlertWrappers == nil) {
+        navigationAlertWrappers = [NSMutableArray array];
+    }
+    [navigationAlertWrappers addObject:wrapper];
+
+    return alert;
 }
 
 - (CPAlertAction*)parseAlertAction:(NSDictionary*)json body:(NSDictionary*)body {
@@ -1403,17 +1412,40 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
             dismissalCtx = @"user";
             break;
     }
+    
+    NSMutableDictionary* userInfo = nil;
+    for (RNCarPlayNavigationAlertWrapper *wrapper in navigationAlertWrappers) {
+        if (wrapper.navigationAlert == navigationAlert) {
+            userInfo = [wrapper.userInfo mutableCopy];
+            break;
+        }
+    }
+    
+    if (userInfo == nil) {
+        return @{
+            @"todo": @(YES),
+            @"reason": dismissalCtx
+        };
+    }
 
-    return @{
-        @"todo": @(YES),
-        @"reason": dismissalCtx
-    };
+    userInfo[@"reason"] = dismissalCtx;
+    
+    return userInfo;
 }
 - (NSDictionary*)navigationAlertToJson:(CPNavigationAlert*)navigationAlert {
-    return @{ @"todo": @(YES) };
-    //    NSMutableDictionary *res = [[NSMutableDictionary alloc] init];
-    //    return @{
-    //                            };
+    NSDictionary* userInfo = nil;
+    for (RNCarPlayNavigationAlertWrapper *wrapper in navigationAlertWrappers) {
+        if (wrapper.navigationAlert == navigationAlert) {
+            userInfo = wrapper.userInfo;
+            break;
+        }
+    }
+    
+    if (userInfo == nil) {
+        return @{ @"todo": @(YES) };
+    }
+    
+    return userInfo;
 }
 
 - (void)sendTemplateEventWithName:(CPTemplate *)template name:(NSString*)name {
@@ -1476,6 +1508,12 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 }
 - (void)mapTemplate:(CPMapTemplate *)mapTemplate didDismissNavigationAlert:(CPNavigationAlert *)navigationAlert dismissalContext:(CPNavigationAlertDismissalContext)dismissalContext {
     [self sendTemplateEventWithName:mapTemplate name:@"didDismissNavigationAlert" json:[self navigationAlertToJson:navigationAlert dismissalContext:dismissalContext]];
+    for (RNCarPlayNavigationAlertWrapper *wrapper in navigationAlertWrappers) {
+        if (wrapper.navigationAlert == navigationAlert) {
+            [navigationAlertWrappers removeObject:wrapper];
+            break;
+        }
+    }
 }
 
 - (void)mapTemplateDidShowPanningInterface:(CPMapTemplate *)mapTemplate {
@@ -1574,6 +1612,19 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 - (void)nowPlayingTemplateAlbumArtistButtonTapped:(CPNowPlayingTemplate *)nowPlayingTemplate {
     [self sendTemplateEventWithName:nowPlayingTemplate name:@"albumArtistButtonPressed"];
+}
+
+@end
+
+@implementation RNCarPlayNavigationAlertWrapper
+
+- (instancetype)initWithAlert:(CPNavigationAlert *)alert userInfo:(NSDictionary *)userInfo {
+    self = [super init];
+    if (self) {
+        _navigationAlert = alert;
+        _userInfo = userInfo;
+    }
+    return self;
 }
 
 @end
