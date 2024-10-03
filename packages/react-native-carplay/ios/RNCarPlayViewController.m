@@ -57,7 +57,8 @@
         @"bottom": @(currentSafeAreaInsets.bottom),
         @"left": @(currentSafeAreaInsets.left),
         @"right": @(currentSafeAreaInsets.right),
-        @"top": @(currentSafeAreaInsets.top)
+        @"top": @(currentSafeAreaInsets.top),
+        @"templateId": self.rootView.moduleName
     }];
 }
 
@@ -66,7 +67,7 @@
 
     if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
         NSString *mode = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? @"dark" : @"light";
-        [self.rnCarPlay sendEventWithName:@"userInterfaceStyleChanged" body:mode];
+        [self.rnCarPlay sendEventWithName:@"userInterfaceStyleChanged" body:@{@"mode": mode, @"templateId": self.rootView.moduleName}];
     }
 }
 

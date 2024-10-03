@@ -40,7 +40,18 @@ export interface PanEvent {
 export interface TripEvent {
   tripId: string;
   routeIndex: number;
- }
+}
+
+export interface SafeAreaInsetsEvent extends BaseEvent {
+  bottom: number;
+  left: number;
+  right: number;
+  top: number;
+}
+
+export interface UserInterfaceStyleEvent extends BaseEvent {
+  mode: 'dark' | 'light',
+}
 
 export interface MapTemplateConfig extends TemplateConfig {
   /**
@@ -152,13 +163,13 @@ export interface MapTemplateConfig extends TemplateConfig {
    * called when safe area insets change
    * @param e safe area insets
    */
-  onSafeAreaInsetsChanged?(e: {bottom: number, left: number, right: number, top: number}): void;
+  onSafeAreaInsetsChanged?(e: SafeAreaInsetsEvent): void;
 
   /**
    * called when user interface style changes (not map style)
    * @param e dark or light ui mode
    */
-  onUserInterfaceStyleChanged?(e: 'dark' | 'light'): void;
+  onUserInterfaceStyleChanged?(e: UserInterfaceStyleEvent): void;
 }
 
 /**
