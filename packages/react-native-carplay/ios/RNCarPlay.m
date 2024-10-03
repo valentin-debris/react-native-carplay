@@ -429,6 +429,7 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
         }
 
         CPInformationTemplate *informationTemplate = [[CPInformationTemplate alloc] initWithTitle:title layout:layout items:items actions:actions];
+        [informationTemplate setTrailingNavigationBarButtons:trailingNavigationBarButtons];
         carPlayTemplate = informationTemplate;
     }
 
