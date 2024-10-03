@@ -900,9 +900,7 @@ RCT_EXPORT_METHOD(dismissNavigationAlert:(NSString*)templateId animated:(BOOL)an
     CPTemplate *template = [[RNCPStore sharedManager] findTemplateById:templateId];
     if (template) {
         CPMapTemplate *mapTemplate = (CPMapTemplate*) template;
-        [mapTemplate dismissNavigationAlertAnimated:YES completion:^(BOOL completion) {
-            [self sendTemplateEventWithName:template name:@"didDismissNavigationAlert"];
-        }];
+        [mapTemplate dismissNavigationAlertAnimated:animated completion:^(BOOL completion) { }];
     }
 }
 
