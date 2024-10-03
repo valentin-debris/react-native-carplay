@@ -147,6 +147,18 @@ export interface MapTemplateConfig extends TemplateConfig {
    * Fired when the back button is pressed
    */
   onBackButtonPressed?(): void;
+
+  /**
+   * called when safe area insets change
+   * @param e safe area insets
+   */
+  onSafeAreaInsetsChanged?(e: {bottom: number, left: number, right: number, top: number}): void;
+
+  /**
+   * called when user interface style changes (not map style)
+   * @param e dark or light ui mode
+   */
+  onUserInterfaceStyleChanged?(e: 'dark' | 'light'): void;
 }
 
 /**
@@ -181,6 +193,8 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       didCancelNavigation: 'onDidCancelNavigation',
       startedTrip: 'onStartedTrip',
       backButtonPressed: 'onBackButtonPressed',
+      safeAreaInsetsChanged: 'onSafeAreaInsetsChanged',
+      userInterfaceStyleChanged: 'onUserInterfaceStyleChanged',
     };
   }
 
