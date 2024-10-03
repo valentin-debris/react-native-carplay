@@ -12,15 +12,17 @@
 @interface RNCarPlayViewController ()
 
 @property (nonatomic, strong) RCTRootView *rootView;
+@property (nonatomic, weak) RNCarPlay *rnCarPlay;
 
 @end
 
 @implementation RNCarPlayViewController
 
-- (instancetype)initWithRootView:(RCTRootView *)rootView {
+- (instancetype)initWithRootView:(RCTRootView *)rootView rnCarPlay:(RNCarPlay *)rnCarPlay {
     self = [super init];
     if (self) {
         _rootView = rootView;
+        _rnCarPlay = rnCarPlay;
     }
     return self;
 }
@@ -45,6 +47,27 @@
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
     self.rootView.frame = self.view.bounds;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+
+    UIEdgeInsets currentSafeAreaInsets = self.view.safeAreaInsets;
+    [self.rnCarPlay sendEventWithName:@"safeAreaInsetsChanged" body:@{
+        @"bottom": @(currentSafeAreaInsets.bottom),
+        @"left": @(currentSafeAreaInsets.left),
+        @"right": @(currentSafeAreaInsets.right),
+        @"top": @(currentSafeAreaInsets.top)
+    }];
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
+        NSString *mode = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? @"dark" : @"light";
+        [self.rnCarPlay sendEventWithName:@"userInterfaceStyleChanged" body:mode];
+    }
 }
 
 @end

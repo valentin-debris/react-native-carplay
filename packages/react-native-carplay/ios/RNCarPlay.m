@@ -116,6 +116,9 @@ RCT_EXPORT_MODULE();
         @"alertActionPressed",
         @"selectedPreviewForTrip",
         @"startedTrip",
+        //window related
+        @"safeAreaInsetsChanged",
+        @"userInterfaceStyleChanged"
     ];
 }
 
@@ -1011,7 +1014,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
     if ([config objectForKey:@"render"]) {
         RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:templateId initialProperties:@{}];
-        RNCarPlayViewController *viewController = [[RNCarPlayViewController alloc] initWithRootView:rootView];
+        RNCarPlayViewController *viewController = [[RNCarPlayViewController alloc] initWithRootView:rootView rnCarPlay:self];
         store.window.rootViewController = viewController;
     }
 }
