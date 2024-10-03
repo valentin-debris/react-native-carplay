@@ -1352,13 +1352,13 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     if ([json objectForKey:@"lightImage"] && [json objectForKey:@"darkImage"]) {
         imageSet = [[CPImageSet alloc] initWithLightContentImage:[RCTConvert UIImage:json[@"lightImage"]] darkContentImage:[RCTConvert UIImage:json[@"darkImage"]]];
     }
-    NSString *actionId = [json objectForKey:@"actionId"];
+    NSString *navigationAlertId = [json objectForKey:@"navigationAlertId"];
     
-    CPAlertAction *secondaryAction = [json objectForKey:@"secondaryAction"] ? [self parseAlertAction:json[@"secondaryAction"] body:@{ @"templateId": templateId, @"secondary": @(YES), @"actionId": actionId }] : nil;
+    CPAlertAction *secondaryAction = [json objectForKey:@"secondaryAction"] ? [self parseAlertAction:json[@"secondaryAction"] body:@{ @"templateId": templateId, @"secondary": @(YES), @"navigationAlertId": navigationAlertId }] : nil;
 
-    CPNavigationAlert* alert = [[CPNavigationAlert alloc] initWithTitleVariants:[RCTConvert NSStringArray:json[@"titleVariants"]] subtitleVariants:[RCTConvert NSStringArray:json[@"subtitleVariants"]] imageSet:imageSet primaryAction:[self parseAlertAction:json[@"primaryAction"] body:@{ @"templateId": templateId, @"primary": @(YES), @"actionId": actionId }] secondaryAction:secondaryAction duration:[RCTConvert double:json[@"duration"]]];
+    CPNavigationAlert* alert = [[CPNavigationAlert alloc] initWithTitleVariants:[RCTConvert NSStringArray:json[@"titleVariants"]] subtitleVariants:[RCTConvert NSStringArray:json[@"subtitleVariants"]] imageSet:imageSet primaryAction:[self parseAlertAction:json[@"primaryAction"] body:@{ @"templateId": templateId, @"primary": @(YES), @"navigationAlertId": navigationAlertId }] secondaryAction:secondaryAction duration:[RCTConvert double:json[@"duration"]]];
     
-    RNCarPlayNavigationAlertWrapper *wrapper = [[RNCarPlayNavigationAlertWrapper alloc] initWithAlert:alert userInfo:@{ @"actionId": actionId }];
+    RNCarPlayNavigationAlertWrapper *wrapper = [[RNCarPlayNavigationAlertWrapper alloc] initWithAlert:alert userInfo:@{ @"navigationAlertId": navigationAlertId }];
     if (navigationAlertWrappers == nil) {
         navigationAlertWrappers = [NSMutableArray array];
     }

@@ -44,7 +44,7 @@ export interface NavigationAlert {
    */
   duration: number;
   /**
-   * identifier passed to the onAlertActionPressed handler so you know which button was pressed
+   * identifier passed to all navigation alert handlers
    */
-  actionId: string;
+  navigationAlertId: string;
 }

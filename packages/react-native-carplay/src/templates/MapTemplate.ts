@@ -21,7 +21,16 @@ export interface MapButtonEvent extends BaseEvent {
 export interface AlertActionEvent extends BaseEvent {
   secondary?: boolean;
   primary?: boolean;
-  actionId: string;
+  navigationAlertId: string;
+}
+
+export interface NavigationAlertShowEvent extends BaseEvent {
+  navigationAlertId: string;
+}
+
+export interface NavigationAlertHideEvent extends BaseEvent {
+  navigationAlertId: string;
+  reason: 'none' | 'timeout' | 'system' | 'user';
 }
 
 export interface PanEvent {
@@ -103,6 +112,28 @@ export interface MapTemplateConfig extends TemplateConfig {
    * @param e Event
    */
   onAlertActionPressed?(e: AlertActionEvent): void;
+
+  /**
+   * Fired when a navigation alert will disappear
+   * @param e Event providing the templateId, navigationAlertId and a reason why the alert is disappearing
+   */
+  onWillDismissNavigationAlert?(e: NavigationAlertHideEvent): void;
+  /**
+   * Fired when a navigation alert did disappear
+   * @param e Event providing the templateId, navigationAlertId and a reason why the alert did disappear
+   */
+  onDidDismissNavigationAlert?(e: NavigationAlertHideEvent): void;
+  /**
+   * Fired when a navigation alert will be shown
+   * @param e Event providing the templateId and the navigationAlertId
+   */
+  onWillShowNavigationAlert?(e: NavigationAlertShowEvent): void;
+    /**
+   * Fired when a navigation alert is shown
+   * @param e Event providing the templateId and the navigationAlertId
+   */
+  onDidShowNavigationAlert?(e: NavigationAlertShowEvent): void;
+
   onMapButtonPressed?(e: MapButtonEvent): void;
   onPanWithDirection?(e: PanEvent): void;
   onPanBeganWithDirection?(e: PanEvent): void;
@@ -137,6 +168,10 @@ export class MapTemplate extends Template<MapTemplateConfig> {
   get eventMap() {
     return {
       alertActionPressed: 'onAlertActionPressed',
+      willDismissNavigationAlert: 'onWillDismissNavigationAlert',
+      didDismissNavigationAlert: 'onDidDismissNavigationAlert',
+      willShowNavigationAlert: 'onWillShowNavigationAlert',
+      didShowNavigationAlert: 'onDidShowNavigationAlert',
       mapButtonPressed: 'onMapButtonPressed',
       panWithDirection: 'onPanWithDirection',
       panBeganWithDirection: 'onPanBeganWithDirection',
