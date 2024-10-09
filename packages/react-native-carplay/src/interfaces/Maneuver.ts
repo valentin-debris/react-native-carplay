@@ -18,6 +18,7 @@ export interface Maneuver {
    * via a color, ie. 'red'. This functionality would usually
    * be available via the `<Image>` tag but carplay requires
    * an image asset to this tinting is done on the native side.
+   * The tinted image is supplied as darkImage so CarPlay decides on when to show the tinted version!
    * If a string is supplied, it will be passed to `processColor`.
    * You may also use `processColor` yourself.
    */

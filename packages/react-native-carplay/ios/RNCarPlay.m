@@ -1303,8 +1303,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
             double height = [RCTConvert double:size[@"height"]];
             symbolImage = [self imageWithSize:symbolImage convertToSize:CGSizeMake(width, height)];
         }
-
-        BOOL shouldTint = [RCTConvert BOOL:json[@"tintSymbolImage"]];
+        
         if ([json objectForKey:@"tintSymbolImage"]) {
             UIColor *tintColor = [RCTConvert UIColor:json[@"tintSymbolImage"]];
             UIImage *darkImage = symbolImage;
