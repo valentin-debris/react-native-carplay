@@ -13,7 +13,7 @@ export class NavigationSession {
 
   public updateManeuvers(maneuvers: Maneuver[]) {
     this.maneuvers = maneuvers;
-    const windowScale = CarPlay.window?.scale ?? 1;
+    const windowScale = CarPlay.window?.scale || 1.0;
     CarPlay.bridge.updateManeuversNavigationSession(
       this.id,
       maneuvers.map(maneuver => {
@@ -21,8 +21,9 @@ export class NavigationSession {
           const image = Image.resolveAssetSource(maneuver.symbolImage);
           maneuver.symbolImage = image;
           maneuver.symbolImageSize = maneuver.symbolImageSize ?? { width: 50, height: 50 };
-          const width = Math.floor((maneuver.symbolImageSize.width * windowScale) / image.scale);
-          const height = Math.floor((maneuver.symbolImageSize.height * windowScale) / image.scale);
+          const scale = image.scale || 1.0;
+          const width = Math.floor((maneuver.symbolImageSize.width * windowScale) / scale);
+          const height = Math.floor((maneuver.symbolImageSize.height * windowScale) / scale);
           maneuver.symbolImageSize = { width, height };
         }
         if (maneuver.junctionImage) {
