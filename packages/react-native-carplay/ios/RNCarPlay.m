@@ -1311,7 +1311,6 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
             symbolImage = [self dynamicImageWithNormalImage:lightImage darkImage:darkImage];
         }
 
-
         [maneuver setSymbolImage:symbolImage];
     }
 
@@ -1545,7 +1544,13 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     [self sendTemplateEventWithName:mapTemplate name:@"didUpdatePanGestureWithTranslation" json:@{ @"translation": @{ @"x": @(translation.x), @"y": @(translation.y) }, @"velocity": @{ @"x": @(velocity.x), @"y": @(velocity.y) }}];
 }
 
-
+- (CPManeuverDisplayStyle)mapTemplate:(CPMapTemplate *)mapTemplate displayStyleForManeuver:(CPManeuver *)maneuver {
+    if(maneuver.instructionVariants.count == 0) {
+        return CPManeuverDisplayStyleSymbolOnly;
+    } else {
+        return CPManeuverDisplayStyleDefault;
+    }
+}
 
 # pragma SearchTemplate
 
