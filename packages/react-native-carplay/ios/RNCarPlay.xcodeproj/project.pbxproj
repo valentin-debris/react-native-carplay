@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		737B95BF2CB96FA200ED2122 /* RNCarPlayDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737B95BE2CB96FA200ED2122 /* RNCarPlayDashboard.swift */; };
 		E344BCC72249585C006FD80D /* RNCarPlay.m in Sources */ = {isa = PBXBuildFile; fileRef = E344BBF222494D53006FD80D /* RNCarPlay.m */; };
 		E344BCC82249585C006FD80D /* RNCPStore.m in Sources */ = {isa = PBXBuildFile; fileRef = E344BBF422494D9D006FD80D /* RNCPStore.m */; };
 		E35223EB224BD4E500623F30 /* RCTConvert+RNCarPlay.m in Sources */ = {isa = PBXBuildFile; fileRef = E35223EA224BD4E500623F30 /* RCTConvert+RNCarPlay.m */; };
@@ -25,6 +26,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		737B95BE2CB96FA200ED2122 /* RNCarPlayDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayDashboard.swift; sourceTree = "<group>"; };
+		737B95C02CB96FA700ED2122 /* RNCarPlay-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCarPlay-Bridging-Header.h"; sourceTree = "<group>"; };
 		E344BBEA22494CBD006FD80D /* RNCarPlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCarPlay.h; sourceTree = "<group>"; };
 		E344BBF222494D53006FD80D /* RNCarPlay.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCarPlay.m; sourceTree = "<group>"; };
 		E344BBF422494D9D006FD80D /* RNCPStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCPStore.m; sourceTree = "<group>"; };
@@ -48,6 +51,7 @@
 		E344BBDD22494CBD006FD80D = {
 			isa = PBXGroup;
 			children = (
+				737B95BE2CB96FA200ED2122 /* RNCarPlayDashboard.swift */,
 				E35223EA224BD4E500623F30 /* RCTConvert+RNCarPlay.m */,
 				E35223E9224BD4C400623F30 /* RCTConvert+RNCarPlay.h */,
 				E344BBEA22494CBD006FD80D /* RNCarPlay.h */,
@@ -55,6 +59,7 @@
 				E344BBF622494DAC006FD80D /* RNCPStore.h */,
 				E344BBF422494D9D006FD80D /* RNCPStore.m */,
 				E344BBE822494CBD006FD80D /* Products */,
+				737B95C02CB96FA700ED2122 /* RNCarPlay-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,6 +102,7 @@
 				TargetAttributes = {
 					E344BCBD22495851006FD80D = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1600;
 					};
 				};
 			};
@@ -125,6 +131,7 @@
 				E35223EB224BD4E500623F30 /* RCTConvert+RNCarPlay.m in Sources */,
 				E344BCC72249585C006FD80D /* RNCarPlay.m in Sources */,
 				E344BCC82249585C006FD80D /* RNCPStore.m in Sources */,
+				737B95BF2CB96FA200ED2122 /* RNCarPlayDashboard.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,11 +259,16 @@
 		E344BCC522495851006FD80D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PD7JU2FJC;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNCarPlay-Bridging-Header.h";
+				"SWIFT_OBJC_INTERFACE_HEADER_NAME[arch=*]" = "$(SWIFT_MODULE_NAME)-Swift.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -264,11 +276,14 @@
 		E344BCC622495851006FD80D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5PD7JU2FJC;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNCarPlay-Bridging-Header.h";
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

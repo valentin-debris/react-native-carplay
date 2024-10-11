@@ -1,4 +1,5 @@
 import {
+  AppRegistry,
   ImageSourcePropType,
   NativeEventEmitter,
   NativeModule,
@@ -102,6 +103,7 @@ export interface InternalCarPlay extends NativeModule {
     icon?: ImageSourcePropType;
     actions?: Action[];
   }): void;
+  createDashboard(id: string, config: unknown): void;
 }
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
@@ -300,6 +302,13 @@ export class CarPlayInterface {
    */
   public enableNowPlaying(enable = true) {
     return this.bridge.enableNowPlaying(enable);
+  }
+
+  public createDashboard(config: {id: string, component: React.ComponentType<any>}) {
+    const {id, component, ...rest} = config;
+
+    AppRegistry.registerComponent(id, () => component);
+    this.bridge.createDashboard(id, rest);
   }
 }
 

@@ -2,6 +2,9 @@
 #import "RNCarPlayViewController.h"
 #import <React/RCTConvert.h>
 #import <React/RCTRootView.h>
+#import "react_native_carplay/react_native_carplay-Swift.h"
+
+static RNCarPlayDashboard *rnCarPlayDashboard = nil;
 
 @implementation RNCarPlay
 {
@@ -1619,6 +1622,24 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 - (void)nowPlayingTemplateAlbumArtistButtonTapped:(CPNowPlayingTemplate *)nowPlayingTemplate {
     [self sendTemplateEventWithName:nowPlayingTemplate name:@"albumArtistButtonPressed"];
 }
+
+
+# pragma Dashboard
+
++ (void) connectWithDashbaordController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
+    rnCarPlayDashboard = [[RNCarPlayDashboard alloc] initWithDashboardInterfaceController:dashboardController dashboardWindow:window];
+    [rnCarPlayDashboard connect];
+}
+
++ (void) disconnectFromDashbaordController {
+    [rnCarPlayDashboard disonnect];
+}
+
+RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
+    RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:@{}];
+    [rnCarPlayDashboard attachWithRootView:rootView];
+}
+
 
 @end
 

@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   s.source       = { :git => "https://github.com/g4rb4g3/react-native-carplay.git" }
 
-  s.source_files  = "ios/*.{h,m}"
+  s.source_files  = "ios/*.{h,m,swift}"
 
   s.dependency 'React'
 end

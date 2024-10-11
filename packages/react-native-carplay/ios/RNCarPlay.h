@@ -36,5 +36,7 @@ typedef void(^SelectedResultBlock)(void);
 + (void) connectWithInterfaceController:(CPInterfaceController*)interfaceController window:(CPWindow*)window;
 + (void) disconnect;
 - (NSArray<CPListSection*>*) parseSections:(NSArray*)sections templateId:(NSString *)templateId;
++ (void) connectWithDashbaordController:(CPDashboardController*)dashboardController window:(UIWindow*)window;
++ (void) disconnectFromDashbaordController;
 
 @end
