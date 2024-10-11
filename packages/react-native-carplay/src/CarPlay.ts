@@ -1,5 +1,6 @@
 import {
   AppRegistry,
+  EmitterSubscription,
   ImageSourcePropType,
   NativeEventEmitter,
   NativeModule,
@@ -279,8 +280,8 @@ export class CarPlayInterface {
    */
   public get rootTemplate(): Promise<string> {
     return new Promise(resolve => {
-      this.bridge.getRootTemplate((templateId) => {
-          resolve(templateId);
+      this.bridge.getRootTemplate(templateId => {
+        resolve(templateId);
       });
     });
   }
@@ -290,8 +291,8 @@ export class CarPlayInterface {
    */
   public get topTemplate(): Promise<string> {
     return new Promise(resolve => {
-      this.bridge.getTopTemplate((templateId) => {
-          resolve(templateId);
+      this.bridge.getTopTemplate(templateId => {
+        resolve(templateId);
       });
     });
   }
@@ -304,8 +305,55 @@ export class CarPlayInterface {
     return this.bridge.enableNowPlaying(enable);
   }
 
-  public createDashboard(config: {id: string, component: React.ComponentType<any>}) {
-    const {id, component, ...rest} = config;
+  public createDashboard(config: {
+    id: string;
+    component: React.ComponentType<any>;
+    onConnect?: () => void;
+    onDisconnect?: () => void;
+    onSafeAreaInsetsChanged?: (e: {
+      bottom: number;
+      left: number;
+      right: number;
+      top: number;
+    }) => void;
+    onUserInterfaceStyleChanged?: (e: { mode: 'dark' | 'light' }) => void;
+  }) {
+    const {
+      id,
+      component,
+      onConnect,
+      onDisconnect,
+      onSafeAreaInsetsChanged,
+      onUserInterfaceStyleChanged,
+      ...rest
+    } = config;
+
+    const subscriptions: Array<EmitterSubscription> = [];
+
+    if (onConnect != null) {
+      const subscription = this.emitter.addListener('dashboardDidConnect', () => onConnect);
+      subscriptions.push(subscription);
+    }
+
+    if (onSafeAreaInsetsChanged != null) {
+      const subscription = this.emitter.addListener('dashboardSafeAreaInsetsChanged', e =>
+        onSafeAreaInsetsChanged(e),
+      );
+      subscriptions.push(subscription);
+    }
+
+    if (onUserInterfaceStyleChanged != null) {
+      const subscription = this.emitter.addListener('dashboardUserInterfaceStyleChanged', e =>
+        onUserInterfaceStyleChanged(e),
+      );
+    }
+
+    this.emitter.addListener('dashboardDidDisconnect', () => {
+      for (const subscription of subscriptions) {
+        subscription.remove();
+      }
+      onDisconnect?.();
+    });
 
     AppRegistry.registerComponent(id, () => component);
     this.bridge.createDashboard(id, rest);

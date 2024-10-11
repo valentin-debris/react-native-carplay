@@ -121,7 +121,12 @@ RCT_EXPORT_MODULE();
         @"startedTrip",
         //window related
         @"safeAreaInsetsChanged",
-        @"userInterfaceStyleChanged"
+        @"userInterfaceStyleChanged",
+        //dashboard
+        @"dashboardDidConnect",
+        @"dashboardDidDisconnect",
+        @"dashboardSafeAreaInsetsChanged",
+        @"dashboardUserInterfaceStyleChanged"
     ];
 }
 
@@ -1628,7 +1633,6 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 + (void) connectWithDashbaordController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
     rnCarPlayDashboard = [[RNCarPlayDashboard alloc] initWithDashboardInterfaceController:dashboardController dashboardWindow:window];
-    [rnCarPlayDashboard connect];
 }
 
 + (void) disconnectFromDashbaordController {
@@ -1637,9 +1641,8 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
     RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:@{}];
-    [rnCarPlayDashboard attachWithRootView:rootView];
+    [rnCarPlayDashboard connectWithRootView:rootView rnCarPlay:self];
 }
-
 
 @end
 
