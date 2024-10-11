@@ -45,20 +45,4 @@ public class RNCarPlayDashboard: UIViewController {
         self.rnCarPlay?.sendEvent(
             withName: "dashboardSafeAreaInsetsChanged", body: safeAreaInsets)
     }
-
-    override public func traitCollectionDidChange(
-        _ previousTraitCollection: UITraitCollection?
-    ) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        if self.traitCollection.userInterfaceStyle
-            != previousTraitCollection?.userInterfaceStyle
-        {
-            let mode =
-                self.traitCollection.userInterfaceStyle == .dark
-                ? "dark" : "light"
-            self.rnCarPlay?.sendEvent(
-                withName: "dashboardUserInterfaceStyleChanged",
-                body: ["mode": mode])
-        }
-    }
 }

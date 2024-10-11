@@ -316,17 +316,8 @@ export class CarPlayInterface {
       right: number;
       top: number;
     }) => void;
-    onUserInterfaceStyleChanged?: (e: { mode: 'dark' | 'light' }) => void;
   }) {
-    const {
-      id,
-      component,
-      onConnect,
-      onDisconnect,
-      onSafeAreaInsetsChanged,
-      onUserInterfaceStyleChanged,
-      ...rest
-    } = config;
+    const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, ...rest } = config;
 
     const subscriptions: Array<EmitterSubscription> = [];
 
@@ -340,12 +331,6 @@ export class CarPlayInterface {
         onSafeAreaInsetsChanged(e),
       );
       subscriptions.push(subscription);
-    }
-
-    if (onUserInterfaceStyleChanged != null) {
-      const subscription = this.emitter.addListener('dashboardUserInterfaceStyleChanged', e =>
-        onUserInterfaceStyleChanged(e),
-      );
     }
 
     this.emitter.addListener('dashboardDidDisconnect', () => {

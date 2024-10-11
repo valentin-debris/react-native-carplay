@@ -121,12 +121,10 @@ RCT_EXPORT_MODULE();
         @"startedTrip",
         //window related
         @"safeAreaInsetsChanged",
-        @"userInterfaceStyleChanged",
         //dashboard
         @"dashboardDidConnect",
         @"dashboardDidDisconnect",
-        @"dashboardSafeAreaInsetsChanged",
-        @"dashboardUserInterfaceStyleChanged"
+        @"dashboardSafeAreaInsetsChanged"
     ];
 }
 

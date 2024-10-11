@@ -49,10 +49,6 @@ export interface SafeAreaInsetsEvent extends BaseEvent {
   top: number;
 }
 
-export interface UserInterfaceStyleEvent extends BaseEvent {
-  mode: 'dark' | 'light',
-}
-
 export interface MapTemplateConfig extends TemplateConfig {
   /**
    * The background color the map template uses when displaying guidance.
@@ -164,12 +160,6 @@ export interface MapTemplateConfig extends TemplateConfig {
    * @param e safe area insets
    */
   onSafeAreaInsetsChanged?(e: SafeAreaInsetsEvent): void;
-
-  /**
-   * called when user interface style changes (not map style)
-   * @param e dark or light ui mode
-   */
-  onUserInterfaceStyleChanged?(e: UserInterfaceStyleEvent): void;
 }
 
 /**
@@ -205,7 +195,6 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       startedTrip: 'onStartedTrip',
       backButtonPressed: 'onBackButtonPressed',
       safeAreaInsetsChanged: 'onSafeAreaInsetsChanged',
-      userInterfaceStyleChanged: 'onUserInterfaceStyleChanged',
     };
   }
 

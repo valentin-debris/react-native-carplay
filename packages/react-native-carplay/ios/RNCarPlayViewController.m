@@ -42,7 +42,6 @@
             [self.rootView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
         ]];
     }
-    [self sendUserInterfaceStyle];
 }
 
 - (void)viewWillLayoutSubviews {
@@ -61,19 +60,6 @@
         @"top": @(currentSafeAreaInsets.top),
         @"templateId": self.rootView.moduleName
     }];
-}
-
-- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
-    [super traitCollectionDidChange:previousTraitCollection];
-
-    if (self.traitCollection.userInterfaceStyle != previousTraitCollection.userInterfaceStyle) {
-        [self sendUserInterfaceStyle];
-    }
-}
-
-- (void)sendUserInterfaceStyle {
-    NSString *mode = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ? @"dark" : @"light";
-    [self.rnCarPlay sendEventWithName:@"userInterfaceStyleChanged" body:@{@"mode": mode, @"templateId": self.rootView.moduleName}];
 }
 
 @end
