@@ -1637,9 +1637,14 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     [rnCarPlayDashboard disonnect];
 }
 
-RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
+RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config callback:(RCTResponseSenderBlock)callback) {
+    if (rnCarPlayDashboard == nil) {
+        callback(@[@"dashboardSceneNotConnected"]);
+        return;
+    }
     RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:@{}];
     [rnCarPlayDashboard connectWithRootView:rootView rnCarPlay:self];
+    callback(@[@"dashboardSceneConnected"]);
 }
 
 RCT_EXPORT_METHOD(checkForDashboardConnection) {
