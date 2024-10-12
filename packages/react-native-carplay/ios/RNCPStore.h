@@ -11,7 +11,7 @@
 @property (nonatomic, retain) CPWindow *window;
 @property (nonatomic, retain) NSString *rootTemplateId;
 
-+ (id)sharedManager;
++ (instancetype)sharedManager;
 - (CPTemplate*) findTemplateById: (NSString*)templateId;
 - (NSString*) setTemplate:(NSString*)templateId template:(CPTemplate*)carPlayTemplate;
 - (CPTrip*) findTripById: (NSString*)tripId;
@@ -21,5 +21,7 @@
 - (Boolean) isConnected;
 - (void) setConnected:(Boolean) isConnected;
 - (NSArray*) getTemplateIds;
+- (Boolean) isDashboardConnected;
+- (void) setIsDashboardConnected:(Boolean)isDashboardConnected;
 
 @end

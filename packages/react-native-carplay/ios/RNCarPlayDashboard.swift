@@ -25,6 +25,7 @@ public class RNCarPlayDashboard: UIViewController {
         self.dashboardWindow.rootViewController?.view = rootView
         self.rnCarPlay = rnCarPlay
         self.rnCarPlay?.sendEvent(withName: "dashboardDidConnect", body: getConnectedWindowInformation())
+        RNCPStore.sharedManager().setIsDashboardConnected(true)
     }
 
     @objc public func disonnect() {
@@ -32,6 +33,7 @@ public class RNCarPlayDashboard: UIViewController {
         self.dashboardInterfaceController = nil
         self.rnCarPlay?.sendEvent(withName: "dashboardDidDisconnect", body: nil)
         self.rnCarPlay = nil
+        RNCPStore.sharedManager().setIsDashboardConnected(false)
     }
 
     override public func viewDidLayoutSubviews() {

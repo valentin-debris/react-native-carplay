@@ -1644,7 +1644,7 @@ RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)
 
 RCT_EXPORT_METHOD(checkForDashboardConnection) {
     RNCPStore *store = [RNCPStore sharedManager];
-    if ([store isConnected] && hasListeners) {
+    if ([store isDashboardConnected] && hasListeners) {
         [self sendEventWithName:@"dashboardDidConnect" body:[rnCarPlayDashboard getConnectedWindowInformation]];
     }
 }

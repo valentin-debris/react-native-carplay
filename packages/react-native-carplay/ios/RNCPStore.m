@@ -5,6 +5,7 @@
     NSMutableDictionary* _navigationSessionsStore;
     NSMutableDictionary* _tripsStore;
     Boolean _connected;
+    Boolean _isDashboardConnected;
 }
 
 @synthesize window;
@@ -16,6 +17,7 @@
         _navigationSessionsStore = [[NSMutableDictionary alloc] init];
         _tripsStore = [[NSMutableDictionary alloc] init];
         _connected = false;
+        _isDashboardConnected = false;
     }
 
     return self;
@@ -67,6 +69,14 @@
 
 - (NSArray*) getTemplateIds {
     return [_templatesStore allKeys];
+}
+
+- (Boolean) isDashboardConnected {
+    return _isDashboardConnected;
+}
+
+- (void) setIsDashboardConnected:(Boolean)isDashboardConnected {
+    _isDashboardConnected = isDashboardConnected;
 }
 
 @end
