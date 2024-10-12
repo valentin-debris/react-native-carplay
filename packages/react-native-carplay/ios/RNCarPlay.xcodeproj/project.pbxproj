@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		734F14CB2CBB297F006B6CC6 /* RNCarPlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 734F14CA2CBB297F006B6CC6 /* RNCarPlayViewController.m */; };
+		734F14CF2CBB2A79006B6CC6 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 734F14CE2CBB2A78006B6CC6 /* Utils.m */; };
 		737B95BF2CB96FA200ED2122 /* RNCarPlayDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 737B95BE2CB96FA200ED2122 /* RNCarPlayDashboard.swift */; };
 		E344BCC72249585C006FD80D /* RNCarPlay.m in Sources */ = {isa = PBXBuildFile; fileRef = E344BBF222494D53006FD80D /* RNCarPlay.m */; };
 		E344BCC82249585C006FD80D /* RNCPStore.m in Sources */ = {isa = PBXBuildFile; fileRef = E344BBF422494D9D006FD80D /* RNCPStore.m */; };
@@ -26,6 +28,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		734F14C92CBB297F006B6CC6 /* RNCarPlayViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCarPlayViewController.h; sourceTree = "<group>"; };
+		734F14CA2CBB297F006B6CC6 /* RNCarPlayViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNCarPlayViewController.m; sourceTree = "<group>"; };
+		734F14CC2CBB29C0006B6CC6 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		734F14CE2CBB2A78006B6CC6 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		737B95BE2CB96FA200ED2122 /* RNCarPlayDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayDashboard.swift; sourceTree = "<group>"; };
 		737B95C02CB96FA700ED2122 /* RNCarPlay-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNCarPlay-Bridging-Header.h"; sourceTree = "<group>"; };
 		E344BBEA22494CBD006FD80D /* RNCarPlay.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNCarPlay.h; sourceTree = "<group>"; };
@@ -52,6 +58,10 @@
 			isa = PBXGroup;
 			children = (
 				737B95BE2CB96FA200ED2122 /* RNCarPlayDashboard.swift */,
+				734F14C92CBB297F006B6CC6 /* RNCarPlayViewController.h */,
+				734F14CA2CBB297F006B6CC6 /* RNCarPlayViewController.m */,
+				734F14CC2CBB29C0006B6CC6 /* Utils.h */,
+				734F14CE2CBB2A78006B6CC6 /* Utils.m */,
 				E35223EA224BD4E500623F30 /* RCTConvert+RNCarPlay.m */,
 				E35223E9224BD4C400623F30 /* RCTConvert+RNCarPlay.h */,
 				E344BBEA22494CBD006FD80D /* RNCarPlay.h */,
@@ -129,9 +139,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				E35223EB224BD4E500623F30 /* RCTConvert+RNCarPlay.m in Sources */,
+				734F14CB2CBB297F006B6CC6 /* RNCarPlayViewController.m in Sources */,
 				E344BCC72249585C006FD80D /* RNCarPlay.m in Sources */,
 				E344BCC82249585C006FD80D /* RNCPStore.m in Sources */,
 				737B95BF2CB96FA200ED2122 /* RNCarPlayDashboard.swift in Sources */,
+				734F14CF2CBB2A79006B6CC6 /* Utils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

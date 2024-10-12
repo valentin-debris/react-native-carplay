@@ -5,7 +5,6 @@ import React
 public class RNCarPlayDashboard: UIViewController {
     var dashboardInterfaceController: CPDashboardController?
     var dashboardWindow: UIWindow
-    var rnCarPlay: RNCarPlay?
 
     @objc public init(
         dashboardInterfaceController: CPDashboardController,
@@ -20,19 +19,18 @@ public class RNCarPlayDashboard: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
-    @objc public func connect(rootView: RCTRootView, rnCarPlay: RNCarPlay) {
+    @objc public func connect(rootView: RCTRootView) {
         self.dashboardWindow.rootViewController = self
         self.dashboardWindow.rootViewController?.view = rootView
-        self.rnCarPlay = rnCarPlay
-        self.rnCarPlay?.sendEvent(withName: "dashboardDidConnect", body: getConnectedWindowInformation())
+        sendRNCarPlayEvent(
+            "dashboardDidConnect", getConnectedWindowInformation())
         RNCPStore.sharedManager().setIsDashboardConnected(true)
     }
 
     @objc public func disonnect() {
         self.dashboardWindow.rootViewController = nil
         self.dashboardInterfaceController = nil
-        self.rnCarPlay?.sendEvent(withName: "dashboardDidDisconnect", body: nil)
-        self.rnCarPlay = nil
+        sendRNCarPlayEvent("dashboardDidDisconnect", nil)
         RNCPStore.sharedManager().setIsDashboardConnected(false)
     }
 
@@ -44,8 +42,7 @@ public class RNCarPlayDashboard: UIViewController {
             "right": self.view.safeAreaInsets.right,
             "top": self.view.safeAreaInsets.top,
         ]
-        self.rnCarPlay?.sendEvent(
-            withName: "dashboardSafeAreaInsetsChanged", body: safeAreaInsets)
+        sendRNCarPlayEvent("dashboardSafeAreaInsetsChanged", safeAreaInsets)
     }
 
     @objc public func getConnectedWindowInformation() -> [String: Any] {

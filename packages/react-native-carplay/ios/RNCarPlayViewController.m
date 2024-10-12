@@ -5,24 +5,22 @@
 //  Created by Susan Thapa on 27/02/2024.
 //
 
-#import <Foundation/Foundation.h>
 #import "RNCarPlayViewController.h"
+#import <Foundation/Foundation.h>
 #import <React/RCTRootView.h>
 
 @interface RNCarPlayViewController ()
 
-@property (nonatomic, strong) RCTRootView *rootView;
-@property (nonatomic, weak) RNCarPlay *rnCarPlay;
+@property(nonatomic, strong) RCTRootView *rootView;
 
 @end
 
 @implementation RNCarPlayViewController
 
-- (instancetype)initWithRootView:(RCTRootView *)rootView rnCarPlay:(RNCarPlay *)rnCarPlay {
+- (instancetype)initWithRootView:(RCTRootView *)rootView {
     self = [super init];
     if (self) {
         _rootView = rootView;
-        _rnCarPlay = rnCarPlay;
     }
     return self;
 }
@@ -34,12 +32,16 @@
         self.rootView.translatesAutoresizingMaskIntoConstraints = false;
         self.rootView.frame = self.view.bounds;
         [self.view addSubview:self.rootView];
-        
+
         [NSLayoutConstraint activateConstraints:@[
-            [self.rootView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-            [self.rootView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-            [self.rootView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-            [self.rootView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+            [self.rootView.leadingAnchor
+                constraintEqualToAnchor:self.view.leadingAnchor],
+            [self.rootView.trailingAnchor
+                constraintEqualToAnchor:self.view.trailingAnchor],
+            [self.rootView.topAnchor
+                constraintEqualToAnchor:self.view.topAnchor],
+            [self.rootView.bottomAnchor
+                constraintEqualToAnchor:self.view.bottomAnchor],
         ]];
     }
 }
@@ -53,13 +55,13 @@
     [super viewDidLayoutSubviews];
 
     UIEdgeInsets currentSafeAreaInsets = self.view.safeAreaInsets;
-    [self.rnCarPlay sendEventWithName:@"safeAreaInsetsChanged" body:@{
-        @"bottom": @(currentSafeAreaInsets.bottom),
-        @"left": @(currentSafeAreaInsets.left),
-        @"right": @(currentSafeAreaInsets.right),
-        @"top": @(currentSafeAreaInsets.top),
-        @"templateId": self.rootView.moduleName
-    }];
+    sendRNCarPlayEvent(@"safeAreaInsetsChanged", @{
+        @"bottom" : @(currentSafeAreaInsets.bottom),
+        @"left" : @(currentSafeAreaInsets.left),
+        @"right" : @(currentSafeAreaInsets.right),
+        @"top" : @(currentSafeAreaInsets.top),
+        @"templateId" : self.rootView.moduleName
+    });
 }
 
 @end

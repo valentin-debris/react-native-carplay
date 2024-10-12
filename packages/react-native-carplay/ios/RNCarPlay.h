@@ -4,6 +4,7 @@
 #import <React/RCTEventEmitter.h>
 #import "RCTConvert+RNCarPlay.h"
 #import "RNCPStore.h"
+#import "Utils.h"
 
 typedef void(^SearchResultUpdateBlock)(NSArray<CPListItem *> * _Nonnull);
 typedef void(^SelectedResultBlock)(void);

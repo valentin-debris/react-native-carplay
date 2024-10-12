@@ -104,7 +104,7 @@ export interface InternalCarPlay extends NativeModule {
     icon?: ImageSourcePropType;
     actions?: Action[];
   }): void;
-  createDashboard(id: string, config: unknown, callback: (response: 'dashboardSceneConnected' | 'dashboardSceneNotConnected') => void): void;
+  createDashboard(id: string, config: unknown): void;
   checkForDashboardConnection(): void;
 }
 
@@ -317,7 +317,7 @@ export class CarPlayInterface {
       right: number;
       top: number;
     }) => void;
-  }, callback: (status: 'dashboardSceneConnected' | 'dashboardSceneNotConnected') => void) {
+  }) {
     const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, ...rest } = config;
 
     const subscriptions: Array<EmitterSubscription> = [];
@@ -342,7 +342,7 @@ export class CarPlayInterface {
     });
 
     AppRegistry.registerComponent(id, () => component);
-    this.bridge.createDashboard(id, rest, (response) => callback(response));
+    this.bridge.createDashboard(id, rest);
   }
 
   public checkForDashboardConnection(): void {

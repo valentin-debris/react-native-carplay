@@ -5,7 +5,8 @@
 #import <UIKit/UIKit.h>
 #import <React/RCTRootView.h>
 #import "RNCarPlay.h"
+#import "Utils.h"
 
 @interface RNCarPlayViewController : UIViewController
-- (instancetype)initWithRootView:(RCTRootView *)rootView rnCarPlay:(RNCarPlay *)rnCarPlay;
+- (instancetype)initWithRootView:(RCTRootView *)rootView;
 @end

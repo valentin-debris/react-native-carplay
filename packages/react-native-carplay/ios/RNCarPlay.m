@@ -18,12 +18,28 @@ static RNCarPlayDashboard *rnCarPlayDashboard = nil;
 @synthesize isNowPlayingActive;
 @synthesize navigationAlertWrappers;
 
--(void)startObserving {
+- (void)startObserving {
     hasListeners = YES;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(handleNotification:)
+                                                   name:RNCarPlaySendEventNotification
+                                                 object:nil];
 }
 
--(void)stopObserving {
+- (void)stopObserving {
     hasListeners = NO;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)handleNotification:(NSNotification *)notification {
+  NSString *name = notification.userInfo[@"name"];
+  id body = notification.userInfo[@"body"];
+
+  if (notification.name && body) {
+    [self sendEventWithName:name body:body];
+  } else if (name) {
+    [self sendEventWithName:name body:@{}];
+  }
 }
 
 + (NSDictionary *) getConnectedWindowInformation: (CPWindow *) window {
@@ -1020,7 +1036,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
     if ([config objectForKey:@"render"]) {
         RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:templateId initialProperties:@{}];
-        RNCarPlayViewController *viewController = [[RNCarPlayViewController alloc] initWithRootView:rootView rnCarPlay:self];
+        RNCarPlayViewController *viewController = [[RNCarPlayViewController alloc] initWithRootView:rootView];
         store.window.rootViewController = viewController;
     }
 }
