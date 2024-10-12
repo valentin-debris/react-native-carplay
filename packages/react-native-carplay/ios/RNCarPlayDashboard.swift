@@ -24,7 +24,7 @@ public class RNCarPlayDashboard: UIViewController {
         self.dashboardWindow.rootViewController = self
         self.dashboardWindow.rootViewController?.view = rootView
         self.rnCarPlay = rnCarPlay
-        self.rnCarPlay?.sendEvent(withName: "dashboardDidConnect", body: nil)
+        self.rnCarPlay?.sendEvent(withName: "dashboardDidConnect", body: getConnectedWindowInformation())
     }
 
     @objc public func disonnect() {
@@ -44,5 +44,13 @@ public class RNCarPlayDashboard: UIViewController {
         ]
         self.rnCarPlay?.sendEvent(
             withName: "dashboardSafeAreaInsetsChanged", body: safeAreaInsets)
+    }
+
+    @objc public func getConnectedWindowInformation() -> [String: Any] {
+        return [
+            "height": self.dashboardWindow.bounds.size.height,
+            "width": self.dashboardWindow.bounds.size.width,
+            "scale": self.dashboardWindow.screen.scale,
+        ]
     }
 }

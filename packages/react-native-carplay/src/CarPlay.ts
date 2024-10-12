@@ -105,6 +105,7 @@ export interface InternalCarPlay extends NativeModule {
     actions?: Action[];
   }): void;
   createDashboard(id: string, config: unknown): void;
+  checkForDashboardConnection(): void;
 }
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
@@ -308,7 +309,7 @@ export class CarPlayInterface {
   public createDashboard(config: {
     id: string;
     component: React.ComponentType<any>;
-    onConnect?: () => void;
+    onConnect?: (window: WindowInformation) => void;
     onDisconnect?: () => void;
     onSafeAreaInsetsChanged?: (e: {
       bottom: number;
@@ -322,7 +323,7 @@ export class CarPlayInterface {
     const subscriptions: Array<EmitterSubscription> = [];
 
     if (onConnect != null) {
-      const subscription = this.emitter.addListener('dashboardDidConnect', () => onConnect);
+      const subscription = this.emitter.addListener('dashboardDidConnect', (e) => onConnect(e));
       subscriptions.push(subscription);
     }
 
@@ -342,6 +343,10 @@ export class CarPlayInterface {
 
     AppRegistry.registerComponent(id, () => component);
     this.bridge.createDashboard(id, rest);
+  }
+
+  public checkForDashboardConnection(): void {
+    this.bridge.checkForDashboardConnection();
   }
 }
 

@@ -1642,6 +1642,13 @@ RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)
     [rnCarPlayDashboard connectWithRootView:rootView rnCarPlay:self];
 }
 
+RCT_EXPORT_METHOD(checkForDashboardConnection) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    if ([store isConnected] && hasListeners) {
+        [self sendEventWithName:@"dashboardDidConnect" body:[rnCarPlayDashboard getConnectedWindowInformation]];
+    }
+}
+
 @end
 
 @implementation RNCarPlayNavigationAlertWrapper
