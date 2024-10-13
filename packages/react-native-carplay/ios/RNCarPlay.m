@@ -1649,11 +1649,9 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 static RCTRootView *dashboardRootView = nil;
 
 + (void) connectWithDashbaordController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
-    NSLog(@"### connectWithDashboardController");
     rnCarPlayDashboard = [[RNCarPlayDashboard alloc] initWithDashboardInterfaceController:dashboardController dashboardWindow:window];
     RNCPStore *store = [RNCPStore sharedManager];
     if (![store isDashboardConnected] && dashboardRootView != nil) {
-        NSLog(@"### connectWithRootView");
         [rnCarPlayDashboard connectWithRootView:dashboardRootView];
     }
 }
@@ -1663,7 +1661,6 @@ static RCTRootView *dashboardRootView = nil;
 }
 
 RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
-    NSLog(@"### createDashboard");
     dashboardRootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:config];
     if (rnCarPlayDashboard == nil) {
         return;

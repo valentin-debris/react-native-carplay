@@ -22,8 +22,21 @@ public class RNCarPlayDashboard: UIViewController {
     }
 
     @objc public func connect(rootView: RCTRootView) {
+        rootView.translatesAutoresizingMaskIntoConstraints = false
 
+        guard let view = self.dashboardWindow.rootViewController?.view else {
+            return
+        }
+        
         self.dashboardWindow.rootViewController?.view.addSubview(rootView)
+
+        NSLayoutConstraint.activate([
+            rootView.topAnchor.constraint(equalTo: view.topAnchor),
+            rootView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            rootView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            rootView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+        
         sendRNCarPlayEvent(
             "dashboardDidConnect", getConnectedWindowInformation())
         RNCPStore.sharedManager().setIsDashboardConnected(true)
