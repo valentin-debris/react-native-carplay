@@ -35,7 +35,7 @@ static RNCarPlayDashboard *rnCarPlayDashboard = nil;
   NSString *name = notification.userInfo[@"name"];
   id body = notification.userInfo[@"body"];
 
-  if (notification.name && body) {
+  if (name && body) {
     [self sendEventWithName:name body:body];
   } else if (name) {
     [self sendEventWithName:name body:@{}];
@@ -140,7 +140,8 @@ RCT_EXPORT_MODULE();
         //dashboard
         @"dashboardDidConnect",
         @"dashboardDidDisconnect",
-        @"dashboardSafeAreaInsetsChanged"
+        @"dashboardSafeAreaInsetsChanged",
+        @"dashboardButtonPressed"
     ];
 }
 
@@ -1645,22 +1646,29 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 # pragma Dashboard
 
+static RCTRootView *dashboardRootView = nil;
+
 + (void) connectWithDashbaordController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
+    NSLog(@"### connectWithDashboardController");
     rnCarPlayDashboard = [[RNCarPlayDashboard alloc] initWithDashboardInterfaceController:dashboardController dashboardWindow:window];
+    RNCPStore *store = [RNCPStore sharedManager];
+    if (![store isDashboardConnected] && dashboardRootView != nil) {
+        NSLog(@"### connectWithRootView");
+        [rnCarPlayDashboard connectWithRootView:dashboardRootView];
+    }
 }
 
 + (void) disconnectFromDashbaordController {
     [rnCarPlayDashboard disonnect];
 }
 
-RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config callback:(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
+    NSLog(@"### createDashboard");
+    dashboardRootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:config];
     if (rnCarPlayDashboard == nil) {
-        callback(@[@"dashboardSceneNotConnected"]);
         return;
     }
-    RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:@{}];
-    [rnCarPlayDashboard connectWithRootView:rootView rnCarPlay:self];
-    callback(@[@"dashboardSceneConnected"]);
+    [rnCarPlayDashboard connectWithRootView:dashboardRootView];
 }
 
 RCT_EXPORT_METHOD(checkForDashboardConnection) {

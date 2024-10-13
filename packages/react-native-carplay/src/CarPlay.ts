@@ -1,6 +1,7 @@
 import {
   AppRegistry,
   EmitterSubscription,
+  Image,
   ImageSourcePropType,
   NativeEventEmitter,
   NativeModule,
@@ -141,6 +142,32 @@ export type ImageSize = {
 
 export type OnConnectCallback = (window: WindowInformation) => void;
 export type OnDisconnectCallback = () => void;
+
+export type DashboardShortcutButtonConfig = {
+  titleVariants: Array<string>;
+  subtitleVariants: Array<string>;
+  image: ImageSourcePropType;
+  onPress: () => void;
+};
+
+export type DashboardConfig = {
+  id: string;
+  component: React.ComponentType<any>;
+  onConnect?: (window: WindowInformation) => void;
+  onDisconnect?: () => void;
+  onSafeAreaInsetsChanged?: (e: {
+    bottom: number;
+    left: number;
+    right: number;
+    top: number;
+  }) => void;
+  /**
+   * Buttons shown on the Dashboard when no navigation is active
+   * up to 2 buttons can be placed in here according to Apple docs
+   * https://developer.apple.com/documentation/carplay/cpdashboardcontroller/shortcutbuttons
+   */
+  shortcutButtons?: Array<DashboardShortcutButtonConfig>;
+};
 
 /**
  * A controller that manages all user interface elements appearing on your map displayed on the CarPlay screen.
@@ -306,24 +333,14 @@ export class CarPlayInterface {
     return this.bridge.enableNowPlaying(enable);
   }
 
-  public createDashboard(config: {
-    id: string;
-    component: React.ComponentType<any>;
-    onConnect?: (window: WindowInformation) => void;
-    onDisconnect?: () => void;
-    onSafeAreaInsetsChanged?: (e: {
-      bottom: number;
-      left: number;
-      right: number;
-      top: number;
-    }) => void;
-  }) {
-    const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, ...rest } = config;
+  public createDashboard(config: DashboardConfig) {
+    const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, shortcutButtons } =
+      config;
 
     const subscriptions: Array<EmitterSubscription> = [];
 
     if (onConnect != null) {
-      const subscription = this.emitter.addListener('dashboardDidConnect', (e) => onConnect(e));
+      const subscription = this.emitter.addListener('dashboardDidConnect', e => onConnect(e));
       subscriptions.push(subscription);
     }
 
@@ -341,8 +358,31 @@ export class CarPlayInterface {
       onDisconnect?.();
     });
 
+    const dashboardConfig: {
+      shortcutButtons: Array<Omit<DashboardShortcutButtonConfig, 'onPress'> & { index: number }>;
+    } = {
+      shortcutButtons: [],
+    };
+
+    if (shortcutButtons != null) {
+      for (var index = 0; index < shortcutButtons.length; index++) {
+        const { onPress, ...button } = shortcutButtons[index];
+
+        dashboardConfig.shortcutButtons.push({
+          ...button,
+          index,
+          image: Image.resolveAssetSource(button.image),
+        });
+      }
+
+      const subscription = this.emitter.addListener('dashboardButtonPressed', e => {
+        shortcutButtons[e.index]?.onPress?.();
+      });
+      subscriptions.push(subscription);
+    }
+
     AppRegistry.registerComponent(id, () => component);
-    this.bridge.createDashboard(id, rest);
+    this.bridge.createDashboard(id, dashboardConfig);
   }
 
   public checkForDashboardConnection(): void {

@@ -13,6 +13,8 @@ public class RNCarPlayDashboard: UIViewController {
         self.dashboardInterfaceController = dashboardInterfaceController
         self.dashboardWindow = dashboardWindow
         super.init(nibName: nil, bundle: nil)
+
+        self.dashboardWindow.rootViewController = self
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -20,11 +22,40 @@ public class RNCarPlayDashboard: UIViewController {
     }
 
     @objc public func connect(rootView: RCTRootView) {
-        self.dashboardWindow.rootViewController = self
-        self.dashboardWindow.rootViewController?.view = rootView
+
+        self.dashboardWindow.rootViewController?.view.addSubview(rootView)
         sendRNCarPlayEvent(
             "dashboardDidConnect", getConnectedWindowInformation())
         RNCPStore.sharedManager().setIsDashboardConnected(true)
+
+        if let shortcutButtons = rootView.appProperties?["shortcutButtons"]
+            as? [[String: Any]]
+        {
+            for button in shortcutButtons {
+                guard
+                    let index = button["index"] as? Int,
+                    let image = button["image"] as? [String: Any],
+                    let subtitleVariants = button["subtitleVariants"]
+                        as? [String],
+                    let titleVariants = button["titleVariants"] as? [String]
+                else {
+                    print("Skipping button due to missing property")
+                    continue
+                }
+
+                let shortcutButton = CPDashboardButton(
+                    titleVariants: titleVariants,
+                    subtitleVariants: subtitleVariants,
+                    image: RCTConvert.uiImage(image)
+                ) { _ in
+                    sendRNCarPlayEvent(
+                        "dashboardButtonPressed", ["index": index])
+                }
+
+                self.dashboardInterfaceController?.shortcutButtons.append(
+                    shortcutButton)
+            }
+        }
     }
 
     @objc public func disonnect() {
