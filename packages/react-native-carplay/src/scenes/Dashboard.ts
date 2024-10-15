@@ -24,6 +24,10 @@ export class Dashboard {
   }
 
   public create(config: DashboardConfig) {
+    for (const subscription of [...this.subscriptions, this.buttonSubscription]) {
+      subscription?.remove();
+    }
+    
     const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, shortcutButtons } =
       config;
 
