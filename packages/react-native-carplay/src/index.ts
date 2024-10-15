@@ -49,3 +49,7 @@ export * from './interfaces/TimeRemainingColor';
 export * from './interfaces/TravelEstimates';
 export * from './interfaces/VoiceControlState';
 export * from './interfaces/PanGestureWithTranslationEvent';
+export * from './interfaces/WindowInformation';
+
+// Scenes
+export * from './interfaces/Dashboard'

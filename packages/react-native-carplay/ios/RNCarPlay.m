@@ -1675,6 +1675,10 @@ RCT_EXPORT_METHOD(checkForDashboardConnection) {
     }
 }
 
+RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
+    [rnCarPlayDashboard setDashboardButtonsWithConfig:config];
+}
+
 @end
 
 @implementation RNCarPlayNavigationAlertWrapper

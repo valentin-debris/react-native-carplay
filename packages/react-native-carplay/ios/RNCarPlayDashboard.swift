@@ -22,12 +22,11 @@ public class RNCarPlayDashboard: UIViewController {
     }
 
     @objc public func connect(rootView: RCTRootView) {
-        rootView.translatesAutoresizingMaskIntoConstraints = false
-
         guard let view = self.dashboardWindow.rootViewController?.view else {
             return
         }
-        
+
+        rootView.translatesAutoresizingMaskIntoConstraints = false
         self.dashboardWindow.rootViewController?.view.addSubview(rootView)
 
         NSLayoutConstraint.activate([
@@ -36,39 +35,12 @@ public class RNCarPlayDashboard: UIViewController {
             rootView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             rootView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
-        
+
         sendRNCarPlayEvent(
             "dashboardDidConnect", getConnectedWindowInformation())
         RNCPStore.sharedManager().setIsDashboardConnected(true)
 
-        if let shortcutButtons = rootView.appProperties?["shortcutButtons"]
-            as? [[String: Any]]
-        {
-            for button in shortcutButtons {
-                guard
-                    let index = button["index"] as? Int,
-                    let image = button["image"] as? [String: Any],
-                    let subtitleVariants = button["subtitleVariants"]
-                        as? [String],
-                    let titleVariants = button["titleVariants"] as? [String]
-                else {
-                    print("Skipping button due to missing property")
-                    continue
-                }
-
-                let shortcutButton = CPDashboardButton(
-                    titleVariants: titleVariants,
-                    subtitleVariants: subtitleVariants,
-                    image: RCTConvert.uiImage(image)
-                ) { _ in
-                    sendRNCarPlayEvent(
-                        "dashboardButtonPressed", ["index": index])
-                }
-
-                self.dashboardInterfaceController?.shortcutButtons.append(
-                    shortcutButton)
-            }
-        }
+        setDashboardButtons(config: rootView.appProperties ?? [:])
     }
 
     @objc public func disonnect() {
@@ -95,5 +67,39 @@ public class RNCarPlayDashboard: UIViewController {
             "width": self.dashboardWindow.bounds.size.width,
             "scale": self.dashboardWindow.screen.scale,
         ]
+    }
+
+    @objc public func setDashboardButtons(config: [AnyHashable: Any]) {
+        var buttons: [CPDashboardButton] = [];
+        
+        if let shortcutButtons = config["shortcutButtons"]
+            as? [[String: Any]]
+        {
+            for button in shortcutButtons {
+                guard
+                    let index = button["index"] as? Int,
+                    let image = button["image"] as? [String: Any],
+                    let subtitleVariants = button["subtitleVariants"]
+                        as? [String],
+                    let titleVariants = button["titleVariants"] as? [String]
+                else {
+                    print("Skipping button due to missing property")
+                    continue
+                }
+
+                let shortcutButton = CPDashboardButton(
+                    titleVariants: titleVariants,
+                    subtitleVariants: subtitleVariants,
+                    image: RCTConvert.uiImage(image)
+                ) { _ in
+                    sendRNCarPlayEvent(
+                        "dashboardButtonPressed", ["index": index])
+                }
+
+                buttons.append(shortcutButton)
+            }
+        }
+        
+        self.dashboardInterfaceController?.shortcutButtons = buttons
     }
 }

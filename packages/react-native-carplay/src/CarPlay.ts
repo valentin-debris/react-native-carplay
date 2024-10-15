@@ -1,20 +1,8 @@
 import {
-  AppRegistry,
-  EmitterSubscription,
-  Image,
-  ImageSourcePropType,
   NativeEventEmitter,
-  NativeModule,
   NativeModules,
   Platform,
 } from 'react-native';
-import { Action } from './interfaces/Action';
-import { Maneuver } from './interfaces/Maneuver';
-import { PauseReason } from './interfaces/PauseReason';
-import { TextConfiguration } from './interfaces/TextConfiguration';
-import { TimeRemainingColor } from './interfaces/TimeRemainingColor';
-import { TravelEstimates } from './interfaces/TravelEstimates';
-import { TripConfig } from './navigation/Trip';
 import { ActionSheetTemplate } from './templates/ActionSheetTemplate';
 import { AlertTemplate } from './templates/AlertTemplate';
 import { ContactTemplate } from './templates/ContactTemplate';
@@ -33,81 +21,9 @@ import { PaneTemplate } from './templates/android/PaneTemplate';
 import { PlaceListMapTemplate } from './templates/android/PlaceListMapTemplate';
 import { PlaceListNavigationTemplate } from './templates/android/PlaceListNavigationTemplate';
 import { RoutePreviewNavigationTemplate } from './templates/android/RoutePreviewNavigationTemplate';
-
-export interface InternalCarPlay extends NativeModule {
-  checkForConnection(): void;
-  setRootTemplate(templateId: string, animated: boolean): void;
-  pushTemplate(templateId: string, animated: boolean): void;
-  popToTemplate(templateId: string, animated: boolean): void;
-  popToRootTemplate(animated: boolean): void;
-  popTemplate(animated: boolean): void;
-  presentTemplate(templateId: string, animated: boolean): void;
-  dismissTemplate(animated: boolean): void;
-  enableNowPlaying(enabled: boolean): void;
-  updateManeuversNavigationSession(id: string, x: Maneuver[]): void;
-  updateTravelEstimatesNavigationSession(
-    id: string,
-    index: number,
-    estimates: TravelEstimates,
-  ): void;
-  cancelNavigationSession(id: string): void;
-  finishNavigationSession(id: string): void;
-  pauseNavigationSession(id: string, reason: PauseReason, description?: string): void;
-  createTrip(id: string, config: TripConfig): void;
-  updateInformationTemplateItems(id: string, config: unknown): void;
-  updateInformationTemplateActions(id: string, config: unknown): void;
-  createTemplate(id: string, config: unknown, callback?: unknown): void;
-  updateTemplate(id: string, config: unknown): void;
-  invalidate(id: string): void;
-  startNavigationSession(
-    id: string,
-    tripId: string,
-  ): Promise<{
-    tripId: string;
-    navigationSessionId: string;
-  }>;
-  updateTravelEstimatesForTrip(
-    id: string,
-    tripId: string,
-    travelEstimates: TravelEstimates,
-    timeRemainingColor: TimeRemainingColor,
-  ): void;
-  updateMapTemplateConfig(id: string, config: unknown): void;
-  updateMapTemplateMapButtons(id: string, config: unknown): void;
-  hideTripPreviews(id: string): void;
-  showTripPreviews(id: string, previews: string[], config: TextConfiguration): void;
-  showRouteChoicesPreviewForTrip(id: string, tripId: string, config: TextConfiguration): void;
-  presentNavigationAlert(id: string, config: unknown, animated: boolean): void;
-  dismissNavigationAlert(id: string, animated: boolean): void;
-  showPanningInterface(id: string, animated: boolean): void;
-  dismissPanningInterface(id: string, animated: boolean): void;
-  getMaximumListSectionCount(id: string): Promise<number>;
-  getMaximumListItemCount(id: string): Promise<number>;
-  getMaximumListItemImageSize(id: string): Promise<ImageSize>;
-  getMaximumNumberOfGridImages(id: string): Promise<number>;
-  getMaximumListImageRowItemImageSize(id: string): Promise<ImageSize>;
-  reactToSelectedResult(status: boolean): void;
-  updateListTemplateSections(id: string, config: unknown): void;
-  updateListTemplateItem(id: string, config: unknown): void;
-  reactToUpdatedSearchText(id: string, items: unknown): void;
-  updateTabBarTemplates(id: string, config: unknown): void;
-  activateVoiceControlState(id: string, identifier: string): void;
-  getRootTemplate(callback: (templateId: string) => void): void;
-  getTopTemplate(callback: (templateId: string) => void): void;
-  // Android
-  reload(): void;
-  toast(message: string, duration: number): void;
-  alert(config: {
-    id: number;
-    title: string;
-    duration: number;
-    subtitle?: string;
-    icon?: ImageSourcePropType;
-    actions?: Action[];
-  }): void;
-  createDashboard(id: string, config: unknown): void;
-  checkForDashboardConnection(): void;
-}
+import { Dashboard } from './scenes/Dashboard';
+import { InternalCarPlay } from './interfaces/InternalCarPlay';
+import { WindowInformation } from './interfaces/WindowInformation';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -129,12 +45,6 @@ export type PushableTemplates =
 
 export type PresentableTemplates = AlertTemplate | ActionSheetTemplate | VoiceControlTemplate;
 
-export type WindowInformation = {
-  width: number;
-  height: number;
-  scale: number;
-};
-
 export type ImageSize = {
   width: number;
   height: number;
@@ -142,32 +52,6 @@ export type ImageSize = {
 
 export type OnConnectCallback = (window: WindowInformation) => void;
 export type OnDisconnectCallback = () => void;
-
-export type DashboardShortcutButtonConfig = {
-  titleVariants: Array<string>;
-  subtitleVariants: Array<string>;
-  image: ImageSourcePropType;
-  onPress: () => void;
-};
-
-export type DashboardConfig = {
-  id: string;
-  component: React.ComponentType<any>;
-  onConnect?: (window: WindowInformation) => void;
-  onDisconnect?: () => void;
-  onSafeAreaInsetsChanged?: (e: {
-    bottom: number;
-    left: number;
-    right: number;
-    top: number;
-  }) => void;
-  /**
-   * Buttons shown on the Dashboard when no navigation is active
-   * up to 2 buttons can be placed in here according to Apple docs
-   * https://developer.apple.com/documentation/carplay/cpdashboardcontroller/shortcutbuttons
-   */
-  shortcutButtons?: Array<DashboardShortcutButtonConfig>;
-};
 
 /**
  * A controller that manages all user interface elements appearing on your map displayed on the CarPlay screen.
@@ -332,62 +216,7 @@ export class CarPlayInterface {
   public enableNowPlaying(enable = true) {
     return this.bridge.enableNowPlaying(enable);
   }
-
-  public createDashboard(config: DashboardConfig) {
-    const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, shortcutButtons } =
-      config;
-
-    const subscriptions: Array<EmitterSubscription> = [];
-
-    if (onConnect != null) {
-      const subscription = this.emitter.addListener('dashboardDidConnect', e => onConnect(e));
-      subscriptions.push(subscription);
-    }
-
-    if (onSafeAreaInsetsChanged != null) {
-      const subscription = this.emitter.addListener('dashboardSafeAreaInsetsChanged', e =>
-        onSafeAreaInsetsChanged(e),
-      );
-      subscriptions.push(subscription);
-    }
-
-    this.emitter.addListener('dashboardDidDisconnect', () => {
-      for (const subscription of subscriptions) {
-        subscription.remove();
-      }
-      onDisconnect?.();
-    });
-
-    const dashboardConfig: {
-      shortcutButtons: Array<Omit<DashboardShortcutButtonConfig, 'onPress'> & { index: number }>;
-    } = {
-      shortcutButtons: [],
-    };
-
-    if (shortcutButtons != null) {
-      for (var index = 0; index < shortcutButtons.length; index++) {
-        const { onPress, ...button } = shortcutButtons[index];
-
-        dashboardConfig.shortcutButtons.push({
-          ...button,
-          index,
-          image: Image.resolveAssetSource(button.image),
-        });
-      }
-
-      const subscription = this.emitter.addListener('dashboardButtonPressed', e => {
-        shortcutButtons[e.index]?.onPress?.();
-      });
-      subscriptions.push(subscription);
-    }
-
-    AppRegistry.registerComponent(id, () => component);
-    this.bridge.createDashboard(id, dashboardConfig);
-  }
-
-  public checkForDashboardConnection(): void {
-    this.bridge.checkForDashboardConnection();
-  }
 }
 
 export const CarPlay = new CarPlayInterface();
+export const CarPlayDashboard = new Dashboard(CarPlay.bridge, CarPlay.emitter);
