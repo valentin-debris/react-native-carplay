@@ -6,6 +6,10 @@ export interface DashboardShortcutButtonConfig {
   subtitleVariants: Array<string>;
   image: ImageSourcePropType;
   onPress: () => void;
+  /**
+   * set to true so your CarPlay scene will be launched when the button is pressed
+   */
+  launchCarplayScene?: boolean;
 }
 
 export interface DashboardConfig {

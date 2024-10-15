@@ -8,7 +8,7 @@ import type { DashboardConfig, DashboardShortcutButtonConfig } from 'src/interfa
 import type { InternalCarPlay } from 'src/interfaces/InternalCarPlay';
 
 type NativeDashboardShortcutButtonConfig = Array<
-  Omit<DashboardShortcutButtonConfig, 'onPress'> & { index: number }
+  Omit<DashboardShortcutButtonConfig, 'onPress'> & { index: number; launchCarplayScene: boolean }
 >;
 
 export class Dashboard {
@@ -65,6 +65,7 @@ export class Dashboard {
           ...button,
           index,
           image: Image.resolveAssetSource(button.image),
+          launchCarplayScene: button.launchCarplayScene ?? false,
         });
       }
 
@@ -95,6 +96,7 @@ export class Dashboard {
         ...button,
         index,
         image: Image.resolveAssetSource(button.image),
+        launchCarplayScene: button.launchCarplayScene ?? false,
       });
     }
 

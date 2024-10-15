@@ -70,8 +70,8 @@ public class RNCarPlayDashboard: UIViewController {
     }
 
     @objc public func setDashboardButtons(config: [AnyHashable: Any]) {
-        var buttons: [CPDashboardButton] = [];
-        
+        var buttons: [CPDashboardButton] = []
+
         if let shortcutButtons = config["shortcutButtons"]
             as? [[String: Any]]
         {
@@ -81,7 +81,9 @@ public class RNCarPlayDashboard: UIViewController {
                     let image = button["image"] as? [String: Any],
                     let subtitleVariants = button["subtitleVariants"]
                         as? [String],
-                    let titleVariants = button["titleVariants"] as? [String]
+                    let titleVariants = button["titleVariants"] as? [String],
+                    let launchCarplayScene = button["launchCarplayScene"]
+                        as? Bool
                 else {
                     print("Skipping button due to missing property")
                     continue
@@ -94,12 +96,34 @@ public class RNCarPlayDashboard: UIViewController {
                 ) { _ in
                     sendRNCarPlayEvent(
                         "dashboardButtonPressed", ["index": index])
+
+                    if launchCarplayScene {
+                        guard
+                            let bundleIdentifier = Bundle.main.bundleIdentifier
+                        else { return }
+
+                        guard
+                            let url = URL(
+                                string: "\(bundleIdentifier)://carplay")
+                        else { return }
+
+                        guard
+                            let dashboardScene = UIApplication.shared
+                                .connectedScenes.first(where: {
+                                    $0 is CPTemplateApplicationDashboardScene
+                                })
+                        else { return }
+
+                        dashboardScene.open(
+                            url, options: nil, completionHandler: nil)
+                    }
+
                 }
 
                 buttons.append(shortcutButton)
             }
         }
-        
+
         self.dashboardInterfaceController?.shortcutButtons = buttons
     }
 }
