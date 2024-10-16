@@ -1648,7 +1648,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 static RCTRootView *dashboardRootView = nil;
 
-+ (void) connectWithDashbaordController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
++ (void) connectWithDashboardController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
     rnCarPlayDashboard = [[RNCarPlayDashboard alloc] initWithDashboardInterfaceController:dashboardController dashboardWindow:window];
     RNCPStore *store = [RNCPStore sharedManager];
     if (![store isDashboardConnected] && dashboardRootView != nil) {
