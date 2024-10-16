@@ -17,22 +17,27 @@ export class NavigationSession {
     CarPlay.bridge.updateManeuversNavigationSession(
       this.id,
       maneuvers.map(maneuver => {
+        let symbolImage: Maneuver['symbolImage'];
+        let symbolImageSize: Maneuver['symbolImageSize'];
+        let junctionImage: Maneuver['junctionImage'];
+        let tintSymbolImage: Maneuver['tintSymbolImage'];
+
         if (maneuver.symbolImage) {
           const image = Image.resolveAssetSource(maneuver.symbolImage);
-          maneuver.symbolImage = image;
-          maneuver.symbolImageSize = maneuver.symbolImageSize ?? { width: 50, height: 50 };
+          symbolImage = image;
+          symbolImageSize = maneuver.symbolImageSize ?? { width: 50, height: 50 };
           const scale = image.scale || 1.0;
-          const width = Math.floor((maneuver.symbolImageSize.width * windowScale) / scale);
-          const height = Math.floor((maneuver.symbolImageSize.height * windowScale) / scale);
-          maneuver.symbolImageSize = { width, height };
+          const width = Math.floor((symbolImageSize.width * windowScale) / scale);
+          const height = Math.floor((symbolImageSize.height * windowScale) / scale);
+          symbolImageSize = { width, height };
         }
         if (maneuver.junctionImage) {
-          maneuver.junctionImage = Image.resolveAssetSource(maneuver.junctionImage);
+          junctionImage = Image.resolveAssetSource(maneuver.junctionImage);
         }
         if (maneuver.tintSymbolImage && typeof maneuver.tintSymbolImage === 'string') {
-          maneuver.tintSymbolImage = processColor(maneuver.tintSymbolImage);
+          tintSymbolImage = processColor(maneuver.tintSymbolImage);
         }
-        return maneuver;
+        return { ...maneuver, symbolImage, symbolImageSize, junctionImage, tintSymbolImage };
       }),
     );
   }
