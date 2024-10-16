@@ -939,7 +939,7 @@ RCT_EXPORT_METHOD(activateVoiceControlState:(NSString*)templateId identifier:(NS
     }
 }
 
-RCT_EXPORT_METHOD(reactToUpdatedSearchText:(NSArray *)items templateId:(NSString *)templateId) {
+RCT_EXPORT_METHOD(reactToUpdatedSearchText:(NSString *)templateId templateId:(NSArray *)items) {
     NSArray *sectionsItems = [self parseListItems:items startIndex:0 templateId:templateId];
 
     if (self.searchResultBlock) {
