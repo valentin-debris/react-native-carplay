@@ -9,7 +9,7 @@ import CarPlay
 import React
 
 @objc(RNCarPlayDashboard)
-public class RNCarPlayDashboard: UIViewController {
+public class RNCarPlayDashboard: NSObject {
 
     var dashboardController: CPDashboardController?
     var window: UIWindow?
@@ -19,16 +19,8 @@ public class RNCarPlayDashboard: UIViewController {
     var buttonConfig: [AnyHashable: Any] = [:]
 
     var rootView: RCTRootView?
-    
+
     @objc public var isConnected = false
-
-    @objc public init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 
     @objc public func connectModule(
         bridge: RCTBridge, moduleName: String, buttonConfig: [AnyHashable: Any]
@@ -41,18 +33,17 @@ public class RNCarPlayDashboard: UIViewController {
     }
 
     @objc public func connectScene(
-      dashboardController: CPDashboardController,
-      window: UIWindow
+        dashboardController: CPDashboardController,
+        window: UIWindow
     ) {
         self.dashboardController = dashboardController
         self.window = window
-        self.window?.rootViewController = self
 
         connect()
     }
 
     private func connect() {
-        guard let view = self.window?.rootViewController?.view else {
+        guard let window = self.window else {
             // connectScene was not called yet
             return
         }
@@ -72,55 +63,31 @@ public class RNCarPlayDashboard: UIViewController {
             let rootView = RCTRootView(
                 bridge: bridge, moduleName: self.moduleName,
                 initialProperties: [:])
-            rootView.translatesAutoresizingMaskIntoConstraints = false
 
             self.rootView = rootView
         }
 
         if let rootView = self.rootView {
-            // add react root view
-            view.addSubview(rootView)
-
-            // match root view size to parent view
-            NSLayoutConstraint.activate([
-                rootView.topAnchor.constraint(equalTo: view.topAnchor),
-                rootView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-                rootView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                rootView.trailingAnchor.constraint(
-                    equalTo: view.trailingAnchor),
-            ])
+            window.rootViewController = RNCarPlayViewController(
+                rootView: rootView, eventName: "dashboardSafeAreaInsetsChanged")
         }
 
         setDashboardButtons()
 
         self.isConnected = true
-        sendRNCarPlayEvent(
-            "dashboardDidConnect", getConnectedWindowInformation())
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "dashboardDidConnect", body: getConnectedWindowInformation())
     }
 
     @objc func disconnect() {
         self.rootView?.removeFromSuperview()
+
         self.dashboardController = nil
         self.window = nil
-        
         self.isConnected = false
-        sendRNCarPlayEvent("dashboardDidDisconnect", [:])
-    }
 
-    override public func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        if !self.isConnected {
-            return
-        }
-        
-        let safeAreaInsets = [
-            "bottom": self.view.safeAreaInsets.bottom,
-            "left": self.view.safeAreaInsets.left,
-            "right": self.view.safeAreaInsets.right,
-            "top": self.view.safeAreaInsets.top,
-        ]
-        sendRNCarPlayEvent("dashboardSafeAreaInsetsChanged", safeAreaInsets)
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "dashboardDidDisconnect", body: nil)
     }
 
     @objc public func getConnectedWindowInformation() -> [String: Any] {
@@ -164,8 +131,8 @@ public class RNCarPlayDashboard: UIViewController {
                     subtitleVariants: subtitleVariants,
                     image: RCTConvert.uiImage(image)
                 ) { _ in
-                    sendRNCarPlayEvent(
-                        "dashboardButtonPressed", ["index": index])
+                    RNCarPlayUtils.sendRNCarPlayEvent(
+                        name: "dashboardButtonPressed", body: ["index": index])
 
                     if launchCarplayScene {
                         guard

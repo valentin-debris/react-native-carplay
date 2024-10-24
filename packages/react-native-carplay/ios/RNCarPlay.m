@@ -2,8 +2,6 @@
 #import <React/RCTConvert.h>
 #import <React/RCTRootView.h>
 #import "react_native_carplay/react_native_carplay-Swift.h"
-#import "RNCarPlayUtils.h"
-#import "RNCarPlayNavigationAlertWrapper.h"
 
 @implementation RNCarPlay
 {
@@ -27,7 +25,7 @@
     hasListeners = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                                selector:@selector(handleNotification:)
-                                                   name:RNCarPlaySendEventNotification
+                                                 name:RNCarPlayUtils.RNCarPlaySendEventNotification
                                                  object:nil];
 }
 
@@ -57,16 +55,16 @@
 
 + (void) connectWithInterfaceController:(CPInterfaceController*)interfaceController window:(CPWindow*)window {
     RNCPStore * store = [RNCPStore sharedManager];
-    store.interfaceController = interfaceController;
-    store.window = window;
-    store.isConnected = true;
-    sendRNCarPlayEvent(@"didConnect", [self getConnectedWindowInformation:window]);
+    if (store.app == nil) {
+        store.app = [[RNCarPlayApp alloc] init];
+    }
+    [store.app connectSceneWithInterfaceController:interfaceController window:window];
 }
 
 + (void) disconnect {
     RNCPStore *store = [RNCPStore sharedManager];
-    store.isConnected = false;
-    sendRNCarPlayEvent(@"didDisconnect", @{});
+    RNCarPlayApp* app = store.app;
+    [app disconnect];
 }
 
 RCT_EXPORT_MODULE();
@@ -173,7 +171,8 @@ RCT_EXPORT_MODULE();
           [UITraitCollection traitCollectionWithDisplayScale:normalImage.scale]]];
         [imageAsset registerImage:normalImage withTraitCollection:darkImageTraitCollection];
 
-        return [imageAsset imageWithTraitCollection: store.interfaceController.carTraitCollection];
+        RNCarPlayApp* app = store.app;
+        return [imageAsset imageWithTraitCollection: app.interfaceController.carTraitCollection];
     }
     else {
         return normalImage;
@@ -236,8 +235,9 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(checkForConnection) {
     RNCPStore *store = [RNCPStore sharedManager];
-    if ([store isConnected] && hasListeners) {
-        [self sendEventWithName:@"didConnect" body:[RNCarPlay getConnectedWindowInformation: store.window]];
+    RNCarPlayApp* app = store.app;
+    if (app.isConnected && hasListeners) {
+        [self sendEventWithName:@"didConnect" body:[app getConnectedWindowInformation]];
     }
 }
 
@@ -568,12 +568,12 @@ RCT_EXPORT_METHOD(finishNavigationSession:(NSString*)navigationSessionId) {
 RCT_EXPORT_METHOD(setRootTemplate:(NSString *)templateId animated:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
     CPTemplate *template = [store findTemplateById:templateId];
+    RNCarPlayApp* app = store.app;
 
-    store.interfaceController.delegate = self;
     store.rootTemplateId = templateId;
 
     if (template) {
-        [store.interfaceController setRootTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
+        [app.interfaceController setRootTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
             NSLog(@"error %@", err);
             // noop
         }];
@@ -585,8 +585,9 @@ RCT_EXPORT_METHOD(setRootTemplate:(NSString *)templateId animated:(BOOL)animated
 RCT_EXPORT_METHOD(pushTemplate:(NSString *)templateId animated:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
     CPTemplate *template = [store findTemplateById:templateId];
+    RNCarPlayApp* app = store.app;
     if (template) {
-        [store.interfaceController pushTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
+        [app.interfaceController pushTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
             NSLog(@"error %@", err);
             // noop
         }];
@@ -598,8 +599,9 @@ RCT_EXPORT_METHOD(pushTemplate:(NSString *)templateId animated:(BOOL)animated) {
 RCT_EXPORT_METHOD(popToTemplate:(NSString *)templateId animated:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
     CPTemplate *template = [store findTemplateById:templateId];
+    RNCarPlayApp* app = store.app;
     if (template) {
-        [store.interfaceController popToTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
+        [app.interfaceController popToTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
             NSLog(@"error %@", err);
             // noop
         }];
@@ -610,7 +612,8 @@ RCT_EXPORT_METHOD(popToTemplate:(NSString *)templateId animated:(BOOL)animated) 
 
 RCT_EXPORT_METHOD(popToRootTemplate:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
-    [store.interfaceController popToRootTemplateAnimated:animated completion:^(BOOL done, NSError * _Nullable err) {
+    RNCarPlayApp* app = store.app;
+    [app.interfaceController popToRootTemplateAnimated:animated completion:^(BOOL done, NSError * _Nullable err) {
         NSLog(@"error %@", err);
         if (done) {
             for (NSString *templateId in store.getTemplateIds) {
@@ -625,7 +628,8 @@ RCT_EXPORT_METHOD(popToRootTemplate:(BOOL)animated) {
 
 RCT_EXPORT_METHOD(popTemplate:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
-    [store.interfaceController popTemplateAnimated:animated completion:^(BOOL done, NSError * _Nullable err) {
+    RNCarPlayApp* app = store.app;
+    [app.interfaceController popTemplateAnimated:animated completion:^(BOOL done, NSError * _Nullable err) {
         NSLog(@"error %@", err);
         // noop
     }];
@@ -634,8 +638,9 @@ RCT_EXPORT_METHOD(popTemplate:(BOOL)animated) {
 RCT_EXPORT_METHOD(presentTemplate:(NSString *)templateId animated:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
     CPTemplate *template = [store findTemplateById:templateId];
+    RNCarPlayApp* app = store.app;
     if (template) {
-        [store.interfaceController presentTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
+        [app.interfaceController presentTemplate:template animated:animated completion:^(BOOL done, NSError * _Nullable err) {
             NSLog(@"error %@", err);
             // noop
         }];
@@ -646,7 +651,8 @@ RCT_EXPORT_METHOD(presentTemplate:(NSString *)templateId animated:(BOOL)animated
 
 RCT_EXPORT_METHOD(dismissTemplate:(BOOL)animated) {
     RNCPStore *store = [RNCPStore sharedManager];
-    [store.interfaceController dismissTemplateAnimated:animated];
+    RNCarPlayApp* app = store.app;
+    [app.interfaceController dismissTemplateAnimated:animated];
 }
 
 RCT_EXPORT_METHOD(updateListTemplate:(NSString*)templateId config:(NSDictionary*)config) {
@@ -970,7 +976,8 @@ RCT_EXPORT_METHOD(updateMapTemplateMapButtons:(NSString*) templateId mapButtons:
 
 RCT_EXPORT_METHOD(getTopTemplate: (RCTResponseSenderBlock)callback) {
     RNCPStore *store = [RNCPStore sharedManager];
-    CPTemplate *topTemplate = store.interfaceController.topTemplate;
+    RNCarPlayApp* app = store.app;
+    CPTemplate *topTemplate = app.interfaceController.topTemplate;
     if (topTemplate == nil || topTemplate.userInfo == nil || topTemplate.userInfo[@"templateId"] == nil) {
         callback(@[]);
     } else {
@@ -1033,9 +1040,10 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     }
 
     if ([config objectForKey:@"render"]) {
-        RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:templateId initialProperties:@{}];
-        RNCarPlayViewController *viewController = [[RNCarPlayViewController alloc] initWithRootView:rootView];
-        store.window.rootViewController = viewController;
+        if (store.app == nil) {
+            store.app = [[RNCarPlayApp alloc] init];
+        }
+        [store.app connectModuleWithBridge:self.bridge moduleName:templateId];
     }
 }
 
@@ -1607,24 +1615,6 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 -(void)pointOfInterestTemplate:(CPPointOfInterestTemplate *)pointOfInterestTemplate didSelectPointOfInterest:(CPPointOfInterest *)pointOfInterest {
     [self sendTemplateEventWithName:pointOfInterestTemplate name:@"didSelectPointOfInterest" json:[pointOfInterest userInfo]];
-}
-
-# pragma InterfaceController
-
-- (void)templateDidAppear:(CPTemplate *)aTemplate animated:(BOOL)animated {
-    [self sendTemplateEventWithName:aTemplate name:@"didAppear" json:@{ @"animated": @(animated) }];
-}
-
-- (void)templateDidDisappear:(CPTemplate *)aTemplate animated:(BOOL)animated {
-    [self sendTemplateEventWithName:aTemplate name:@"didDisappear" json:@{ @"animated": @(animated) }];
-}
-
-- (void)templateWillAppear:(CPTemplate *)aTemplate animated:(BOOL)animated {
-    [self sendTemplateEventWithName:aTemplate name:@"willAppear" json:@{ @"animated": @(animated) }];
-}
-
-- (void)templateWillDisappear:(CPTemplate *)aTemplate animated:(BOOL)animated {
-    [self sendTemplateEventWithName:aTemplate name:@"willDisappear" json:@{ @"animated": @(animated) }];
 }
 
 # pragma NowPlaying

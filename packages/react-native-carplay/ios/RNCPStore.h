@@ -4,11 +4,9 @@
 @interface RNCPStore : NSObject {
 }
 
-@property (nonatomic, strong) CPInterfaceController *interfaceController;
-@property (nonatomic, strong) CPWindow *window;
 @property (nonatomic, strong) NSString *rootTemplateId;
 @property (nonatomic, strong) id dashboard;
-@property (nonatomic, assign) BOOL isConnected;
+@property (nonatomic, strong) id app;
 
 + (instancetype)sharedManager;
 - (CPTemplate*) findTemplateById: (NSString*)templateId;
