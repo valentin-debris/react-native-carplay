@@ -5,7 +5,7 @@
 //  Created by Manuel Auer on 13.10.24.
 //
 
-#import "Utils.h"
+#import "RNCarPlayUtils.h"
 
 NSString *const RNCarPlaySendEventNotification = @"RNCarPlaySendEventNotification";
 

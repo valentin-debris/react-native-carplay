@@ -1,22 +1,27 @@
 #import "RNCarPlay.h"
-#import "RNCarPlayViewController.h"
 #import <React/RCTConvert.h>
 #import <React/RCTRootView.h>
 #import "react_native_carplay/react_native_carplay-Swift.h"
-
-static RNCarPlayDashboard *rnCarPlayDashboard = nil;
+#import "RNCarPlayUtils.h"
+#import "RNCarPlayNavigationAlertWrapper.h"
 
 @implementation RNCarPlay
 {
     bool hasListeners;
+    NSMutableArray<RNCarPlayNavigationAlertWrapper *> *navigationAlertWrappers;
 }
 
-@synthesize interfaceController;
-@synthesize window;
 @synthesize searchResultBlock;
 @synthesize selectedResultBlock;
 @synthesize isNowPlayingActive;
-@synthesize navigationAlertWrappers;
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        navigationAlertWrappers = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
 
 - (void)startObserving {
     hasListeners = YES;
@@ -54,22 +59,14 @@ static RNCarPlayDashboard *rnCarPlayDashboard = nil;
     RNCPStore * store = [RNCPStore sharedManager];
     store.interfaceController = interfaceController;
     store.window = window;
-    [store setConnected:true];
-    RNCarPlay *cp = [RNCarPlay allocWithZone:nil];
-    if (cp.bridge) {
-        [cp sendEventWithName:@"didConnect" body:[self getConnectedWindowInformation:window]];
-    }
+    store.isConnected = true;
+    sendRNCarPlayEvent(@"didConnect", [self getConnectedWindowInformation:window]);
 }
 
 + (void) disconnect {
-    RNCarPlay *cp = [RNCarPlay allocWithZone:nil];
     RNCPStore *store = [RNCPStore sharedManager];
-    [store setConnected:false];
-    store.window.rootViewController = nil;
-
-    if (cp.bridge) {
-        [cp sendEventWithName:@"didDisconnect" body:@{}];
-    }
+    store.isConnected = false;
+    sendRNCarPlayEvent(@"didDisconnect", @{});
 }
 
 RCT_EXPORT_MODULE();
@@ -1384,9 +1381,6 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     CPNavigationAlert* alert = [[CPNavigationAlert alloc] initWithTitleVariants:[RCTConvert NSStringArray:json[@"titleVariants"]] subtitleVariants:[RCTConvert NSStringArray:json[@"subtitleVariants"]] imageSet:imageSet primaryAction:[self parseAlertAction:json[@"primaryAction"] body:@{ @"templateId": templateId, @"primary": @(YES), @"navigationAlertId": navigationAlertId }] secondaryAction:secondaryAction duration:[RCTConvert double:json[@"duration"]]];
     
     RNCarPlayNavigationAlertWrapper *wrapper = [[RNCarPlayNavigationAlertWrapper alloc] initWithAlert:alert userInfo:@{ @"navigationAlertId": navigationAlertId }];
-    if (navigationAlertWrappers == nil) {
-        navigationAlertWrappers = [NSMutableArray array];
-    }
     [navigationAlertWrappers addObject:wrapper];
 
     return alert;
@@ -1646,50 +1640,37 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 
 # pragma Dashboard
 
-static RCTRootView *dashboardRootView = nil;
-
 + (void) connectWithDashboardController:(CPDashboardController*)dashboardController window:(UIWindow*)window {
-    rnCarPlayDashboard = [[RNCarPlayDashboard alloc] initWithDashboardInterfaceController:dashboardController dashboardWindow:window];
     RNCPStore *store = [RNCPStore sharedManager];
-    if (![store isDashboardConnected] && dashboardRootView != nil) {
-        [rnCarPlayDashboard connectWithRootView:dashboardRootView];
+    if (store.dashboard == nil) {
+        store.dashboard = [[RNCarPlayDashboard alloc] init];
     }
+    [store.dashboard connectSceneWithDashboardController:dashboardController window:window];
 }
 
 + (void) disconnectFromDashbaordController {
-    [rnCarPlayDashboard disonnect];
+    RNCPStore *store = [RNCPStore sharedManager];
+    [store.dashboard disconnect];
 }
 
 RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
-    dashboardRootView = [[RCTRootView alloc] initWithBridge:self.bridge moduleName:dashboardId initialProperties:config];
-    if (rnCarPlayDashboard == nil) {
-        return;
+    RNCPStore *store = [RNCPStore sharedManager];
+    if (store.dashboard == nil) {
+        store.dashboard = [[RNCarPlayDashboard alloc] init];
     }
-    [rnCarPlayDashboard connectWithRootView:dashboardRootView];
+    [store.dashboard connectModuleWithBridge:self.bridge moduleName:dashboardId buttonConfig:config];
 }
 
 RCT_EXPORT_METHOD(checkForDashboardConnection) {
     RNCPStore *store = [RNCPStore sharedManager];
-    if ([store isDashboardConnected] && hasListeners) {
-        [self sendEventWithName:@"dashboardDidConnect" body:[rnCarPlayDashboard getConnectedWindowInformation]];
+    if (((RNCarPlayDashboard *)store.dashboard).isConnected && hasListeners) {
+        [self sendEventWithName:@"dashboardDidConnect" body:[store.dashboard getConnectedWindowInformation]];
     }
 }
 
 RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
-    [rnCarPlayDashboard setDashboardButtonsWithConfig:config];
-}
-
-@end
-
-@implementation RNCarPlayNavigationAlertWrapper
-
-- (instancetype)initWithAlert:(CPNavigationAlert *)alert userInfo:(NSDictionary *)userInfo {
-    self = [super init];
-    if (self) {
-        _navigationAlert = alert;
-        _userInfo = userInfo;
-    }
-    return self;
+    RNCPStore *store = [RNCPStore sharedManager];
+    [store.dashboard updateDashboardButtonsWithConfig:config];
 }
 
 @end

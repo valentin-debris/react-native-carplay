@@ -36,24 +36,17 @@ export class Dashboard {
       this.subscriptions.push(subscription);
     }
 
+    if (onDisconnect != null) {
+      const subscription = this.emitter.addListener('dashboardDidDisconnect', onDisconnect);
+      this.subscriptions.push(subscription);
+    }
+
     if (onSafeAreaInsetsChanged != null) {
       const subscription = this.emitter.addListener('dashboardSafeAreaInsetsChanged', e =>
         onSafeAreaInsetsChanged(e),
       );
       this.subscriptions.push(subscription);
     }
-
-    this.emitter.addListener('dashboardDidDisconnect', () => {
-      for (const subscription of this.subscriptions) {
-        subscription.remove();
-      }
-      this.subscriptions = [];
-
-      this.buttonSubscription?.remove();
-      this.buttonSubscription = null;
-
-      onDisconnect?.();
-    });
 
     const dashboardConfig: {
       shortcutButtons: NativeDashboardShortcutButtonConfig;

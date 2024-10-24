@@ -2,14 +2,13 @@
 #import <CarPlay/CarPlay.h>
 
 @interface RNCPStore : NSObject {
-    CPInterfaceController *interfaceController;
-    CPWindow *window;
-    NSString *rootTemplateId;
 }
 
-@property (nonatomic, retain) CPInterfaceController *interfaceController;
-@property (nonatomic, retain) CPWindow *window;
-@property (nonatomic, retain) NSString *rootTemplateId;
+@property (nonatomic, strong) CPInterfaceController *interfaceController;
+@property (nonatomic, strong) CPWindow *window;
+@property (nonatomic, strong) NSString *rootTemplateId;
+@property (nonatomic, strong) id dashboard;
+@property (nonatomic, assign) BOOL isConnected;
 
 + (instancetype)sharedManager;
 - (CPTemplate*) findTemplateById: (NSString*)templateId;
@@ -18,10 +17,6 @@
 - (NSString*) setTrip:(NSString*)tripId trip:(CPTrip*)trip;
 - (CPNavigationSession*) findNavigationSessionById:(NSString*)navigationSessionId;
 - (NSString*) setNavigationSession:(NSString*)navigationSessionId navigationSession:(CPNavigationSession*)navigationSession;
-- (Boolean) isConnected;
-- (void) setConnected:(Boolean) isConnected;
 - (NSArray*) getTemplateIds;
-- (Boolean) isDashboardConnected;
-- (void) setIsDashboardConnected:(Boolean)isDashboardConnected;
 
 @end

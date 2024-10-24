@@ -4,20 +4,13 @@
     NSMutableDictionary* _templatesStore;
     NSMutableDictionary* _navigationSessionsStore;
     NSMutableDictionary* _tripsStore;
-    Boolean _connected;
-    Boolean _isDashboardConnected;
 }
-
-@synthesize window;
-@synthesize interfaceController;
 
 -(instancetype)init {
     if (self = [super init]) {
         _templatesStore = [[NSMutableDictionary alloc] init];
         _navigationSessionsStore = [[NSMutableDictionary alloc] init];
         _tripsStore = [[NSMutableDictionary alloc] init];
-        _connected = false;
-        _isDashboardConnected = false;
     }
 
     return self;
@@ -30,14 +23,6 @@
         shared = [[self alloc] init];
     });
     return shared;
-}
-
-- (void) setConnected:(Boolean) isConnected {
-    _connected = isConnected;
-}
-
-- (Boolean) isConnected {
-    return _connected;
 }
 
 - (CPTemplate*) findTemplateById:(NSString*)templateId {
@@ -69,14 +54,6 @@
 
 - (NSArray*) getTemplateIds {
     return [_templatesStore allKeys];
-}
-
-- (Boolean) isDashboardConnected {
-    return _isDashboardConnected;
-}
-
-- (void) setIsDashboardConnected:(Boolean)isDashboardConnected {
-    _isDashboardConnected = isDashboardConnected;
 }
 
 @end
