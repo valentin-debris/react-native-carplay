@@ -46,6 +46,8 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
             self.rootView = nil
         }
 
+        let isReconnect = self.rootView != nil
+
         if self.rootView == nil {
             guard let bridge = self.bridge else {
                 // connectModule was not called yet
@@ -64,10 +66,36 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
                 rootView: rootView, eventName: "safeAreaInsetsChanged")
         }
 
-        if let store = RNCPStore.sharedManager(),
-            let template = store.findTemplate(byId: self.moduleName)
+        if isReconnect, let store = RNCPStore.sharedManager(),
+            let template = store.findTemplate(byId: self.moduleName),
+            let interfaceController = self.interfaceController
         {
-            self.interfaceController?.setRootTemplate(template, animated: false)
+            if let mapTemplate = template as? CPMapTemplate {
+                // create a new map template to make navigation sessions work on reconnect
+                let reconnectTemplate = CPMapTemplate()
+                reconnectTemplate.automaticallyHidesNavigationBar =
+                    mapTemplate.automaticallyHidesNavigationBar
+                reconnectTemplate.backButton = mapTemplate.backButton
+                reconnectTemplate.guidanceBackgroundColor =
+                    mapTemplate.guidanceBackgroundColor
+                reconnectTemplate.hidesButtonsWithNavigationBar =
+                    mapTemplate.hidesButtonsWithNavigationBar
+                reconnectTemplate.tripEstimateStyle =
+                    mapTemplate.tripEstimateStyle
+                reconnectTemplate.leadingNavigationBarButtons =
+                    mapTemplate.leadingNavigationBarButtons
+                reconnectTemplate.mapButtons = mapTemplate.mapButtons
+                reconnectTemplate.mapDelegate = mapTemplate.mapDelegate
+                reconnectTemplate.trailingNavigationBarButtons =
+                    mapTemplate.trailingNavigationBarButtons
+                reconnectTemplate.userInfo = mapTemplate.userInfo
+
+                interfaceController.setRootTemplate(
+                    reconnectTemplate, animated: false)
+                store.setTemplate(self.moduleName, template: reconnectTemplate)
+            } else {
+                interfaceController.setRootTemplate(template, animated: false)
+            }
         }
 
         self.isConnected = true
