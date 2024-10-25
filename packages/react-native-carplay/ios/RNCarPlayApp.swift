@@ -46,8 +46,6 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
             self.rootView = nil
         }
 
-        let isReconnect = self.rootView != nil
-
         if self.rootView == nil {
             guard let bridge = self.bridge else {
                 // connectModule was not called yet
@@ -66,7 +64,7 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
                 rootView: rootView, eventName: "safeAreaInsetsChanged")
         }
 
-        if isReconnect, let store = RNCPStore.sharedManager(),
+        if let store = RNCPStore.sharedManager(),
             let template = store.findTemplate(byId: self.moduleName),
             let interfaceController = self.interfaceController
         {
