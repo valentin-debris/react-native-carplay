@@ -540,6 +540,7 @@ RCT_EXPORT_METHOD(updateManeuversNavigationSession:(NSString*)navigationSessionI
         for (NSDictionary *maneuver in maneuvers) {
             [upcomingManeuvers addObject:[self parseManeuver:maneuver]];
         }
+        [navigationSession addManeuvers:upcomingManeuvers];
         [navigationSession setUpcomingManeuvers:upcomingManeuvers];
     }
 }
@@ -1359,6 +1360,12 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     if ([json objectForKey:@"instructionVariants"]) {
         [maneuver setInstructionVariants:[RCTConvert NSStringArray:json[@"instructionVariants"]]];
     }
+    
+    if (@available(iOS 17.4, *)) {
+        if ([json objectForKey:@"maneuverType"]) {
+            [maneuver setManeuverType:[RCTConvert int:json[@"maneuverType"]]];
+        }
+    }
 
     return maneuver;
 }
@@ -1535,6 +1542,10 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 //- (BOOL)mapTemplate:(CPMapTemplate *)mapTemplate shouldShowNotificationForNavigationAlert:(CPNavigationAlert *)navigationAlert {
 //    // @todo
 //}
+
+- (BOOL)mapTemplateShouldProvideNavigationMetadata:(CPMapTemplate *)mapTemplate {
+    return true;
+}
 
 - (void)mapTemplate:(CPMapTemplate *)mapTemplate willShowNavigationAlert:(CPNavigationAlert *)navigationAlert {
     [self sendTemplateEventWithName:mapTemplate name:@"willShowNavigationAlert" json:[self navigationAlertToJson:navigationAlert]];
