@@ -17,6 +17,17 @@ export interface InformationTemplateConfig extends TemplateConfig {
   items: InformationItem[];
   actions: InformationAction[];
   onActionButtonPressed(e: { id: string; templateId: string }): void;
+
+  /**
+  * Option to hide back button
+  * @default false
+  */
+   backButtonHidden?: boolean;
+
+   /**
+    * Title to be shown on the back button, defaults to no text so only the < icon is shown
+    */
+   backButtonTitle?: string;
 }
 
 export class InformationTemplate extends Template<InformationTemplateConfig> {
