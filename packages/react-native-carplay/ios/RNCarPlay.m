@@ -233,6 +233,18 @@ RCT_EXPORT_MODULE();
     [task resume];
 }
 
+- (void)handleBackButtonPress:(NSString *)templateId {
+    RNCPStore *store = [RNCPStore sharedManager];
+    
+    if (self->hasListeners) {
+        [self sendEventWithName:@"backButtonPressed" body:@{@"templateId":templateId}];
+    }
+    
+    if (templateId != store.rootTemplateId) {
+        [self popTemplate:true];
+    }
+}
+
 RCT_EXPORT_METHOD(checkForConnection) {
     RNCPStore *store = [RNCPStore sharedManager];
     RNCarPlayApp* app = store.app;
@@ -254,10 +266,21 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
     // Create a new CPTemplate object
     CPTemplate *carPlayTemplate = [[CPTemplate alloc] init];
     
-    CPBarButton *backButton = config[@"isBackButtonCustomized"] ? [[CPBarButton alloc] initWithType:CPBarButtonTypeText handler:^(CPBarButton * _Nonnull barButton) {
-        [self sendEventWithName:@"backButtonPressed" body:@{@"templateId":templateId}];
-    }] : nil;
-
+    CPBarButton *backButton = nil;
+    if (![RCTConvert BOOL:config[@"backButtonHidden"]]) {
+        NSString *backButtonTitle = [RCTConvert NSString:config[@"backButtonTitle"]];
+        if (@available(iOS 14.0, *)) {
+            backButton = [[CPBarButton alloc] initWithTitle:backButtonTitle handler:^(CPBarButton * _Nonnull barButton) {
+                [self handleBackButtonPress:templateId];
+            }];
+        } else {
+            backButton = [[CPBarButton alloc] initWithType:CPBarButtonTypeText handler:^(CPBarButton * _Nonnull barButton) {
+                [self handleBackButtonPress:templateId];
+            }];
+            backButton.title = backButtonTitle;
+        }
+    }
+    
     if ([type isEqualToString:@"search"]) {
         CPSearchTemplate *searchTemplate = [[CPSearchTemplate alloc] init];
         searchTemplate.delegate = self;
@@ -290,17 +313,7 @@ RCT_EXPORT_METHOD(createTemplate:(NSString *)templateId config:(NSDictionary*)co
         }
         [listTemplate setLeadingNavigationBarButtons:leadingNavigationBarButtons];
         [listTemplate setTrailingNavigationBarButtons:trailingNavigationBarButtons];
-        if (![RCTConvert BOOL:config[@"backButtonHidden"]]) {
-            if (@available(iOS 14.0, *)) {
-                CPBarButton *backButton = [[CPBarButton alloc] initWithTitle:@" Back" handler:^(CPBarButton * _Nonnull barButton) {
-                    if (hasListeners) {
-                        [self sendEventWithName:@"backButtonPressed" body:@{@"templateId":templateId}];
-                    }
-                    [self popTemplate:false];
-                }];
-                [listTemplate setBackButton:backButton];
-            }
-        }
+        [listTemplate setBackButton:backButton];
         if (config[@"emptyViewTitleVariants"]) {
             if (@available(iOS 14.0, *)) {
                 listTemplate.emptyViewTitleVariants = [RCTConvert NSArray:config[@"emptyViewTitleVariants"]];

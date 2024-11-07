@@ -148,7 +148,6 @@ export class Template<P> {
   }
 
   updateTemplate = (config: P) => {
-    console.log('LETSGO!', config, this.type);
     CarPlay.bridge.updateTemplate(this.id, this.parseConfig({ type: this.type, ...config }));
   };
 
@@ -167,9 +166,6 @@ export class Template<P> {
       }
     }
     const result = JSON.parse(JSON.stringify(config));
-    if (config.onBackButtonPressed) {
-      result.isBackButtonCustomized = true;
-    }
     traverse(result);
     return result;
   }

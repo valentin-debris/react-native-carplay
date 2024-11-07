@@ -33,6 +33,17 @@ export interface GridTemplateConfig extends TemplateConfig {
    * Fired when the back button is pressed
    */
   onBackButtonPressed?(): void;
+
+   /**
+   * Option to hide back button
+   * @default false
+   */
+    backButtonHidden?: boolean;
+
+    /**
+     * Title to be shown on the back button, defaults to no text so only the < icon is shown
+     */
+    backButtonTitle?: string;
 }
 
 export class GridTemplate extends Template<GridTemplateConfig> {
