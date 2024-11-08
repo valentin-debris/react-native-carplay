@@ -82,5 +82,7 @@ export interface InternalCarPlay extends NativeModule {
     createDashboard(id: string, config: unknown): void;
     checkForDashboardConnection(): void;
     updateDashboardShortcutButtons(config: unknown): void;
+    initCluster(clusterId: string, config: unknown): void;
+    checkForClusterConnection(clusterId: string): void;
   }
   

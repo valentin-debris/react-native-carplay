@@ -7,6 +7,7 @@
 @property (nonatomic, strong) NSString *rootTemplateId;
 @property (nonatomic, strong) id dashboard;
 @property (nonatomic, strong) id app;
+@property (nonatomic, strong) NSMutableDictionary<NSString*, id> *cluster;
 
 + (instancetype)sharedManager;
 - (CPTemplate*) findTemplateById: (NSString*)templateId;

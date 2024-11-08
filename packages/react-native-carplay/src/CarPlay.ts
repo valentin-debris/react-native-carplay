@@ -24,6 +24,8 @@ import { RoutePreviewNavigationTemplate } from './templates/android/RoutePreview
 import { Dashboard } from './scenes/Dashboard';
 import { InternalCarPlay } from './interfaces/InternalCarPlay';
 import { WindowInformation } from './interfaces/WindowInformation';
+import { OnClusterConnectCallback } from './interfaces/Cluster';
+import { Cluster } from './scenes/Cluster';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -75,6 +77,7 @@ export class CarPlayInterface {
 
   private onConnectCallbacks = new Set<OnConnectCallback>();
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
+  private onClusterConnectCallbacks = new Set<OnClusterConnectCallback>();
 
   constructor() {
     this.emitter.addListener('didConnect', (window: WindowInformation) => {
@@ -99,6 +102,13 @@ export class CarPlayInterface {
         }
       });
     }
+
+    this.emitter.addListener(
+      'clusterDidConnect',
+      (props: { id: string; window?: WindowInformation }) => {
+        this.onClusterConnectCallbacks.forEach(callback => callback(props));
+      },
+    );
 
     // check if already connected this will fire any 'didConnect' events
     // if a connected is already present.
@@ -125,6 +135,15 @@ export class CarPlayInterface {
 
   public unregisterOnDisconnect = (callback: OnDisconnectCallback) => {
     this.onDisconnectCallbacks.delete(callback);
+  };
+
+  public registerOnClusterConnect = (callback: OnClusterConnectCallback) => {
+    this.onClusterConnectCallbacks.add(callback);
+    return {
+      remove: () => {
+        this.onClusterConnectCallbacks.delete(callback);
+      },
+    };
   };
 
   /**
@@ -220,3 +239,4 @@ export class CarPlayInterface {
 
 export const CarPlay = new CarPlayInterface();
 export const CarPlayDashboard = new Dashboard(CarPlay.bridge, CarPlay.emitter);
+export const CarPlayCluster = new Cluster(CarPlay.bridge, CarPlay.emitter);

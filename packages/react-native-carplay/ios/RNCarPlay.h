@@ -26,4 +26,9 @@ typedef void(^SelectedResultBlock)(void);
 + (void) connectWithDashboardController:(CPDashboardController*_Nonnull)dashboardController window:(UIWindow*_Nonnull)window;
 + (void) disconnectFromDashbaordController;
 
++ (void) connectWithInstrumentClusterController:(CPInstrumentClusterController *_Nonnull)instrumentClusterController clusterId:(NSString *_Nonnull)clusterId API_AVAILABLE(ios(15.4));
++ (void) connectWithClusterWindow:(UIWindow *_Nonnull)window clusterId:(NSString *_Nonnull)clusterId API_AVAILABLE(ios(15.4));
++ (void) disconnectFromInstrumentClusterController:(NSString *_Nonnull)clusterId;
++ (void) disonnectFromClusterWindow:(NSString *_Nonnull)clusterId API_AVAILABLE(ios(15.4));
+
 @end

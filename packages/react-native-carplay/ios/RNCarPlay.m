@@ -136,7 +136,15 @@ RCT_EXPORT_MODULE();
         @"dashboardDidConnect",
         @"dashboardDidDisconnect",
         @"dashboardSafeAreaInsetsChanged",
-        @"dashboardButtonPressed"
+        @"dashboardButtonPressed",
+        //cluster
+        @"clusterDidConnect",
+        @"clusterDidDisconnect",
+        @"clusterSafeAreaInsetsChanged",
+        @"clusterDidChangeCompassSetting",
+        @"clusterDidChangeSpeedLimitSetting",
+        @"clusterDidZoomIn",
+        @"clusterDidZoomOut"
     ];
 }
 
@@ -1686,6 +1694,53 @@ RCT_EXPORT_METHOD(checkForDashboardConnection) {
 RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
     RNCPStore *store = [RNCPStore sharedManager];
     [store.dashboard updateDashboardButtonsWithConfig:config];
+}
+
+# pragma Cluster
+
++ (void) connectWithInstrumentClusterController:(CPInstrumentClusterController *)instrumentClusterController clusterId:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    if ([store.cluster objectForKey:clusterId] == nil) {
+        store.cluster[clusterId] = [[RNCarPlayCluster alloc] init];
+    }
+    RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
+    [cluster connectWithInstrumentClusterController:instrumentClusterController clusterId:clusterId];
+}
+
++ (void) connectWithClusterWindow:(UIWindow *)window clusterId:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    if ([store.cluster objectForKey:clusterId] == nil) {
+        store.cluster[clusterId] = [[RNCarPlayCluster alloc] init];
+    }
+    [store.cluster[clusterId] connectWithWindow:window clusterId:clusterId];
+}
+
++ (void) disconnectFromInstrumentClusterController:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
+    [cluster disconnect];
+    [store.cluster removeObjectForKey:clusterId];
+}
+
++ (void) disonnectFromClusterWindow:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
+    [cluster disconnectWindow];
+}
+
+RCT_EXPORT_METHOD(initCluster:(NSString *)clusterId config:(NSDictionary *)config) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    [store.cluster[clusterId] connectWithBridge:self.bridge config:config];
+}
+
+RCT_EXPORT_METHOD(checkForClusterConnection:(NSString *)clusterId) {
+    if (@available(iOS 15.4, *)) {
+        RNCPStore *store = [RNCPStore sharedManager];
+        RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
+        if (cluster != nil && cluster.isConnected && hasListeners) {
+            [self sendEventWithName:@"clusterDidConnect" body:[cluster getConnectedWindowInformation]];
+        }
+    }
 }
 
 @end

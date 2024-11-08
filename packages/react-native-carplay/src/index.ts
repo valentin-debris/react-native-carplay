@@ -52,4 +52,5 @@ export * from './interfaces/PanGestureWithTranslationEvent';
 export * from './interfaces/WindowInformation';
 
 // Scenes
-export * from './interfaces/Dashboard'
+export * from './interfaces/Dashboard';
+export * from './interfaces/Cluster';

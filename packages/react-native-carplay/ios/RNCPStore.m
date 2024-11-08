@@ -11,6 +11,7 @@
         _templatesStore = [[NSMutableDictionary alloc] init];
         _navigationSessionsStore = [[NSMutableDictionary alloc] init];
         _tripsStore = [[NSMutableDictionary alloc] init];
+        self.cluster = [[NSMutableDictionary alloc] init];
     }
 
     return self;
