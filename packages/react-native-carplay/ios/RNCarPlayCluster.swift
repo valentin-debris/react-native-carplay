@@ -10,8 +10,7 @@ import React
 
 @available(iOS 15.4, *)
 @objc(RNCarPlayCluster)
-public class RNCarPlayCluster: NSObject {
-
+public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
     var instrumentClusterController: CPInstrumentClusterController?
     var window: UIWindow?
 
@@ -26,20 +25,13 @@ public class RNCarPlayCluster: NSObject {
         instrumentClusterController: CPInstrumentClusterController,
         clusterId: String
     ) {
+        instrumentClusterController.delegate = self
         self.instrumentClusterController = instrumentClusterController
         self.id = clusterId
         self.isConnected = true
 
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "clusterDidConnect", body: getConnectedWindowInformation())
-    }
-
-    @objc public func connect(
-        window: UIWindow,
-        clusterId: String
-    ) {
-        self.window = window
-        self.id = clusterId
     }
 
     @objc public func connect(
@@ -50,23 +42,30 @@ public class RNCarPlayCluster: NSObject {
 
         if let instrumentClusterController = self.instrumentClusterController {
             if let descriptions = config["inactiveDescriptionVariants"]
-                as? [[String: Any]] {
+                as? [[String: Any]]
+            {
                 for description in descriptions {
                     guard
                         let text = description["text"] as? String
                     else {
-                        print("Skipping inactiveDescriptionVariant due to missing property")
+                        print(
+                            "Skipping inactiveDescriptionVariant due to missing property"
+                        )
                         continue
                     }
-                    
+
                     let string = NSMutableAttributedString(string: text)
-                    
-                    if let image = description["image"] as? [String: Any], let icon = RCTConvert.uiImage(image) {
-                        let attributedString = NSAttributedString(attachment: NSTextAttachment(image: icon))
+
+                    if let image = description["image"] as? [String: Any],
+                        let icon = RCTConvert.uiImage(image)
+                    {
+                        let attributedString = NSAttributedString(
+                            attachment: NSTextAttachment(image: icon))
                         string.append(attributedString)
                     }
-                    
-                    instrumentClusterController.attributedInactiveDescriptionVariants.append(string)
+
+                    instrumentClusterController
+                        .attributedInactiveDescriptionVariants.append(string)
                 }
             }
         }
@@ -118,5 +117,55 @@ public class RNCarPlayCluster: NSObject {
             ]
         }
         return ["id": self.id ?? ""]
+    }
+
+    // MARK: CPInstrumentClusterControllerDelegate
+    public func instrumentClusterControllerDidConnect(
+        _ instrumentClusterWindow: UIWindow
+    ) {
+        self.window = instrumentClusterWindow
+    }
+
+    public func instrumentClusterControllerDidDisconnectWindow(
+        _ instrumentClusterWindow: UIWindow
+    ) {
+        self.window = nil
+    }
+
+    public func instrumentClusterControllerDidZoom(
+        in instrumentClusterController: CPInstrumentClusterController
+    ) {
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "clusterDidZoomIn", body: ["id": self.id ?? ""])
+    }
+
+    public func instrumentClusterControllerDidZoomOut(
+        _ instrumentClusterController: CPInstrumentClusterController
+    ) {
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "clusterDidZoomOut", body: ["id": self.id ?? ""])
+    }
+
+    public func instrumentClusterController(
+        _ instrumentClusterController: CPInstrumentClusterController,
+        didChangeCompassSetting compassSetting: CPInstrumentClusterSetting
+    ) {
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "clusterDidChangeCompassSetting",
+            body: [
+                "id": self.id ?? "", "compassSetting": compassSetting.rawValue,
+            ])
+    }
+
+    public func instrumentClusterController(
+        _ instrumentClusterController: CPInstrumentClusterController,
+        didChangeSpeedLimitSetting speedLimitSetting: CPInstrumentClusterSetting
+    ) {
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "clusterDidChangeSpeedLimitSetting",
+            body: [
+                "id": self.id ?? "",
+                "speedLimitSetting": speedLimitSetting.rawValue,
+            ])
     }
 }

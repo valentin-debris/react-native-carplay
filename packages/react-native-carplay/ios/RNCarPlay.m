@@ -1707,25 +1707,11 @@ RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
     [cluster connectWithInstrumentClusterController:instrumentClusterController clusterId:clusterId];
 }
 
-+ (void) connectWithClusterWindow:(UIWindow *)window clusterId:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
-    RNCPStore *store = [RNCPStore sharedManager];
-    if ([store.cluster objectForKey:clusterId] == nil) {
-        store.cluster[clusterId] = [[RNCarPlayCluster alloc] init];
-    }
-    [store.cluster[clusterId] connectWithWindow:window clusterId:clusterId];
-}
-
 + (void) disconnectFromInstrumentClusterController:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
     RNCPStore *store = [RNCPStore sharedManager];
     RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
     [cluster disconnect];
     [store.cluster removeObjectForKey:clusterId];
-}
-
-+ (void) disonnectFromClusterWindow:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
-    RNCPStore *store = [RNCPStore sharedManager];
-    RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
-    [cluster disconnectWindow];
 }
 
 RCT_EXPORT_METHOD(initCluster:(NSString *)clusterId config:(NSDictionary *)config) {
