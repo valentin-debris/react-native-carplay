@@ -22,17 +22,14 @@ export interface ClusterConfig {
   onZoomOut?: () => void;
   onDidChangeCompassSetting?: (setting: InstrumentClusterSetting) => void;
   onDidChangeSpeedLimitSetting?: (setting: InstrumentClusterSetting) => void;
+  onWindowDidConnect?: (window: ClusterWindowInformation) => void;
+  onContentStyleDidChange?: (contentStyle: ContentStyle) => void;
 }
 
-export type OnClusterConnectCallback = ({
+export type OnClusterControllerConnectCallback = ({
   id,
-  window,
 }: {
   id: string;
-  /**
-   * window is only provided in case the scene content type is either Map or Navigation App
-   */
-  window?: WindowInformation;
 }) => void;
 
 export interface InactiveDescriptionVariant {
@@ -48,4 +45,14 @@ export enum InstrumentClusterSetting {
   Enabled = 1,
   Disabled = 2,
   UserPreference = 3,
+}
+
+export enum ContentStyle {
+  Unspecified = 0,
+  Light = 1,
+  Dark = 2,
+}
+
+export interface ClusterWindowInformation extends WindowInformation {
+  contentStyle: ContentStyle;
 }

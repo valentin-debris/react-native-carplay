@@ -13,6 +13,7 @@ import React
 public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
     var instrumentClusterController: CPInstrumentClusterController?
     var window: UIWindow?
+    @objc public var contentStyle: UIUserInterfaceStyle = .unspecified
 
     var bridge: RCTBridge?
     var id: String?
@@ -23,15 +24,17 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
 
     @objc public func connect(
         instrumentClusterController: CPInstrumentClusterController,
+        contentStyle: UIUserInterfaceStyle,
         clusterId: String
     ) {
         instrumentClusterController.delegate = self
         self.instrumentClusterController = instrumentClusterController
         self.id = clusterId
         self.isConnected = true
+        self.contentStyle = contentStyle
 
         RNCarPlayUtils.sendRNCarPlayEvent(
-            name: "clusterDidConnect", body: getConnectedWindowInformation())
+            name: "clusterControllerDidConnect", body: ["id": self.id ?? ""])
     }
 
     @objc public func connect(
@@ -91,6 +94,10 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
             window.rootViewController = RNCarPlayViewController(
                 rootView: rootView, eventName: "clusterSafeAreaInsetsChanged")
         }
+
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "clusterWindowDidConnect",
+            body: getConnectedWindowInformation())
     }
 
     @objc public func disconnect() {
@@ -114,6 +121,7 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
                 "width": window.bounds.size.width,
                 "scale": window.screen.scale,
                 "id": self.id ?? "",
+                "contentStyle": self.contentStyle.rawValue,
             ]
         }
         return ["id": self.id ?? ""]

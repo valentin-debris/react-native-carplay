@@ -24,7 +24,7 @@ import { RoutePreviewNavigationTemplate } from './templates/android/RoutePreview
 import { Dashboard } from './scenes/Dashboard';
 import { InternalCarPlay } from './interfaces/InternalCarPlay';
 import { WindowInformation } from './interfaces/WindowInformation';
-import { OnClusterConnectCallback } from './interfaces/Cluster';
+import { OnClusterControllerConnectCallback } from './interfaces/Cluster';
 import { Cluster } from './scenes/Cluster';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
@@ -77,7 +77,7 @@ export class CarPlayInterface {
 
   private onConnectCallbacks = new Set<OnConnectCallback>();
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
-  private onClusterConnectCallbacks = new Set<OnClusterConnectCallback>();
+  private onClusterConnectCallbacks = new Set<OnClusterControllerConnectCallback>();
 
   constructor() {
     this.emitter.addListener('didConnect', (window: WindowInformation) => {
@@ -104,8 +104,8 @@ export class CarPlayInterface {
     }
 
     this.emitter.addListener(
-      'clusterDidConnect',
-      (props: { id: string; window?: WindowInformation }) => {
+      'clusterControllerDidConnect',
+      (props: { id: string; }) => {
         this.onClusterConnectCallbacks.forEach(callback => callback(props));
       },
     );
@@ -137,7 +137,7 @@ export class CarPlayInterface {
     this.onDisconnectCallbacks.delete(callback);
   };
 
-  public registerOnClusterConnect = (callback: OnClusterConnectCallback) => {
+  public registerOnClusterConnect = (callback: OnClusterControllerConnectCallback) => {
     this.onClusterConnectCallbacks.add(callback);
     return {
       remove: () => {

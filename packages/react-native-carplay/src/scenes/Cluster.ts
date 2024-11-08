@@ -8,7 +8,9 @@ type Events =
   | 'onDidChangeCompassSetting'
   | 'onDidChangeSpeedLimitSetting'
   | 'onZoomIn'
-  | 'onZoomOut';
+  | 'onZoomOut'
+  | 'onWindowDidConnect'
+  | 'onContentStyleDidChange';
 
 export class Cluster {
   private readonly bridge: InternalCarPlay;
@@ -44,6 +46,16 @@ export class Cluster {
     emitter.addListener('clusterDidZoomOut', e => {
       this.subscriptions[e.id]?.['onZoomOut']?.();
     });
+
+    emitter.addListener('clusterWindowDidConnect', e => {
+        const { id, ...rest } = e;
+        this.subscriptions[id]?.['onWindowDidConnect']?.(rest);
+    });
+
+    emitter.addListener('clusterContentStyleDidChange', e => {
+        const { id, ...rest } = e;
+        this.subscriptions[id]?.['onContentStyleDidChange']?.(rest);
+    });
   }
 
   public create(config: ClusterConfig) {
@@ -57,6 +69,8 @@ export class Cluster {
       onDidChangeSpeedLimitSetting,
       onZoomIn,
       onZoomOut,
+      onWindowDidConnect,
+      onContentStyleDidChange,
     } = config;
 
     this.subscriptions[id] = {
@@ -66,6 +80,8 @@ export class Cluster {
       onDidChangeSpeedLimitSetting,
       onZoomIn,
       onZoomOut,
+      onWindowDidConnect,
+      onContentStyleDidChange,
     };
 
     const clusterConfig = {

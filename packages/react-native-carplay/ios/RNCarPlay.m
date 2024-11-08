@@ -138,13 +138,15 @@ RCT_EXPORT_MODULE();
         @"dashboardSafeAreaInsetsChanged",
         @"dashboardButtonPressed",
         //cluster
-        @"clusterDidConnect",
+        @"clusterControllerDidConnect",
+        @"clusterWindowDidConnect",
         @"clusterDidDisconnect",
         @"clusterSafeAreaInsetsChanged",
         @"clusterDidChangeCompassSetting",
         @"clusterDidChangeSpeedLimitSetting",
         @"clusterDidZoomIn",
-        @"clusterDidZoomOut"
+        @"clusterDidZoomOut",
+        @"clusterContentStyleDidChange"
     ];
 }
 
@@ -1698,13 +1700,20 @@ RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
 
 # pragma Cluster
 
-+ (void) connectWithInstrumentClusterController:(CPInstrumentClusterController *)instrumentClusterController clusterId:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
++ (void) connectWithInstrumentClusterController:(CPInstrumentClusterController *)instrumentClusterController contentStyle:(UIUserInterfaceStyle)contentStyle clusterId:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
     RNCPStore *store = [RNCPStore sharedManager];
     if ([store.cluster objectForKey:clusterId] == nil) {
         store.cluster[clusterId] = [[RNCarPlayCluster alloc] init];
     }
     RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
-    [cluster connectWithInstrumentClusterController:instrumentClusterController clusterId:clusterId];
+    [cluster connectWithInstrumentClusterController:instrumentClusterController contentStyle:contentStyle clusterId:clusterId];
+}
+
++ (void) clusterContentStyleDidChange:(UIUserInterfaceStyle)contentStyle clusterId:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
+    RNCPStore *store = [RNCPStore sharedManager];
+    RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
+    cluster.contentStyle = contentStyle;
+    [RNCarPlayUtils sendRNCarPlayEventWithName:@"clusterContentStyleDidChange" body:@{@"id": clusterId, @"contentStyle": @(contentStyle)}];
 }
 
 + (void) disconnectFromInstrumentClusterController:(NSString *)clusterId API_AVAILABLE(ios(15.4)) {
@@ -1724,7 +1733,7 @@ RCT_EXPORT_METHOD(checkForClusterConnection:(NSString *)clusterId) {
         RNCPStore *store = [RNCPStore sharedManager];
         RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
         if (cluster != nil && cluster.isConnected && hasListeners) {
-            [self sendEventWithName:@"clusterDidConnect" body:[cluster getConnectedWindowInformation]];
+            [self sendEventWithName:@"clusterWindowDidConnect" body:[cluster getConnectedWindowInformation]];
         }
     }
 }
