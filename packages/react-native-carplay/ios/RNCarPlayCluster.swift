@@ -85,7 +85,14 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
         if self.rootView == nil {
             let rootView = RCTRootView(
                 bridge: bridge, moduleName: id,
-                initialProperties: [:])
+                initialProperties: [
+                    "id": self.id ?? "",
+                    "window": [
+                        "height": window.screen.bounds.size.height,
+                        "width": window.screen.bounds.size.width,
+                        "scale": window.screen.scale,
+                    ],
+                ])
 
             self.rootView = rootView
         }
@@ -117,8 +124,8 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
     @objc public func getConnectedWindowInformation() -> [String: Any] {
         if let window = self.window {
             return [
-                "height": window.bounds.size.height,
-                "width": window.bounds.size.width,
+                "height": window.screen.bounds.size.height,
+                "width": window.screen.bounds.size.width,
                 "scale": window.screen.scale,
                 "id": self.id ?? "",
                 "contentStyle": self.contentStyle.rawValue,
