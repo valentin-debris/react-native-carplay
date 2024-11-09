@@ -101,7 +101,7 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
 
         if let rootView = self.rootView {
             window.rootViewController = RNCarPlayViewController(
-                rootView: rootView, eventName: "clusterSafeAreaInsetsChanged")
+                rootView: rootView)
         }
 
         RNCarPlayUtils.sendRNCarPlayEvent(

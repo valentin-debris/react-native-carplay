@@ -70,7 +70,7 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
 
         if let rootView = self.rootView {
             window.rootViewController = RNCarPlayViewController(
-                rootView: rootView, eventName: "safeAreaInsetsChanged")
+                rootView: rootView)
         }
 
         if let store = RNCPStore.sharedManager(),

@@ -11,11 +11,9 @@ import React
 @objc(RNCarPlayViewController)
 public class RNCarPlayViewController: UIViewController {
     let rootView: RCTRootView
-    let eventName: String
-
-    @objc public init(rootView: RCTRootView, eventName: String) {
+    
+    @objc public init(rootView: RCTRootView) {
         self.rootView = rootView
-        self.eventName = eventName
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -50,13 +48,13 @@ public class RNCarPlayViewController: UIViewController {
         super.viewDidLayoutSubviews()
 
         RNCarPlayUtils.sendRNCarPlayEvent(
-            name: self.eventName,
+            name: "safeAreaInsetsDidChange",
             body: [
                 "bottom": self.view.safeAreaInsets.bottom,
                 "left": self.view.safeAreaInsets.left,
                 "right": self.view.safeAreaInsets.right,
                 "top": self.view.safeAreaInsets.top,
-                "templateId": self.rootView.moduleName,
+                "id": self.rootView.moduleName,
             ])
     }
 

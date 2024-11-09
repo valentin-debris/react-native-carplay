@@ -12,12 +12,6 @@ export interface ClusterConfig {
    */
   inactiveDescriptionVariants: InactiveDescriptionVariant[];
   onDisconnect?: () => void;
-  onSafeAreaInsetsChanged?: (e: {
-    bottom: number;
-    left: number;
-    right: number;
-    top: number;
-  }) => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onDidChangeCompassSetting?: (setting: InstrumentClusterSetting) => void;

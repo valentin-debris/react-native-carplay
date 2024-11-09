@@ -28,7 +28,7 @@ export class Dashboard {
       subscription?.remove();
     }
     
-    const { id, component, onConnect, onDisconnect, onSafeAreaInsetsChanged, shortcutButtons } =
+    const { id, component, onConnect, onDisconnect, shortcutButtons } =
       config;
 
     if (onConnect != null) {
@@ -38,13 +38,6 @@ export class Dashboard {
 
     if (onDisconnect != null) {
       const subscription = this.emitter.addListener('dashboardDidDisconnect', onDisconnect);
-      this.subscriptions.push(subscription);
-    }
-
-    if (onSafeAreaInsetsChanged != null) {
-      const subscription = this.emitter.addListener('dashboardSafeAreaInsetsChanged', e =>
-        onSafeAreaInsetsChanged(e),
-      );
       this.subscriptions.push(subscription);
     }
 

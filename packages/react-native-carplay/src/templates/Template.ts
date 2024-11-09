@@ -114,20 +114,16 @@ export class Template<P> {
       ...(this.eventMap || {}),
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Object.entries(eventMap).forEach(([eventName, callbackName]: [string, any]) => {
-      const subscription = CarPlay.emitter.addListener(eventName, (e: { id: string; templateId: string }) => {
-        const configEventName = callbackName as keyof Pick<
-          TemplateConfig,
-          | 'onWillAppear'
-          | 'onWillDisappear'
-          | 'onDidAppear'
-          | 'onDidDisappear'
-          | 'onBarButtonPressed'
-        >;
-        if (config[configEventName] && e.templateId === this.id) {
-          config[configEventName]?.(e);
+    Object.entries(eventMap).forEach(([eventName, callbackName]) => {
+      const subscription = CarPlay.emitter.addListener(eventName, e => {
+        const callback =
+          e.templateId === this.id && callbackName in config
+            ? config[callbackName as keyof typeof config]
+            : null;
+        if (callback == null || typeof callback !== 'function') {
+          return;
         }
+        callback(e);
       });
 
       this.listenerSubscriptions.push(subscription);

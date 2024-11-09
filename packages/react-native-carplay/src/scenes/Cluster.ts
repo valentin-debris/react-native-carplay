@@ -4,7 +4,6 @@ import type { InternalCarPlay } from 'src/interfaces/InternalCarPlay';
 
 type Events =
   | 'onDisconnect'
-  | 'onSafeAreaInsetsChanged'
   | 'onDidChangeCompassSetting'
   | 'onDidChangeSpeedLimitSetting'
   | 'onZoomIn'
@@ -31,11 +30,6 @@ export class Cluster {
     emitter.addListener('clusterDidDisconnect', e => {
       this.subscriptions[e.id]?.['onDisconnect']?.();
       this.clusterIds.delete(e.id);
-    });
-
-    emitter.addListener('clusterSafeAreaInsetsChanged', e => {
-      const { templateId, ...rest } = e;
-      this.subscriptions[templateId]?.['onSafeAreaInsetsChanged']?.(rest);
     });
 
     emitter.addListener('clusterDidChangeCompassSetting', e => {
@@ -73,7 +67,6 @@ export class Cluster {
       component,
       inactiveDescriptionVariants,
       onDisconnect,
-      onSafeAreaInsetsChanged,
       onDidChangeCompassSetting,
       onDidChangeSpeedLimitSetting,
       onZoomIn,
@@ -84,7 +77,6 @@ export class Cluster {
 
     this.subscriptions[id] = {
       onDisconnect,
-      onSafeAreaInsetsChanged,
       onDidChangeCompassSetting,
       onDidChangeSpeedLimitSetting,
       onZoomIn,

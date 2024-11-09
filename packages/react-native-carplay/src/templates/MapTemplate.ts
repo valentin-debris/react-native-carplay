@@ -42,13 +42,6 @@ export interface TripEvent {
   routeIndex: number;
 }
 
-export interface SafeAreaInsetsEvent extends BaseEvent {
-  bottom: number;
-  left: number;
-  right: number;
-  top: number;
-}
-
 export interface MapTemplateConfig extends TemplateConfig {
   /**
    * The background color the map template uses when displaying guidance.
@@ -155,12 +148,6 @@ export interface MapTemplateConfig extends TemplateConfig {
    */
   onBackButtonPressed?(): void;
 
-  /**
-   * called when safe area insets change
-   * @param e safe area insets
-   */
-  onSafeAreaInsetsChanged?(e: SafeAreaInsetsEvent): void;
-
    /**
    * Option to hide back button
    * @default false
@@ -205,7 +192,6 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       didCancelNavigation: 'onDidCancelNavigation',
       startedTrip: 'onStartedTrip',
       backButtonPressed: 'onBackButtonPressed',
-      safeAreaInsetsChanged: 'onSafeAreaInsetsChanged',
     };
   }
 

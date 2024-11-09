@@ -85,6 +85,7 @@ RCT_EXPORT_MODULE();
         @"didDisconnect",
         @"didPressMenuItem",
         @"appearanceDidChange",
+        @"safeAreaInsetsDidChange",
         // interface
         @"barButtonPressed",
         @"backButtonPressed",
@@ -131,18 +132,14 @@ RCT_EXPORT_MODULE();
         @"alertActionPressed",
         @"selectedPreviewForTrip",
         @"startedTrip",
-        //window related
-        @"safeAreaInsetsChanged",
         //dashboard
         @"dashboardDidConnect",
         @"dashboardDidDisconnect",
-        @"dashboardSafeAreaInsetsChanged",
         @"dashboardButtonPressed",
         //cluster
         @"clusterControllerDidConnect",
         @"clusterWindowDidConnect",
         @"clusterDidDisconnect",
-        @"clusterSafeAreaInsetsChanged",
         @"clusterDidChangeCompassSetting",
         @"clusterDidChangeSpeedLimitSetting",
         @"clusterDidZoomIn",

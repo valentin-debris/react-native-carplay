@@ -78,7 +78,7 @@ public class RNCarPlayDashboard: NSObject {
 
         if let rootView = self.rootView {
             window.rootViewController = RNCarPlayViewController(
-                rootView: rootView, eventName: "dashboardSafeAreaInsetsChanged")
+                rootView: rootView)
         }
 
         setDashboardButtons()

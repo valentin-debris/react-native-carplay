@@ -58,13 +58,25 @@ export type OnDisconnectCallback = () => void;
 type AppearanceInformation = {
   colorScheme: 'dark' | 'light';
   /**
-   * id that was specified on the MapTemplate, Dashboard or the Cluster
+   * id that was specified on the MapTemplate, Dashboard or Cluster
    */
   id: string;
 };
 
 export type OnAppearanceDidChangeCallback = ({ colorScheme, id }: AppearanceInformation) => void;
 
+export interface SafeAreaInsetsEvent {
+  bottom: number;
+  left: number;
+  right: number;
+  top: number;
+  /**
+   * id that was specified on the MapTemplate, Dashboard or Cluster
+   */
+  id: string;
+}
+
+export type OnSafeAreaInsetsDidChangeCallback = (safeAreaInsets: SafeAreaInsetsEvent) => void;
 /**
  * A controller that manages all user interface elements appearing on your map displayed on the CarPlay screen.
  */
@@ -89,6 +101,7 @@ export class CarPlayInterface {
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
   private onClusterConnectCallbacks = new Set<OnClusterControllerConnectCallback>();
   private onAppearanceDidChangeCallbacks = new Set<OnAppearanceDidChangeCallback>();
+  private onOnSafeAreaInsetsDidChangeCallbacks = new Set<OnSafeAreaInsetsDidChangeCallback>();
 
   constructor() {
     this.emitter.addListener('didConnect', (window: WindowInformation) => {
@@ -120,6 +133,10 @@ export class CarPlayInterface {
 
     this.emitter.addListener('appearanceDidChange', (props: AppearanceInformation) => {
       this.onAppearanceDidChangeCallbacks.forEach(callback => callback(props));
+    });
+
+    this.emitter.addListener('safeAreaInsetsDidChange', (props: SafeAreaInsetsEvent) => {
+      this.onOnSafeAreaInsetsDidChangeCallbacks.forEach(callback => callback(props));
     });
 
     // check if already connected this will fire any 'didConnect' events
@@ -163,6 +180,15 @@ export class CarPlayInterface {
     return {
       remove: () => {
         this.onAppearanceDidChangeCallbacks.delete(callback);
+      },
+    };
+  };
+
+  public registerOnSafeAreaInsetsDidChange = (callback: OnSafeAreaInsetsDidChangeCallback) => {
+    this.onOnSafeAreaInsetsDidChangeCallbacks.add(callback);
+    return {
+      remove: () => {
+        this.onOnSafeAreaInsetsDidChangeCallbacks.delete(callback);
       },
     };
   };
