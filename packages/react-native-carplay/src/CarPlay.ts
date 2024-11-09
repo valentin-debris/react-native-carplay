@@ -55,6 +55,16 @@ export type ImageSize = {
 export type OnConnectCallback = (window: WindowInformation) => void;
 export type OnDisconnectCallback = () => void;
 
+type AppearanceInformation = {
+  colorScheme: 'dark' | 'light';
+  /**
+   * id that was specified on the MapTemplate, Dashboard or the Cluster
+   */
+  id: string;
+};
+
+export type OnAppearanceDidChangeCallback = ({ colorScheme, id }: AppearanceInformation) => void;
+
 /**
  * A controller that manages all user interface elements appearing on your map displayed on the CarPlay screen.
  */
@@ -78,6 +88,7 @@ export class CarPlayInterface {
   private onConnectCallbacks = new Set<OnConnectCallback>();
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
   private onClusterConnectCallbacks = new Set<OnClusterControllerConnectCallback>();
+  private onAppearanceDidChangeCallbacks = new Set<OnAppearanceDidChangeCallback>();
 
   constructor() {
     this.emitter.addListener('didConnect', (window: WindowInformation) => {
@@ -103,12 +114,13 @@ export class CarPlayInterface {
       });
     }
 
-    this.emitter.addListener(
-      'clusterControllerDidConnect',
-      (props: { id: string; }) => {
-        this.onClusterConnectCallbacks.forEach(callback => callback(props));
-      },
-    );
+    this.emitter.addListener('clusterControllerDidConnect', (props: { id: string }) => {
+      this.onClusterConnectCallbacks.forEach(callback => callback(props));
+    });
+
+    this.emitter.addListener('appearanceDidChange', (props: AppearanceInformation) => {
+      this.onAppearanceDidChangeCallbacks.forEach(callback => callback(props));
+    });
 
     // check if already connected this will fire any 'didConnect' events
     // if a connected is already present.
@@ -142,6 +154,15 @@ export class CarPlayInterface {
     return {
       remove: () => {
         this.onClusterConnectCallbacks.delete(callback);
+      },
+    };
+  };
+
+  public registerOnAppearanceDidChange = (callback: OnAppearanceDidChangeCallback) => {
+    this.onAppearanceDidChangeCallbacks.add(callback);
+    return {
+      remove: () => {
+        this.onAppearanceDidChangeCallbacks.delete(callback);
       },
     };
   };

@@ -62,7 +62,16 @@ public class RNCarPlayDashboard: NSObject {
 
             let rootView = RCTRootView(
                 bridge: bridge, moduleName: self.moduleName,
-                initialProperties: [:])
+                initialProperties: [
+                    "id": self.moduleName,
+                    "colorScheme": window.screen.traitCollection
+                        .userInterfaceStyle == .dark ? "dark" : "light",
+                    "window": [
+                        "height": window.screen.bounds.size.height,
+                        "width": window.screen.bounds.size.width,
+                        "scale": window.screen.scale,
+                    ],
+                ])
 
             self.rootView = rootView
         }

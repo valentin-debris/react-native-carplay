@@ -16,12 +16,21 @@ export class Cluster {
   private readonly bridge: InternalCarPlay;
 
   private subscriptions: { [key: string]: Partial<{ [key in Events]: (e?: any) => void }> } = {};
+  private clusterIds = new Set<String>();
+
+  /**
+   * @returns ids of all connected clusters
+   */
+  public getClusterIds() {
+    return [...this.clusterIds];
+  }
 
   constructor(bridge: InternalCarPlay, emitter: NativeEventEmitter) {
     this.bridge = bridge;
 
     emitter.addListener('clusterDidDisconnect', e => {
       this.subscriptions[e.id]?.['onDisconnect']?.();
+      this.clusterIds.delete(e.id);
     });
 
     emitter.addListener('clusterSafeAreaInsetsChanged', e => {
@@ -92,6 +101,7 @@ export class Cluster {
     };
 
     AppRegistry.registerComponent(id, () => component);
+    this.clusterIds.add(id);
     this.bridge.initCluster(id, clusterConfig);
   }
 

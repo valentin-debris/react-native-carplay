@@ -87,6 +87,8 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
                 bridge: bridge, moduleName: id,
                 initialProperties: [
                     "id": self.id ?? "",
+                    "colorScheme": window.screen.traitCollection
+                        .userInterfaceStyle == .dark ? "dark" : "light",
                     "window": [
                         "height": window.screen.bounds.size.height,
                         "width": window.screen.bounds.size.width,

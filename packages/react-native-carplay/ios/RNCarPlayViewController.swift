@@ -59,4 +59,21 @@ public class RNCarPlayViewController: UIViewController {
                 "templateId": self.rootView.moduleName,
             ])
     }
+
+    public override func traitCollectionDidChange(
+        _ previousTraitCollection: UITraitCollection?
+    ) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        if traitCollection.hasDifferentColorAppearance(
+            comparedTo: previousTraitCollection)
+        {
+            RNCarPlayUtils.sendRNCarPlayEvent(
+                name: "appearanceDidChange",
+                body: [
+                    "colorScheme": traitCollection.userInterfaceStyle == .dark
+                        ? "dark" : "light",
+                    "id": self.rootView.moduleName,
+                ])
+        }
+    }
 }
