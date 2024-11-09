@@ -50,6 +50,7 @@ export * from './interfaces/TravelEstimates';
 export * from './interfaces/VoiceControlState';
 export * from './interfaces/PanGestureWithTranslationEvent';
 export * from './interfaces/WindowInformation';
+export * from './interfaces/RootComponentInitialProps';
 
 // Scenes
 export * from './interfaces/Dashboard';
