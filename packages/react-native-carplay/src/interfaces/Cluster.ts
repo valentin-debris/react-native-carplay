@@ -6,6 +6,10 @@ export interface ClusterConfig {
    * the id you got from the onClusterConnect callback using CarPlay.registerOnClusterConnect
    */
   id: string;
+  /**
+   * the component to be rendered, works only for cluster type "Map" & "Navigation App"
+   * register onWindowDidConnect to know if the cluster can render your component
+   */
   component: React.ComponentType<any>;
   /**
    * inactiveDescriptionVariants is an array of a string and an optional image to be displayed when the user is not actively navigating arranged from most to least preferred.
