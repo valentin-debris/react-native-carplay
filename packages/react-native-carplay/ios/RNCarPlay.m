@@ -1373,6 +1373,25 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
         if ([json objectForKey:@"maneuverType"]) {
             [maneuver setManeuverType:[RCTConvert int:json[@"maneuverType"]]];
         }
+        if ([json objectForKey:@"junctionType"]) {
+            [maneuver setJunctionType:[RCTConvert int:json[@"junctionType"]]];
+        }
+        if ([json objectForKey:@"trafficSide"]) {
+            [maneuver setTrafficSide:[RCTConvert int:json[@"trafficSide"]]];
+        }
+        if ([json objectForKey:@"junctionExitAngle"]) {
+            int junctionExitAngle = [RCTConvert int:json[@"junctionExitAngle"]];
+            [maneuver setJunctionExitAngle:[[NSMeasurement alloc] initWithDoubleValue:junctionExitAngle unit:NSUnitAngle.degrees]];
+        }
+        if ([json objectForKey:@"junctionElementAngles"]) {
+            NSArray<NSNumber *> *junctionElementAngles = [RCTConvert NSArray:@"junctionElementAngles"];
+            NSMutableSet<NSMeasurement<NSUnitAngle *> *> *junctionElementAnglesMeasurements = [[NSMutableSet alloc] init];
+            for (NSNumber *angle in junctionElementAngles) {
+                NSMeasurement<NSUnitAngle *> *measurement = [[NSMeasurement alloc] initWithDoubleValue:angle.doubleValue unit:NSUnitAngle.degrees];
+                [junctionElementAnglesMeasurements addObject:measurement];
+            }
+            [maneuver setJunctionElementAngles:junctionElementAnglesMeasurements];
+        }
     }
 
     return maneuver;

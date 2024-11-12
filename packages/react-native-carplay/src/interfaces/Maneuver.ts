@@ -29,8 +29,18 @@ export interface Maneuver {
   dashboardInstructionVariants?: string[];
   notificationInstructionVariants?: string[];
 
-  // set this to show the maneuver on the "standard instrument cluster"
+  // these are required for the "standard instrument cluster" and/or "head up display"
   maneuverType?: ManeuverType;
+  junctionType?: JunctionType;
+  trafficSide?: TrafficSide;
+  /**
+   * specify angle between -180° and +180° shown as the active exit
+   */
+  junctionExitAngle?: number;
+  /**
+   * specify angles (or a single angle) between -180° and +180°
+   */
+  junctionElementAngles?: Array<number>;
 }
 
 export enum ManeuverType {
@@ -88,4 +98,14 @@ export enum ManeuverType {
   ChangeHighway = 51,
   ChangeHighwayLeft = 52,
   ChangeHighwayRight = 53,
+}
+
+export enum JunctionType {
+  Intersection = 0, // single intersection with roads coming to a common point
+  Roundabout   = 1, // roundabout, junction elements represent roads exiting the roundabout
+};
+
+export enum TrafficSide {
+  Right = 0, // counterclockwise for roundabouts
+  Left  = 1, // clockwise for roundabouts
 }
