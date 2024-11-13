@@ -1392,6 +1392,16 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
             }
             [maneuver setJunctionElementAngles:junctionElementAnglesMeasurements];
         }
+        
+        NSArray<NSString *> *roadFollowingManeuverVariants = [RCTConvert NSArray:[json objectForKey:@"roadFollowingManeuverVariants"]];
+        if (roadFollowingManeuverVariants.count > 0) {
+            [maneuver setRoadFollowingManeuverVariants:roadFollowingManeuverVariants];
+        }
+        
+        NSString *highwayExitLabel = [RCTConvert NSString:[json objectForKey:@"highwayExitLabel"]];
+        if (highwayExitLabel != nil) {
+            [maneuver setHighwayExitLabel:highwayExitLabel];
+        }
     }
 
     return maneuver;

@@ -41,6 +41,8 @@ export interface Maneuver {
    * specify angles (or a single angle) between -180° and +180°
    */
   junctionElementAngles?: Array<number>;
+  roadFollowingManeuverVariants?: Array<String>;
+  highwayExitLabel?: string;
 }
 
 export enum ManeuverType {
