@@ -1383,8 +1383,8 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
             int junctionExitAngle = [RCTConvert int:json[@"junctionExitAngle"]];
             [maneuver setJunctionExitAngle:[[NSMeasurement alloc] initWithDoubleValue:junctionExitAngle unit:NSUnitAngle.degrees]];
         }
-        if ([json objectForKey:@"junctionElementAngles"]) {
-            NSArray<NSNumber *> *junctionElementAngles = [RCTConvert NSArray:@"junctionElementAngles"];
+        NSArray<NSNumber *> *junctionElementAngles = [json objectForKey:@"junctionElementAngles"];
+        if (junctionElementAngles) {
             NSMutableSet<NSMeasurement<NSUnitAngle *> *> *junctionElementAnglesMeasurements = [[NSMutableSet alloc] init];
             for (NSNumber *angle in junctionElementAngles) {
                 NSMeasurement<NSUnitAngle *> *measurement = [[NSMeasurement alloc] initWithDoubleValue:angle.doubleValue unit:NSUnitAngle.degrees];
