@@ -36,6 +36,10 @@ export interface InactiveDescriptionVariant {
    * attachment image size can be up to 64x25 points.
    */
   image?: ImageSourcePropType;
+  /**
+   * position of the image in the text, if missing the image will be appended to the text
+   */
+  imagePosition?: number;
 }
 
 export enum InstrumentClusterSetting {

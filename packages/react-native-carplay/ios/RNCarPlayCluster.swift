@@ -64,7 +64,12 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
                     {
                         let attributedString = NSAttributedString(
                             attachment: NSTextAttachment(image: icon))
-                        string.append(attributedString)
+                        
+                        if let imagePosition = description["imagePosition"] as? Int {
+                            string.insert(attributedString, at: imagePosition)
+                        } else {
+                            string.append(attributedString)
+                        }
                     }
 
                     instrumentClusterController
