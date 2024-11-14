@@ -1581,7 +1581,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 //}
 
 - (BOOL)mapTemplateShouldProvideNavigationMetadata:(CPMapTemplate *)mapTemplate {
-    return true;
+    return [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"RNCPMapTemplateShouldProvideNavigationMetadata"] boolValue];
 }
 
 - (void)mapTemplate:(CPMapTemplate *)mapTemplate willShowNavigationAlert:(CPNavigationAlert *)navigationAlert {
