@@ -33,13 +33,13 @@ export class Cluster {
     });
 
     emitter.addListener('clusterDidChangeCompassSetting', e => {
-      const { id, ...rest } = e;
-      this.subscriptions[id]?.['onDidChangeCompassSetting']?.(rest);
+      const { id, compassSetting } = e;
+      this.subscriptions[id]?.['onDidChangeCompassSetting']?.(compassSetting);
     });
 
     emitter.addListener('clusterDidChangeSpeedLimitSetting', e => {
-      const { id, ...rest } = e;
-      this.subscriptions[id]?.['onDidChangeSpeedLimitSetting']?.(rest);
+      const { id, speedLimitSetting } = e;
+      this.subscriptions[id]?.['onDidChangeSpeedLimitSetting']?.(speedLimitSetting);
     });
 
     emitter.addListener('clusterDidZoomIn', e => {
