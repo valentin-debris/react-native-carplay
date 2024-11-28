@@ -548,7 +548,12 @@ RCT_EXPORT_METHOD(updateManeuversNavigationSession:(NSString*)navigationSessionI
         for (NSDictionary *maneuver in maneuvers) {
             [upcomingManeuvers addObject:[self parseManeuver:maneuver]];
         }
-        [navigationSession addManeuvers:upcomingManeuvers];
+        
+        if (@available(iOS 17.4, *)) {
+            // disgusting workaround to prevent crashes on iOS < 17.4 even though this should be supported since iOS 12 according to Apple docs
+            [navigationSession addManeuvers:upcomingManeuvers];
+        }
+
         [navigationSession setUpcomingManeuvers:upcomingManeuvers];
     }
 }
