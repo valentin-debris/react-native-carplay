@@ -64,8 +64,10 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
                     {
                         let attributedString = NSAttributedString(
                             attachment: NSTextAttachment(image: icon))
-                        
-                        if let imagePosition = description["imagePosition"] as? Int {
+
+                        if let imagePosition = description["imagePosition"]
+                            as? Int
+                        {
                             string.insert(attributedString, at: imagePosition)
                         } else {
                             string.append(attributedString)
@@ -83,6 +85,11 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
         }
 
         if let rootView = self.rootView, rootView.moduleName != self.id {
+            if let contentView = self.rootView?.contentView
+                as? RCTRootContentView
+            {
+                contentView.invalidate()
+            }
             rootView.removeFromSuperview()
             self.rootView = nil
         }
@@ -115,17 +122,16 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
     }
 
     @objc public func disconnect() {
-        disconnectWindow()
+        if let contentView = self.rootView?.contentView as? RCTRootContentView {
+            contentView.invalidate()
+        }
+        self.rootView?.removeFromSuperview()
 
+        self.window = nil
         self.isConnected = false
 
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "clusterDidDisconnect", body: ["id": self.id ?? ""])
-    }
-
-    @objc public func disconnectWindow() {
-        self.rootView?.removeFromSuperview()
-        self.window = nil
     }
 
     @objc public func getConnectedWindowInformation() -> [String: Any] {
