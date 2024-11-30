@@ -1708,6 +1708,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 + (void) disconnectFromDashbaordController {
     RNCPStore *store = [RNCPStore sharedManager];
     [store.dashboard disconnect];
+    store.dashboard = nil;
 }
 
 RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {

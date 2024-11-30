@@ -30,91 +30,58 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
         self.window = window
 
         self.interfaceController?.delegate = self
+        self.isConnected = true
 
         connect()
-    }
-
-    internal func connect() {
-        guard let window = self.window else {
-            // connectScene was not called yet
-            return
-        }
-
-        if let rootView = self.rootView, rootView.moduleName != self.moduleName
-        {
-            rootView.removeFromSuperview()
-            self.rootView = nil
-        }
-
-        if self.rootView == nil {
-            guard let bridge = self.bridge else {
-                // connectModule was not called yet
-                return
-            }
-
-            let rootView = RCTRootView(
-                bridge: bridge, moduleName: self.moduleName,
-                initialProperties: [
-                    "id": self.moduleName,
-                    "colorScheme": window.screen.traitCollection
-                        .userInterfaceStyle == .dark ? "dark" : "light",
-                    "window": [
-                        "height": window.bounds.size.height,
-                        "width": window.bounds.size.width,
-                        "scale": window.screen.scale,
-                    ],
-                ])
-
-            self.rootView = rootView
-        }
-
-        if let rootView = self.rootView {
-            window.rootViewController = RNCarPlayViewController(
-                rootView: rootView)
-        }
-
-        if let store = RNCPStore.sharedManager(),
-            let template = store.findTemplate(byId: self.moduleName),
-            let interfaceController = self.interfaceController
-        {
-            if let mapTemplate = template as? CPMapTemplate {
-                // create a new map template to make navigation sessions work on reconnect
-                let reconnectTemplate = CPMapTemplate()
-                reconnectTemplate.automaticallyHidesNavigationBar =
-                    mapTemplate.automaticallyHidesNavigationBar
-                reconnectTemplate.backButton = mapTemplate.backButton
-                reconnectTemplate.guidanceBackgroundColor =
-                    mapTemplate.guidanceBackgroundColor
-                reconnectTemplate.hidesButtonsWithNavigationBar =
-                    mapTemplate.hidesButtonsWithNavigationBar
-                reconnectTemplate.tripEstimateStyle =
-                    mapTemplate.tripEstimateStyle
-                reconnectTemplate.leadingNavigationBarButtons =
-                    mapTemplate.leadingNavigationBarButtons
-                reconnectTemplate.mapButtons = mapTemplate.mapButtons
-                reconnectTemplate.mapDelegate = mapTemplate.mapDelegate
-                reconnectTemplate.trailingNavigationBarButtons =
-                    mapTemplate.trailingNavigationBarButtons
-                reconnectTemplate.userInfo = mapTemplate.userInfo
-
-                interfaceController.setRootTemplate(
-                    reconnectTemplate, animated: false)
-                store.setTemplate(self.moduleName, template: reconnectTemplate)
-            } else {
-                interfaceController.setRootTemplate(template, animated: false)
-            }
-        }
-
-        self.isConnected = true
 
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "didConnect", body: getConnectedWindowInformation())
     }
 
+    internal func connect() {
+        if self.rootView != nil {
+            return
+        }
+
+        guard let window = self.window else {
+            // connectScene was not called yet
+            return
+        }
+
+        guard let bridge = self.bridge else {
+            // connectModule was not called yet
+            return
+        }
+
+        let rootView = RCTRootView(
+            bridge: bridge, moduleName: self.moduleName,
+            initialProperties: [
+                "id": self.moduleName,
+                "colorScheme": window.screen.traitCollection
+                    .userInterfaceStyle == .dark ? "dark" : "light",
+                "window": [
+                    "height": window.bounds.size.height,
+                    "width": window.bounds.size.width,
+                    "scale": window.screen.scale,
+                ],
+            ])
+
+        self.rootView = rootView
+
+        window.rootViewController = RNCarPlayViewController(
+            rootView: rootView)
+    }
+
     @objc public func disconnect() {
+        if let contentView = self.rootView?.contentView as? RCTRootContentView {
+            contentView.invalidate()
+        }
+
         self.rootView?.removeFromSuperview()
 
+        self.rootView = nil
         self.interfaceController = nil
+        self.window?.rootViewController = nil
         self.window = nil
         self.isConnected = false
 

@@ -28,7 +28,8 @@ public class RNCarPlayDashboard: NSObject {
         self.bridge = bridge
         self.moduleName = moduleName
         self.buttonConfig = buttonConfig
-
+        
+        setDashboardButtons()
         connect()
     }
 
@@ -43,55 +44,54 @@ public class RNCarPlayDashboard: NSObject {
     }
 
     private func connect() {
+        if self.rootView != nil {
+            // there is already a visible root view
+            return
+        }
+
         guard let window = self.window else {
             // connectScene was not called yet
             return
         }
 
-        if let rootView = self.rootView, rootView.moduleName != self.moduleName
-        {
-            rootView.removeFromSuperview()
-            self.rootView = nil
+        guard let bridge = self.bridge else {
+            // connectModule was not called yet
+            return
         }
 
-        if self.rootView == nil {
-            guard let bridge = self.bridge else {
-                // connectModule was not called yet
-                return
-            }
+        let rootView = RCTRootView(
+            bridge: bridge, moduleName: self.moduleName,
+            initialProperties: [
+                "id": self.moduleName,
+                "colorScheme": window.screen.traitCollection
+                    .userInterfaceStyle == .dark ? "dark" : "light",
+                "window": [
+                    "height": window.screen.bounds.size.height,
+                    "width": window.screen.bounds.size.width,
+                    "scale": window.screen.scale,
+                ],
+            ])
+        
+        self.rootView = rootView
 
-            let rootView = RCTRootView(
-                bridge: bridge, moduleName: self.moduleName,
-                initialProperties: [
-                    "id": self.moduleName,
-                    "colorScheme": window.screen.traitCollection
-                        .userInterfaceStyle == .dark ? "dark" : "light",
-                    "window": [
-                        "height": window.screen.bounds.size.height,
-                        "width": window.screen.bounds.size.width,
-                        "scale": window.screen.scale,
-                    ],
-                ])
-
-            self.rootView = rootView
-        }
-
-        if let rootView = self.rootView {
-            window.rootViewController = RNCarPlayViewController(
-                rootView: rootView)
-        }
-
-        setDashboardButtons()
-
+        window.rootViewController = RNCarPlayViewController(
+            rootView: rootView)
+        
         self.isConnected = true
+        
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "dashboardDidConnect", body: getConnectedWindowInformation())
     }
 
     @objc func disconnect() {
-        self.rootView?.removeFromSuperview()
+        if let contentView = self.rootView?.contentView as? RCTRootContentView {
+            contentView.invalidate()
+        }
 
+        self.rootView?.removeFromSuperview()
+        self.rootView = nil
         self.dashboardController = nil
+        self.window?.rootViewController = nil
         self.window = nil
         self.isConnected = false
 

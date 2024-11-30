@@ -84,37 +84,27 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
             return
         }
 
-        if let rootView = self.rootView, rootView.moduleName != self.id {
-            if let contentView = self.rootView?.contentView
-                as? RCTRootContentView
-            {
-                contentView.invalidate()
-            }
-            rootView.removeFromSuperview()
-            self.rootView = nil
+        if self.rootView != nil {
+            return
         }
+        
+        let rootView = RCTRootView(
+            bridge: bridge, moduleName: id,
+            initialProperties: [
+                "id": self.id ?? "",
+                "colorScheme": window.screen.traitCollection
+                    .userInterfaceStyle == .dark ? "dark" : "light",
+                "window": [
+                    "height": window.screen.bounds.size.height,
+                    "width": window.screen.bounds.size.width,
+                    "scale": window.screen.scale,
+                ],
+            ])
 
-        if self.rootView == nil {
-            let rootView = RCTRootView(
-                bridge: bridge, moduleName: id,
-                initialProperties: [
-                    "id": self.id ?? "",
-                    "colorScheme": window.screen.traitCollection
-                        .userInterfaceStyle == .dark ? "dark" : "light",
-                    "window": [
-                        "height": window.screen.bounds.size.height,
-                        "width": window.screen.bounds.size.width,
-                        "scale": window.screen.scale,
-                    ],
-                ])
+        self.rootView = rootView
 
-            self.rootView = rootView
-        }
-
-        if let rootView = self.rootView {
-            window.rootViewController = RNCarPlayViewController(
-                rootView: rootView)
-        }
+        window.rootViewController = RNCarPlayViewController(
+            rootView: rootView)
 
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "clusterWindowDidConnect",
@@ -127,6 +117,8 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
         }
         self.rootView?.removeFromSuperview()
 
+        self.rootView = nil
+        self.window?.rootViewController = nil
         self.window = nil
         self.isConnected = false
 
