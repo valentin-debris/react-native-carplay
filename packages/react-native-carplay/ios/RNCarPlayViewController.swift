@@ -27,16 +27,6 @@ public class RNCarPlayViewController: UIViewController {
         self.view.translatesAutoresizingMaskIntoConstraints = false
         self.rootView.frame = self.view.bounds
         self.view = rootView
-//
-//        NSLayoutConstraint.activate([
-//            self.rootView.topAnchor.constraint(equalTo: self.view.topAnchor),
-//            self.rootView.bottomAnchor.constraint(
-//                equalTo: self.view.bottomAnchor),
-//            self.rootView.leadingAnchor.constraint(
-//                equalTo: self.view.leadingAnchor),
-//            self.rootView.trailingAnchor.constraint(
-//                equalTo: self.view.trailingAnchor),
-//        ])
     }
 
     public override func viewWillLayoutSubviews() {

@@ -29,8 +29,8 @@ public class RNCarPlayDashboard: NSObject {
         self.moduleName = moduleName
         self.buttonConfig = buttonConfig
         
-        setDashboardButtons()
         connect()
+        setDashboardButtons()
     }
 
     @objc public func connectScene(
@@ -39,8 +39,10 @@ public class RNCarPlayDashboard: NSObject {
     ) {
         self.dashboardController = dashboardController
         self.window = window
-
-        connect()
+        self.isConnected = true
+        
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: "dashboardDidConnect", body: getConnectedWindowInformation())
     }
 
     private func connect() {
@@ -76,11 +78,6 @@ public class RNCarPlayDashboard: NSObject {
 
         window.rootViewController = RNCarPlayViewController(
             rootView: rootView)
-        
-        self.isConnected = true
-        
-        RNCarPlayUtils.sendRNCarPlayEvent(
-            name: "dashboardDidConnect", body: getConnectedWindowInformation())
     }
 
     @objc func disconnect() {
@@ -170,6 +167,10 @@ public class RNCarPlayDashboard: NSObject {
             }
         }
 
+        if (buttons.isEmpty) {
+            return
+        }
+        
         self.dashboardController?.shortcutButtons = buttons
     }
 }

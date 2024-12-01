@@ -4,8 +4,10 @@ import {
   type EmitterSubscription,
   type NativeEventEmitter,
 } from 'react-native';
-import type { DashboardConfig, DashboardShortcutButtonConfig } from 'src/interfaces/Dashboard';
-import type { InternalCarPlay } from 'src/interfaces/InternalCarPlay';
+import { OnConnectCallback, OnDisconnectCallback } from '../CarPlay';
+import type { DashboardConfig, DashboardShortcutButtonConfig } from '../interfaces/Dashboard';
+import type { InternalCarPlay } from '../interfaces/InternalCarPlay';
+import { WindowInformation } from '../interfaces/WindowInformation';
 
 type NativeDashboardShortcutButtonConfig = Array<
   Omit<DashboardShortcutButtonConfig, 'onPress'> & { index: number; launchCarplayScene: boolean }
@@ -14,6 +16,10 @@ type NativeDashboardShortcutButtonConfig = Array<
 export class Dashboard {
   private readonly bridge: InternalCarPlay;
   private readonly emitter: NativeEventEmitter;
+  public connected = false;
+  public window: WindowInformation | null = null;
+  private onConnectCallbacks = new Set<OnConnectCallback>();
+  private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
 
   private subscriptions: Array<EmitterSubscription> = [];
   private buttonSubscription: EmitterSubscription | null = null;
@@ -21,24 +27,39 @@ export class Dashboard {
   constructor(bridge: InternalCarPlay, emitter: NativeEventEmitter) {
     this.bridge = bridge;
     this.emitter = emitter;
+
+    this.emitter.addListener('dashboardDidConnect', window => {
+      this.connected = true;
+      this.window = window;
+      this.onConnectCallbacks.forEach(callback => {
+        callback(window);
+      });
+    });
+
+    this.emitter.addListener('dashboardDidDisconnect', () => {
+      this.connected = false;
+      this.window = null;
+      this.onDisconnectCallbacks.forEach(callback => {
+        callback();
+      });
+    });
+
+    // check if already connected this will fire any 'dashboardDidDisconnect' events
+    // if a connected is already present.
+    this.bridge.checkForDashboardConnection();
   }
 
   public create(config: DashboardConfig) {
     for (const subscription of [...this.subscriptions, this.buttonSubscription]) {
       subscription?.remove();
     }
-    
-    const { id, component, onConnect, onDisconnect, shortcutButtons } =
-      config;
 
-    if (onConnect != null) {
-      const subscription = this.emitter.addListener('dashboardDidConnect', e => onConnect(e));
-      this.subscriptions.push(subscription);
-    }
+    const { id, component, shortcutButtons } = config;
 
-    if (onDisconnect != null) {
-      const subscription = this.emitter.addListener('dashboardDidDisconnect', onDisconnect);
-      this.subscriptions.push(subscription);
+    if (shortcutButtons.length === 0 || shortcutButtons.length > 2) {
+      throw new Error(
+        `invalid number of dashboard shortcut buttons, got ${shortcutButtons.length} when it has to be a min of 1 and a max of 2`,
+      );
     }
 
     const dashboardConfig: {
@@ -96,4 +117,24 @@ export class Dashboard {
 
     this.bridge.updateDashboardShortcutButtons(config);
   }
+
+  /**
+   * Fired when CarPlay is connected to the dashboard scene.
+   */
+  public registerOnConnect = (callback: OnConnectCallback) => {
+    this.onConnectCallbacks.add(callback);
+    return {
+      remove: () => this.onConnectCallbacks.delete(callback),
+    };
+  };
+
+  /**
+   * Fired when CarPlay is disconnected from the dashboard scene.
+   */
+  public registerOnDisconnect = (callback: OnDisconnectCallback) => {
+    this.onDisconnectCallbacks.add(callback);
+    return {
+      remove: () => this.onDisconnectCallbacks.delete(callback),
+    };
+  };
 }

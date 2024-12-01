@@ -32,8 +32,6 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
         self.interfaceController?.delegate = self
         self.isConnected = true
 
-        connect()
-
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "didConnect", body: getConnectedWindowInformation())
     }
