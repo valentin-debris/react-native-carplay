@@ -28,7 +28,7 @@ export class Dashboard {
     this.bridge = bridge;
     this.emitter = emitter;
 
-    this.emitter.addListener('dashboardDidConnect', window => {
+    this.emitter.addListener('dashboardDidConnect', (window: WindowInformation) => {
       this.connected = true;
       this.window = window;
       this.onConnectCallbacks.forEach(callback => {
@@ -69,7 +69,8 @@ export class Dashboard {
     };
 
     if (shortcutButtons != null) {
-      for (var index = 0; index < shortcutButtons.length; index++) {
+      for (let index = 0; index < shortcutButtons.length; index++) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { onPress, ...button } = shortcutButtons[index];
 
         dashboardConfig.shortcutButtons.push({
@@ -100,7 +101,8 @@ export class Dashboard {
 
     this.buttonSubscription?.remove();
 
-    for (var index = 0; index < shortcutButtons.length; index++) {
+    for (let index = 0; index < shortcutButtons.length; index++) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { onPress, ...button } = shortcutButtons[index];
 
       config.shortcutButtons.push({

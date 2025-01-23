@@ -128,15 +128,18 @@ export class ListTemplate extends Template<ListTemplateConfig> {
   constructor(public config: ListTemplateConfig) {
     super(config);
 
-    let subscription = CarPlay.emitter.addListener('didSelectListItem', (e: { templateId: string; index: number }) => {
-      if (config.onItemSelect && e.templateId === this.id) {
-        void Promise.resolve(config.onItemSelect(e)).then(() => {
-          if (Platform.OS === 'ios') {
-            CarPlay.bridge.reactToSelectedResult(true);
-          }
-        });
-      }
-    });
+    let subscription = CarPlay.emitter.addListener(
+      'didSelectListItem',
+      (e: { templateId: string; index: number }) => {
+        if (config.onItemSelect && e.templateId === this.id) {
+          void Promise.resolve(config.onItemSelect(e)).then(() => {
+            if (Platform.OS === 'ios') {
+              CarPlay.bridge.reactToSelectedResult(true);
+            }
+          });
+        }
+      },
+    );
 
     this.listenerSubscriptions.push(subscription);
 

@@ -33,12 +33,12 @@ export interface PointOfInterestTemplateConfig extends TemplateConfig {
    * Option to hide back button
    * @default false
    */
-    backButtonHidden?: boolean;
+  backButtonHidden?: boolean;
 
-    /**
-     * Title to be shown on the back button, defaults to no text so only the < icon is shown
-     */
-    backButtonTitle?: string;
+  /**
+   * Title to be shown on the back button, defaults to no text so only the < icon is shown
+   */
+  backButtonTitle?: string;
 }
 
 export class PointOfInterestTemplate extends Template<PointOfInterestTemplateConfig> {

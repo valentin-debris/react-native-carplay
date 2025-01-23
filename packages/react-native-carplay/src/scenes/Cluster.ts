@@ -14,8 +14,9 @@ type Events =
 export class Cluster {
   private readonly bridge: InternalCarPlay;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private subscriptions: { [key: string]: Partial<{ [key in Events]: (e?: any) => void }> } = {};
-  private clusterIds = new Set<String>();
+  private clusterIds = new Set<string>();
 
   /**
    * @returns ids of all connected clusters
@@ -27,37 +28,37 @@ export class Cluster {
   constructor(bridge: InternalCarPlay, emitter: NativeEventEmitter) {
     this.bridge = bridge;
 
-    emitter.addListener('clusterDidDisconnect', e => {
-      this.subscriptions[e.id]?.['onDisconnect']?.();
+    emitter.addListener('clusterDidDisconnect', (e: { id: string }) => {
+      this.subscriptions[e.id]?.onDisconnect?.();
       this.clusterIds.delete(e.id);
     });
 
     emitter.addListener('clusterDidChangeCompassSetting', e => {
       const { id, compassSetting } = e;
-      this.subscriptions[id]?.['onDidChangeCompassSetting']?.(compassSetting);
+      this.subscriptions[id]?.onDidChangeCompassSetting?.(compassSetting);
     });
 
     emitter.addListener('clusterDidChangeSpeedLimitSetting', e => {
       const { id, speedLimitSetting } = e;
-      this.subscriptions[id]?.['onDidChangeSpeedLimitSetting']?.(speedLimitSetting);
+      this.subscriptions[id]?.onDidChangeSpeedLimitSetting?.(speedLimitSetting);
     });
 
     emitter.addListener('clusterDidZoomIn', e => {
-      this.subscriptions[e.id]?.['onZoomIn']?.();
+      this.subscriptions[e.id]?.onZoomIn?.();
     });
 
     emitter.addListener('clusterDidZoomOut', e => {
-      this.subscriptions[e.id]?.['onZoomOut']?.();
+      this.subscriptions[e.id]?.onZoomOut?.();
     });
 
     emitter.addListener('clusterWindowDidConnect', e => {
-        const { id, ...rest } = e;
-        this.subscriptions[id]?.['onWindowDidConnect']?.(rest);
+      const { id, ...rest } = e;
+      this.subscriptions[id]?.onWindowDidConnect?.(rest);
     });
 
     emitter.addListener('clusterContentStyleDidChange', e => {
-        const { id, ...rest } = e;
-        this.subscriptions[id]?.['onContentStyleDidChange']?.(rest);
+      const { id, ...rest } = e;
+      this.subscriptions[id]?.onContentStyleDidChange?.(rest);
     });
   }
 

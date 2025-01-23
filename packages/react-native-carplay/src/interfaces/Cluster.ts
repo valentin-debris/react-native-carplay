@@ -10,6 +10,7 @@ export interface ClusterConfig {
    * the component to be rendered, works only for cluster type "Map" & "Navigation App"
    * register onWindowDidConnect to know if the cluster can render your component
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
   /**
    * inactiveDescriptionVariants is an array of a string and an optional image to be displayed when the user is not actively navigating arranged from most to least preferred.
@@ -24,11 +25,7 @@ export interface ClusterConfig {
   onContentStyleDidChange?: (contentStyle: ContentStyle) => void;
 }
 
-export type OnClusterControllerConnectCallback = ({
-  id,
-}: {
-  id: string;
-}) => void;
+export type OnClusterControllerConnectCallback = ({ id }: { id: string }) => void;
 
 export interface InactiveDescriptionVariant {
   text: string;

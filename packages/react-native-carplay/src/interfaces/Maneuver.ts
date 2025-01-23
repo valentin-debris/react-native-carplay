@@ -41,7 +41,7 @@ export interface Maneuver {
    * specify angles (or a single angle) between -180° and +180°
    */
   junctionElementAngles?: Array<number>;
-  roadFollowingManeuverVariants?: Array<String>;
+  roadFollowingManeuverVariants?: Array<string>;
   highwayExitLabel?: string;
 }
 
@@ -104,10 +104,10 @@ export enum ManeuverType {
 
 export enum JunctionType {
   Intersection = 0, // single intersection with roads coming to a common point
-  Roundabout   = 1, // roundabout, junction elements represent roads exiting the roundabout
-};
+  Roundabout = 1, // roundabout, junction elements represent roads exiting the roundabout
+}
 
 export enum TrafficSide {
   Right = 0, // counterclockwise for roundabouts
-  Left  = 1, // clockwise for roundabouts
+  Left = 1, // clockwise for roundabouts
 }

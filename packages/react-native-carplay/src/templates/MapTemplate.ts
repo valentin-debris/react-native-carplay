@@ -31,7 +31,7 @@ export interface NavigationAlertShowEvent extends BaseEvent {
 
 export interface NavigationAlertHideEvent extends BaseEvent {
   navigationAlertId: string;
-  reason: 'none' | 'timeout' | 'system' | 'user';
+  reason: 'none' | 'timeout' | 'system' | 'user';
 }
 
 export interface PanEvent {
@@ -129,7 +129,7 @@ export interface MapTemplateConfig extends TemplateConfig {
    * @param e Event providing the templateId and the navigationAlertId
    */
   onWillShowNavigationAlert?(e: NavigationAlertShowEvent): void;
-    /**
+  /**
    * Fired when a navigation alert is shown
    * @param e Event providing the templateId and the navigationAlertId
    */
@@ -153,16 +153,16 @@ export interface MapTemplateConfig extends TemplateConfig {
    */
   onBackButtonPressed?(): void;
 
-   /**
+  /**
    * Option to hide back button
    * @default false
    */
-    backButtonHidden?: boolean;
+  backButtonHidden?: boolean;
 
-    /**
-     * Title to be shown on the back button, defaults to no text so only the < icon is shown
-     */
-    backButtonTitle?: string;
+  /**
+   * Title to be shown on the back button, defaults to no text so only the < icon is shown
+   */
+  backButtonTitle?: string;
 }
 
 /**
@@ -270,7 +270,7 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       }),
     );
   }
-  
+
   public updateTravelEstimates(maneuverIndex: number, travelEstimates: TravelEstimates) {
     if (!travelEstimates.distanceUnits) {
       travelEstimates.distanceUnits = 'kilometers';

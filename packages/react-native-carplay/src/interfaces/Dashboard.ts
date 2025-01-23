@@ -1,5 +1,4 @@
 import type { ImageSourcePropType } from 'react-native';
-import type { WindowInformation } from './WindowInformation';
 
 export interface DashboardShortcutButtonConfig {
   titleVariants: Array<string>;
@@ -14,6 +13,7 @@ export interface DashboardShortcutButtonConfig {
 
 export interface DashboardConfig {
   id: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   component: React.ComponentType<any>;
   /**
    * Buttons shown on the Dashboard when no navigation is active
