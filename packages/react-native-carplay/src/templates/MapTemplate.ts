@@ -1,11 +1,10 @@
-import { AppRegistry, Platform, ProcessedColorValue } from 'react-native';
+import { AppRegistry, Image, Platform, processColor, ProcessedColorValue } from 'react-native';
 import { CarPlay } from '../CarPlay';
 import { MapButton } from '../interfaces/MapButton';
 import { NavigationAlert } from '../interfaces/NavigationAlert';
 import { TextConfiguration } from '../interfaces/TextConfiguration';
 import { TimeRemainingColor } from '../interfaces/TimeRemainingColor';
 import { TravelEstimates } from '../interfaces/TravelEstimates';
-import { NavigationSession } from '../navigation/NavigationSession';
 import { Trip } from '../navigation/Trip';
 import { BaseEvent, Template, TemplateConfig } from './Template';
 import { ListItem } from '../interfaces/ListItem';
@@ -13,6 +12,8 @@ import { Action } from '../interfaces/Action';
 import { Header } from '../interfaces/Header';
 import { Pane } from '../interfaces/Pane';
 import { PanGestureWithTranslationEvent } from 'src/interfaces/PanGestureWithTranslationEvent';
+import { PauseReason } from 'src/interfaces/PauseReason';
+import { Maneuver } from 'src/interfaces/Maneuver';
 
 export interface MapButtonEvent extends BaseEvent {
   id: string;
@@ -140,6 +141,10 @@ export interface MapTemplateConfig extends TemplateConfig {
   onPanEndedWithDirection?(e: PanEvent): void;
   onDidUpdatePanGestureWithTranslation?(e: PanGestureWithTranslationEvent): void;
   onSelectedPreviewForTrip?(e: TripEvent): void;
+  /**
+   * Fired when the vehicles built in navigation system is started by the user,
+   * any ongoing navigation session is canceled on native side when this happens
+   */
   onDidCancelNavigation?(): void;
   onStartedTrip?(e: TripEvent): void;
 
@@ -221,12 +226,59 @@ export class MapTemplate extends Template<MapTemplateConfig> {
    * Keep a reference to the navigation session to perform guidance updates.
    * @param trip Trip class instance
    */
-  public async startNavigationSession(trip: Trip): Promise<NavigationSession> {
-    const res = await CarPlay.bridge.startNavigationSession(this.id, trip.id);
-    return new NavigationSession(res.navigationSessionId, trip, this);
+  public async startNavigationSession(trip: Trip) {
+    return CarPlay.bridge.startNavigationSession(this.id, trip.id);
   }
 
-  public updateTravelEstimates(
+  public cancelNavigationSession() {
+    return CarPlay.bridge.cancelNavigationSession();
+  }
+
+  public finishNavigationSession() {
+    return CarPlay.bridge.finishNavigationSession();
+  }
+
+  public pauseNavigationSession(reason: PauseReason, description?: string) {
+    return CarPlay.bridge.pauseNavigation(reason, description);
+  }
+
+  public updateManeuvers(maneuvers: Maneuver[]) {
+    const windowScale = CarPlay.window?.scale || 1.0;
+    CarPlay.bridge.updateManeuvers(
+      maneuvers.map(maneuver => {
+        let symbolImage: Maneuver['symbolImage'];
+        let symbolImageSize: Maneuver['symbolImageSize'];
+        let junctionImage: Maneuver['junctionImage'];
+        let tintSymbolImage: Maneuver['tintSymbolImage'];
+
+        if (maneuver.symbolImage) {
+          const image = Image.resolveAssetSource(maneuver.symbolImage);
+          symbolImage = image;
+          symbolImageSize = maneuver.symbolImageSize ?? { width: 50, height: 50 };
+          const scale = image.scale || 1.0;
+          const width = Math.floor((symbolImageSize.width * windowScale) / scale);
+          const height = Math.floor((symbolImageSize.height * windowScale) / scale);
+          symbolImageSize = { width, height };
+        }
+        if (maneuver.junctionImage) {
+          junctionImage = Image.resolveAssetSource(maneuver.junctionImage);
+        }
+        if (maneuver.tintSymbolImage && typeof maneuver.tintSymbolImage === 'string') {
+          tintSymbolImage = processColor(maneuver.tintSymbolImage);
+        }
+        return { ...maneuver, symbolImage, symbolImageSize, junctionImage, tintSymbolImage };
+      }),
+    );
+  }
+  
+  public updateTravelEstimates(maneuverIndex: number, travelEstimates: TravelEstimates) {
+    if (!travelEstimates.distanceUnits) {
+      travelEstimates.distanceUnits = 'kilometers';
+    }
+    CarPlay.bridge.updateTravelEstimatesNavigationSession(maneuverIndex, travelEstimates);
+  }
+
+  public updateTravelEstimatesForTrip(
     trip: Trip,
     travelEstimates: TravelEstimates,
     timeRemainingColor: TimeRemainingColor = 0,

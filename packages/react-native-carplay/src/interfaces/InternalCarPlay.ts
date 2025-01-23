@@ -18,15 +18,14 @@ export interface InternalCarPlay extends NativeModule {
     presentTemplate(templateId: string, animated: boolean): void;
     dismissTemplate(animated: boolean): void;
     enableNowPlaying(enabled: boolean): void;
-    updateManeuversNavigationSession(id: string, x: Maneuver[]): void;
+    updateManeuvers(maneuvers: Maneuver[]): void;
     updateTravelEstimatesNavigationSession(
-      id: string,
       index: number,
       estimates: TravelEstimates,
     ): void;
-    cancelNavigationSession(id: string): void;
-    finishNavigationSession(id: string): void;
-    pauseNavigationSession(id: string, reason: PauseReason, description?: string): void;
+    cancelNavigationSession(): Promise<void>;
+    finishNavigationSession(): Promise<void>;
+    pauseNavigation(reason: PauseReason, description?: string): Promise<void>;
     createTrip(id: string, config: TripConfig): void;
     updateInformationTemplateItems(id: string, config: unknown): void;
     updateInformationTemplateActions(id: string, config: unknown): void;
@@ -34,12 +33,9 @@ export interface InternalCarPlay extends NativeModule {
     updateTemplate(id: string, config: unknown): void;
     invalidate(id: string): void;
     startNavigationSession(
-      id: string,
+      templateId: string,
       tripId: string,
-    ): Promise<{
-      tripId: string;
-      navigationSessionId: string;
-    }>;
+    ): Promise<void>;
     updateTravelEstimatesForTrip(
       id: string,
       tripId: string,

@@ -2,14 +2,13 @@
 
 @implementation RNCPStore {
     NSMutableDictionary* _templatesStore;
-    NSMutableDictionary* _navigationSessionsStore;
+    CPNavigationSession* _navigationSession;
     NSMutableDictionary* _tripsStore;
 }
 
 -(instancetype)init {
     if (self = [super init]) {
         _templatesStore = [[NSMutableDictionary alloc] init];
-        _navigationSessionsStore = [[NSMutableDictionary alloc] init];
         _tripsStore = [[NSMutableDictionary alloc] init];
         self.cluster = [[NSMutableDictionary alloc] init];
     }
@@ -44,13 +43,12 @@
     return tripId;
 }
 
-- (CPNavigationSession*) findNavigationSessionById:(NSString*)navigationSessionId {
-    return [_navigationSessionsStore objectForKey:navigationSessionId];
+- (CPNavigationSession*) getNavigationSession {
+    return _navigationSession;
 }
 
-- (NSString*) setNavigationSession:(NSString*)navigationSessionId navigationSession:(CPNavigationSession*)navigationSession {
-    [_navigationSessionsStore setObject:navigationSession forKey:navigationSessionId];
-    return navigationSessionId;
+- (void) setNavigationSession:(CPNavigationSession*)navigationSession {
+    _navigationSession = navigationSession;
 }
 
 - (NSArray*) getTemplateIds {

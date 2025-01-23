@@ -24,7 +24,6 @@ export * from './templates/android/RoutePreviewNavigationTemplate';
 // Others
 export * from './CarPlay';
 export * from './navigation/Trip';
-export * from './navigation/NavigationSession';
 
 // Types
 export * from './interfaces/Action';

@@ -532,17 +532,23 @@ RCT_REMAP_METHOD(startNavigationSession,
         CPMapTemplate *mapTemplate = (CPMapTemplate*) template;
         CPTrip *trip = [[RNCPStore sharedManager] findTripById:tripId];
         if (trip) {
-            CPNavigationSession *navigationSession = [mapTemplate startNavigationSessionForTrip:trip];
-            [store setNavigationSession:tripId navigationSession:navigationSession];
-            resolve(@{ @"tripId": tripId, @"navigationSessionId": tripId });
+            CPNavigationSession *navigationSession = [[RNCPStore sharedManager] getNavigationSession];
+            if (navigationSession) {
+                [navigationSession cancelTrip];
+                [[RNCPStore sharedManager] setNavigationSession:nil];
+            }
+            
+            navigationSession = [mapTemplate startNavigationSessionForTrip:trip];
+            [store setNavigationSession:navigationSession];
+            resolve(nil);
         }
     } else {
         reject(@"template_not_found", @"Template not found in store", nil);
     }
 }
 
-RCT_EXPORT_METHOD(updateManeuversNavigationSession:(NSString*)navigationSessionId maneuvers:(NSArray*)maneuvers) {
-    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] findNavigationSessionById:navigationSessionId];
+RCT_EXPORT_METHOD(updateManeuvers:(NSArray*)maneuvers) {
+    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] getNavigationSession];
     if (navigationSession) {
         NSMutableArray<CPManeuver*>* upcomingManeuvers = [NSMutableArray array];
         for (NSDictionary *maneuver in maneuvers) {
@@ -558,8 +564,8 @@ RCT_EXPORT_METHOD(updateManeuversNavigationSession:(NSString*)navigationSessionI
     }
 }
 
-RCT_EXPORT_METHOD(updateTravelEstimatesNavigationSession:(NSString*)navigationSessionId maneuverIndex:(NSUInteger)maneuverIndex travelEstimates:(NSDictionary*)travelEstimates) {
-    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] findNavigationSessionById:navigationSessionId];
+RCT_EXPORT_METHOD(updateTravelEstimatesNavigationSession:(NSUInteger)maneuverIndex travelEstimates:(NSDictionary*)travelEstimates) {
+    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] getNavigationSession];
     if (navigationSession) {
         CPManeuver *maneuver = [[navigationSession upcomingManeuvers] objectAtIndex:maneuverIndex];
         if (maneuver) {
@@ -568,28 +574,35 @@ RCT_EXPORT_METHOD(updateTravelEstimatesNavigationSession:(NSString*)navigationSe
     }
 }
 
-RCT_EXPORT_METHOD(pauseNavigationSession:(NSString*)navigationSessionId reason:(NSUInteger*)reason description:(NSString*)description) {
-    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] findNavigationSessionById:navigationSessionId];
+RCT_EXPORT_METHOD(pauseNavigationSession:(NSUInteger*)reason description:(NSString*)description resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] getNavigationSession];
     if (navigationSession) {
         [navigationSession pauseTripForReason:(CPTripPauseReason) reason description:description];
+        resolve(nil);
     } else {
-        NSLog(@"Could not find session");
+        reject(@"no_session", @"Could not pause. No session found.", nil);
     }
 }
 
-RCT_EXPORT_METHOD(cancelNavigationSession:(NSString*)navigationSessionId) {
-    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] findNavigationSessionById:navigationSessionId];
+RCT_EXPORT_METHOD(cancelNavigationSession:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] getNavigationSession];
     if (navigationSession) {
         [navigationSession cancelTrip];
+        [[RNCPStore sharedManager] setNavigationSession:nil];
+        resolve(nil);
     } else {
-        NSLog(@"Could not cancel. No session found.");
+        reject(@"no_session", @"Could not cancel. No session found.", nil);
     }
 }
 
-RCT_EXPORT_METHOD(finishNavigationSession:(NSString*)navigationSessionId) {
-    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] findNavigationSessionById:navigationSessionId];
+RCT_EXPORT_METHOD(finishNavigationSession:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] getNavigationSession];
     if (navigationSession) {
         [navigationSession finishTrip];
+        [[RNCPStore sharedManager] setNavigationSession:nil];
+        resolve(nil);
+    } else {
+        reject(@"no_session", @"Could not finish. No session found.", nil);
     }
 }
 
@@ -1572,6 +1585,11 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 }
 
 - (void)mapTemplateDidCancelNavigation:(CPMapTemplate *)mapTemplate {
+    CPNavigationSession* navigationSession = [[RNCPStore sharedManager] getNavigationSession];
+    if (navigationSession) {
+        [navigationSession cancelTrip];
+        [[RNCPStore sharedManager] setNavigationSession:nil];
+    }
     [self sendTemplateEventWithName:mapTemplate name:@"didCancelNavigation"];
 }
 

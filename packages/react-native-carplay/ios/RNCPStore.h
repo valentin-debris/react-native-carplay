@@ -14,8 +14,8 @@
 - (NSString*) setTemplate:(NSString*)templateId template:(CPTemplate*)carPlayTemplate;
 - (CPTrip*) findTripById: (NSString*)tripId;
 - (NSString*) setTrip:(NSString*)tripId trip:(CPTrip*)trip;
-- (CPNavigationSession*) findNavigationSessionById:(NSString*)navigationSessionId;
-- (NSString*) setNavigationSession:(NSString*)navigationSessionId navigationSession:(CPNavigationSession*)navigationSession;
+- (CPNavigationSession*) getNavigationSession;
+- (void) setNavigationSession:(CPNavigationSession*)navigationSession;
 - (NSArray*) getTemplateIds;
 
 @end
