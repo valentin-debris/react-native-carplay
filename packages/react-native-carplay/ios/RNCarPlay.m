@@ -589,7 +589,9 @@ RCT_EXPORT_METHOD(cancelNavigationSession:(RCTPromiseResolveBlock)resolve reject
     if (navigationSession) {
         [navigationSession cancelTrip];
         [[RNCPStore sharedManager] setNavigationSession:nil];
-        resolve(nil);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            resolve(nil);
+        });
     } else {
         reject(@"no_session", @"Could not cancel. No session found.", nil);
     }
@@ -600,7 +602,9 @@ RCT_EXPORT_METHOD(finishNavigationSession:(RCTPromiseResolveBlock)resolve reject
     if (navigationSession) {
         [navigationSession finishTrip];
         [[RNCPStore sharedManager] setNavigationSession:nil];
-        resolve(nil);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            resolve(nil);
+        });
     } else {
         reject(@"no_session", @"Could not finish. No session found.", nil);
     }
