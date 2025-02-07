@@ -22,12 +22,15 @@ typedef void(^SelectedResultBlock)(void);
 
 + (void) connectWithInterfaceController:(CPInterfaceController*_Nullable)interfaceController window:(CPWindow*_Nonnull)window;
 + (void) disconnect;
-- (NSArray<CPListSection*>*_Nullable) parseSections:(NSArray*_Nonnull)sections templateId:(NSString *_Nonnull)templateId;
++ (void) stateChanged:(BOOL)isVisible;
+
 + (void) connectWithDashboardController:(CPDashboardController*_Nonnull)dashboardController window:(UIWindow*_Nonnull)window;
 + (void) disconnectFromDashbaordController;
++ (void) dashboardStateChanged:(BOOL)isVisible;
 
 + (void) connectWithInstrumentClusterController:(CPInstrumentClusterController *_Nonnull)instrumentClusterController contentStyle:(UIUserInterfaceStyle)contentStyle clusterId:(NSString *_Nonnull)clusterId API_AVAILABLE(ios(15.4));
 + (void) clusterContentStyleDidChange:(UIUserInterfaceStyle)contentStyle clusterId:(NSString *_Nonnull)clusterId API_AVAILABLE(ios(15.4));
 + (void) disconnectFromInstrumentClusterController:(NSString *_Nonnull)clusterId;
++ (void) clusterStateChanged:(NSString *_Nonnull)clusterId isVisible:(BOOL)isVisible;
 
 @end

@@ -163,6 +163,12 @@ export interface MapTemplateConfig extends TemplateConfig {
    * Title to be shown on the back button, defaults to no text so only the < icon is shown
    */
   backButtonTitle?: string;
+
+  /**
+   * fired when the scene hosting the map template changes its state
+   * @param isVisible 
+   */
+  onStateChanged?: (isVisible: boolean) => void;
 }
 
 /**
@@ -197,6 +203,7 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       didCancelNavigation: 'onDidCancelNavigation',
       startedTrip: 'onStartedTrip',
       backButtonPressed: 'onBackButtonPressed',
+      stateDidChange: 'onStateChanged'
     };
   }
 

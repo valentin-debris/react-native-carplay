@@ -9,7 +9,7 @@ type Events =
   | 'onZoomIn'
   | 'onZoomOut'
   | 'onWindowDidConnect'
-  | 'onContentStyleDidChange';
+  | 'onContentStyleDidChange' | 'onStateChanged';
 
 export class Cluster {
   private readonly bridge: InternalCarPlay;
@@ -60,6 +60,11 @@ export class Cluster {
       const { id, ...rest } = e;
       this.subscriptions[id]?.onContentStyleDidChange?.(rest);
     });
+
+    emitter.addListener('clusterStateDidChange', e => {
+      const { id, isVisible} = e;
+      this.subscriptions[id]?.onStateChanged?.(isVisible);
+    });
   }
 
   public create(config: ClusterConfig) {
@@ -74,6 +79,7 @@ export class Cluster {
       onZoomOut,
       onWindowDidConnect,
       onContentStyleDidChange,
+      onStateChanged,
     } = config;
 
     this.subscriptions[id] = {
@@ -84,6 +90,7 @@ export class Cluster {
       onZoomOut,
       onWindowDidConnect,
       onContentStyleDidChange,
+      onStateChanged,
     };
 
     const clusterConfig = {

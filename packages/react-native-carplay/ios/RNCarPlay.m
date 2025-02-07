@@ -67,6 +67,10 @@
     [app disconnect];
 }
 
++ (void) stateChanged:(BOOL)isVisible {
+    [RNCarPlayUtils sendRNCarPlayEventWithName:@"stateDidChange" body:@{@"isVisible": @(isVisible)}];
+}
+
 RCT_EXPORT_MODULE();
 
 + (id)allocWithZone:(NSZone *)zone {
@@ -83,6 +87,7 @@ RCT_EXPORT_MODULE();
     return @[
         @"didConnect",
         @"didDisconnect",
+        @"stateDidChange",
         @"didPressMenuItem",
         @"appearanceDidChange",
         @"safeAreaInsetsDidChange",
@@ -136,6 +141,7 @@ RCT_EXPORT_MODULE();
         @"dashboardDidConnect",
         @"dashboardDidDisconnect",
         @"dashboardButtonPressed",
+        @"dashboardStateDidChange",
         //cluster
         @"clusterControllerDidConnect",
         @"clusterWindowDidConnect",
@@ -144,7 +150,8 @@ RCT_EXPORT_MODULE();
         @"clusterDidChangeSpeedLimitSetting",
         @"clusterDidZoomIn",
         @"clusterDidZoomOut",
-        @"clusterContentStyleDidChange"
+        @"clusterContentStyleDidChange",
+        @"clusterStateDidChange"
     ];
 }
 
@@ -1732,6 +1739,10 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     [store.dashboard disconnect];
 }
 
++ (void) dashboardStateChanged:(BOOL)isVisible {
+    [RNCarPlayUtils sendRNCarPlayEventWithName:@"dashboardStateDidChange" body:@{@"isVisible": @(isVisible)}];
+}
+
 RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
     RNCPStore *store = [RNCPStore sharedManager];
     if (store.dashboard == nil) {
@@ -1775,6 +1786,10 @@ RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
     RNCarPlayCluster *cluster = [store.cluster objectForKey:clusterId];
     [cluster disconnect];
     [store.cluster removeObjectForKey:clusterId];
+}
+
++ (void) clusterStateChanged:(NSString *)clusterId isVisible:(BOOL)isVisible {
+    [RNCarPlayUtils sendRNCarPlayEventWithName:@"clusterStateDidChange" body:@{@"id": clusterId, @"isVisible": @(isVisible)}];
 }
 
 RCT_EXPORT_METHOD(initCluster:(NSString *)clusterId config:(NSDictionary *)config) {

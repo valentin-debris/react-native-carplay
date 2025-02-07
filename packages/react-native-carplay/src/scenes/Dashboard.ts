@@ -21,7 +21,7 @@ export class Dashboard {
   private onConnectCallbacks = new Set<OnConnectCallback>();
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
 
-  private subscriptions: Array<EmitterSubscription> = [];
+  private stateSubscription: EmitterSubscription | null = null;
   private buttonSubscription: EmitterSubscription | null = null;
 
   constructor(bridge: InternalCarPlay, emitter: NativeEventEmitter) {
@@ -50,11 +50,11 @@ export class Dashboard {
   }
 
   public create(config: DashboardConfig) {
-    for (const subscription of [...this.subscriptions, this.buttonSubscription]) {
+    for (const subscription of [this.stateSubscription, this.buttonSubscription]) {
       subscription?.remove();
     }
 
-    const { id, component, shortcutButtons } = config;
+    const { id, component, shortcutButtons, onStateChanged } = config;
 
     if (shortcutButtons.length === 0 || shortcutButtons.length > 2) {
       throw new Error(
@@ -84,6 +84,12 @@ export class Dashboard {
       this.buttonSubscription = this.emitter.addListener('dashboardButtonPressed', e => {
         shortcutButtons[e.index]?.onPress?.();
       });
+
+      if (onStateChanged != null) {
+        this.stateSubscription = this.emitter.addListener("dashboardStateDidChange", e => {
+          onStateChanged(e.isVisible);
+        });
+      }
     }
 
     AppRegistry.registerComponent(id, () => component);

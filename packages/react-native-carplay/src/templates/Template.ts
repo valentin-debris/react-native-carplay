@@ -116,8 +116,14 @@ export class Template<P> {
 
     Object.entries(eventMap).forEach(([eventName, callbackName]) => {
       const subscription = CarPlay.emitter.addListener(eventName, e => {
+        // stateDidChange is fired by the scene which does not know anything about the template id but affects only MapTemplate
+        const isStateChangedEvent = eventName === 'stateDidChange';
+        if (isStateChangedEvent) {
+          e = e.isVisible;
+        }
+
         const callback =
-          e.templateId === this.id && callbackName in config
+          (e.templateId === this.id || isStateChangedEvent) && callbackName in config
             ? config[callbackName as keyof typeof config]
             : null;
         if (callback == null || typeof callback !== 'function') {
