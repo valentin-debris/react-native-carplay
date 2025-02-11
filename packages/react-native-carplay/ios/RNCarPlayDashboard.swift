@@ -28,7 +28,7 @@ public class RNCarPlayDashboard: NSObject {
         self.bridge = bridge
         self.moduleName = moduleName
         self.buttonConfig = buttonConfig
-        
+
         connect()
         setDashboardButtons()
     }
@@ -40,7 +40,7 @@ public class RNCarPlayDashboard: NSObject {
         self.dashboardController = dashboardController
         self.window = window
         self.isConnected = true
-        
+
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "dashboardDidConnect", body: getConnectedWindowInformation())
     }
@@ -73,11 +73,18 @@ public class RNCarPlayDashboard: NSObject {
                     "scale": window.screen.scale,
                 ],
             ])
-        
+
         self.rootView = rootView
 
         window.rootViewController = RNCarPlayViewController(
             rootView: rootView)
+
+        let isVisible = RNCPStore.sharedManager().getVisibility(
+            RNCarPlayConstants.SceneIdCarPlayDashbaord)
+
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: RNCarPlayConstants.EventDashboardStateDidChange,
+            body: ["isVisible": isVisible])
     }
 
     @objc func disconnect() {
@@ -167,10 +174,10 @@ public class RNCarPlayDashboard: NSObject {
             }
         }
 
-        if (buttons.isEmpty) {
+        if buttons.isEmpty {
             return
         }
-        
+
         self.dashboardController?.shortcutButtons = buttons
     }
 }

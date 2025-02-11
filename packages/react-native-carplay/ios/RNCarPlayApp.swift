@@ -68,6 +68,13 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
 
         window.rootViewController = RNCarPlayViewController(
             rootView: rootView)
+
+        let isVisible = RNCPStore.sharedManager().getVisibility(
+            RNCarPlayConstants.SceneIdCarPlayApp)
+
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: RNCarPlayConstants.EventStateDidChange,
+            body: ["isVisible": isVisible])
     }
 
     @objc public func disconnect() {

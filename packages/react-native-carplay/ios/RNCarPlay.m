@@ -68,7 +68,9 @@
 }
 
 + (void) stateChanged:(BOOL)isVisible {
-    [RNCarPlayUtils sendRNCarPlayEventWithName:@"stateDidChange" body:@{@"isVisible": @(isVisible)}];
+    RNCPStore *store = [RNCPStore sharedManager];
+    [store setVisibility:isVisible forScene:RNCarPlayConstants.SceneIdCarPlayApp];
+    [RNCarPlayUtils sendRNCarPlayEventWithName:RNCarPlayConstants.EventStateDidChange body:@{@"isVisible": @(isVisible)}];
 }
 
 RCT_EXPORT_MODULE();
@@ -87,7 +89,7 @@ RCT_EXPORT_MODULE();
     return @[
         @"didConnect",
         @"didDisconnect",
-        @"stateDidChange",
+        RNCarPlayConstants.EventStateDidChange,
         @"didPressMenuItem",
         @"appearanceDidChange",
         @"safeAreaInsetsDidChange",
@@ -141,7 +143,7 @@ RCT_EXPORT_MODULE();
         @"dashboardDidConnect",
         @"dashboardDidDisconnect",
         @"dashboardButtonPressed",
-        @"dashboardStateDidChange",
+        RNCarPlayConstants.EventDashboardStateDidChange,
         //cluster
         @"clusterControllerDidConnect",
         @"clusterWindowDidConnect",
@@ -151,7 +153,7 @@ RCT_EXPORT_MODULE();
         @"clusterDidZoomIn",
         @"clusterDidZoomOut",
         @"clusterContentStyleDidChange",
-        @"clusterStateDidChange"
+        RNCarPlayConstants.EventClusterStateDidChange
     ];
 }
 
@@ -1740,7 +1742,9 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 }
 
 + (void) dashboardStateChanged:(BOOL)isVisible {
-    [RNCarPlayUtils sendRNCarPlayEventWithName:@"dashboardStateDidChange" body:@{@"isVisible": @(isVisible)}];
+    RNCPStore *store = [RNCPStore sharedManager];
+    [store setVisibility:isVisible forScene:RNCarPlayConstants.SceneIdCarPlayDashbaord];
+    [RNCarPlayUtils sendRNCarPlayEventWithName:RNCarPlayConstants.EventDashboardStateDidChange body:@{@"isVisible": @(isVisible)}];
 }
 
 RCT_EXPORT_METHOD(createDashboard:(NSString *)dashboardId config:(NSDictionary*)config) {
@@ -1789,7 +1793,9 @@ RCT_EXPORT_METHOD(updateDashboardShortcutButtons:(NSDictionary*)config) {
 }
 
 + (void) clusterStateChanged:(NSString *)clusterId isVisible:(BOOL)isVisible {
-    [RNCarPlayUtils sendRNCarPlayEventWithName:@"clusterStateDidChange" body:@{@"id": clusterId, @"isVisible": @(isVisible)}];
+    RNCPStore *store = [RNCPStore sharedManager];
+    [store setVisibility:isVisible forScene:clusterId];
+    [RNCarPlayUtils sendRNCarPlayEventWithName:RNCarPlayConstants.EventClusterStateDidChange body:@{@"id": clusterId, @"isVisible": @(isVisible)}];
 }
 
 RCT_EXPORT_METHOD(initCluster:(NSString *)clusterId config:(NSDictionary *)config) {

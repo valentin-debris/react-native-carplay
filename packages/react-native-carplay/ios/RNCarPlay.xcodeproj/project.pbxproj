@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		732845FB2D5B4E17003519EE /* RNCarPlayCluster.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732845F92D5B4E17003519EE /* RNCarPlayCluster.swift */; };
+		732845FC2D5B4E17003519EE /* RNCarPlayConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732845FA2D5B4E17003519EE /* RNCarPlayConstants.swift */; };
 		7354597A2CCA3E2C00E4A6A7 /* RNCarPlayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735459792CCA3E2700E4A6A7 /* RNCarPlayViewController.swift */; };
 		735459902CCA65DF00E4A6A7 /* RNCarPlayApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7354598F2CCA65DF00E4A6A7 /* RNCarPlayApp.swift */; };
 		735459922CCAB10600E4A6A7 /* RNCarPlayNavigationAlertWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 735459912CCAB10600E4A6A7 /* RNCarPlayNavigationAlertWrapper.swift */; };
@@ -30,6 +32,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		732845F92D5B4E17003519EE /* RNCarPlayCluster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayCluster.swift; sourceTree = "<group>"; };
+		732845FA2D5B4E17003519EE /* RNCarPlayConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayConstants.swift; sourceTree = "<group>"; };
 		735459792CCA3E2700E4A6A7 /* RNCarPlayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayViewController.swift; sourceTree = "<group>"; };
 		7354598F2CCA65DF00E4A6A7 /* RNCarPlayApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayApp.swift; sourceTree = "<group>"; };
 		735459912CCAB10600E4A6A7 /* RNCarPlayNavigationAlertWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNCarPlayNavigationAlertWrapper.swift; sourceTree = "<group>"; };
@@ -72,6 +76,8 @@
 				737B95C02CB96FA700ED2122 /* RNCarPlay-Bridging-Header.h */,
 				735459792CCA3E2700E4A6A7 /* RNCarPlayViewController.swift */,
 				735459912CCAB10600E4A6A7 /* RNCarPlayNavigationAlertWrapper.swift */,
+				732845F92D5B4E17003519EE /* RNCarPlayCluster.swift */,
+				732845FA2D5B4E17003519EE /* RNCarPlayConstants.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -147,6 +153,8 @@
 				735459942CCABFFD00E4A6A7 /* RNCarPlayUtils.swift in Sources */,
 				E344BCC82249585C006FD80D /* RNCPStore.m in Sources */,
 				737B95BF2CB96FA200ED2122 /* RNCarPlayDashboard.swift in Sources */,
+				732845FB2D5B4E17003519EE /* RNCarPlayCluster.swift in Sources */,
+				732845FC2D5B4E17003519EE /* RNCarPlayConstants.swift in Sources */,
 				735459922CCAB10600E4A6A7 /* RNCarPlayNavigationAlertWrapper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

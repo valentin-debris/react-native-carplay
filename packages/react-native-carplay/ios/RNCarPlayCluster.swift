@@ -87,7 +87,7 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
         if self.rootView != nil {
             return
         }
-        
+
         let rootView = RCTRootView(
             bridge: bridge, moduleName: id,
             initialProperties: [
@@ -109,6 +109,12 @@ public class RNCarPlayCluster: NSObject, CPInstrumentClusterControllerDelegate {
         RNCarPlayUtils.sendRNCarPlayEvent(
             name: "clusterWindowDidConnect",
             body: getConnectedWindowInformation())
+
+        let isVisible = RNCPStore.sharedManager().getVisibility(id)
+
+        RNCarPlayUtils.sendRNCarPlayEvent(
+            name: RNCarPlayConstants.EventClusterStateDidChange,
+            body: ["isVisible": isVisible])
     }
 
     @objc public func disconnect() {
