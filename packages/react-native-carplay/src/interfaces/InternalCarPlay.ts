@@ -42,7 +42,7 @@ export interface InternalCarPlay extends NativeModule {
   showTripPreviews(id: string, previews: string[], config: TextConfiguration): void;
   showRouteChoicesPreviewForTrip(id: string, tripId: string, config: TextConfiguration): void;
   presentNavigationAlert(id: string, config: unknown, animated: boolean): void;
-  dismissNavigationAlert(id: string, animated: boolean): void;
+  dismissNavigationAlert(id: string, animated: boolean): Promise<boolean>;
   showPanningInterface(id: string, animated: boolean): void;
   dismissPanningInterface(id: string, animated: boolean): void;
   getMaximumListSectionCount(id: string): Promise<number>;
