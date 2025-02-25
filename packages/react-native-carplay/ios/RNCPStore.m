@@ -4,12 +4,14 @@
     NSMutableDictionary* _templatesStore;
     CPNavigationSession* _navigationSession;
     NSMutableDictionary* _tripsStore;
+    NSMutableDictionary<NSString*, NSNumber*>* _sceneVisibility;
 }
 
 -(instancetype)init {
     if (self = [super init]) {
         _templatesStore = [[NSMutableDictionary alloc] init];
         _tripsStore = [[NSMutableDictionary alloc] init];
+        _sceneVisibility = [[NSMutableDictionary alloc] init];
         self.cluster = [[NSMutableDictionary alloc] init];
     }
 
@@ -53,6 +55,14 @@
 
 - (NSArray*) getTemplateIds {
     return [_templatesStore allKeys];
+}
+
+- (void) setVisibility:(BOOL)isVisible forScene:(NSString*)sceneId {
+    [_sceneVisibility setObject:@(isVisible) forKey:sceneId];
+}
+
+- (BOOL) getVisibility:(NSString *)sceneId {
+    return [_sceneVisibility objectForKey:sceneId].boolValue;
 }
 
 @end

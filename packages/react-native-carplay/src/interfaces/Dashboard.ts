@@ -21,4 +21,5 @@ export interface DashboardConfig {
    * https://developer.apple.com/documentation/carplay/cpdashboardcontroller/shortcutbuttons
    */
   shortcutButtons: Array<DashboardShortcutButtonConfig>;
+  onStateChanged?: (isVisible: boolean) => void;
 }

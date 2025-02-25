@@ -17,5 +17,7 @@
 - (CPNavigationSession*) getNavigationSession;
 - (void) setNavigationSession:(CPNavigationSession*)navigationSession;
 - (NSArray*) getTemplateIds;
+- (BOOL) getVisibility:(NSString*) sceneId;
+- (void) setVisibility:(BOOL)isVisible forScene:(NSString *)sceneId;
 
 @end

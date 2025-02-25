@@ -23,6 +23,7 @@ export interface ClusterConfig {
   onDidChangeSpeedLimitSetting?: (setting: InstrumentClusterSetting) => void;
   onWindowDidConnect?: (window: ClusterWindowInformation) => void;
   onContentStyleDidChange?: (contentStyle: ContentStyle) => void;
+  onStateChanged?: (isVisible: boolean) => void;
 }
 
 export type OnClusterControllerConnectCallback = ({ id }: { id: string }) => void;
