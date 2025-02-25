@@ -329,8 +329,13 @@ export class MapTemplate extends Template<MapTemplateConfig> {
     CarPlay.bridge.presentNavigationAlert(this.id, config, animated);
   }
 
+  /**
+   * Dismisses the currently shown navigation alert. This function is async and should be awaited before showing a new alert dialog.
+   * @param animated A Boolean value that determines whether to animate the dismissal of the alert dialog.
+   * @returns A Promise that indicates if the alert dialog dismissal was successful
+   */
   public dismissNavigationAlert(animated = true) {
-    CarPlay.bridge.dismissNavigationAlert(this.id, animated);
+    return CarPlay.bridge.dismissNavigationAlert(this.id, animated);
   }
 
   /**

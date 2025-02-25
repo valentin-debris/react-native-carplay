@@ -971,11 +971,15 @@ RCT_EXPORT_METHOD(presentNavigationAlert:(NSString*)templateId json:(NSDictionar
     }
 }
 
-RCT_EXPORT_METHOD(dismissNavigationAlert:(NSString*)templateId animated:(BOOL)animated) {
+RCT_EXPORT_METHOD(dismissNavigationAlert:(NSString*)templateId animated:(BOOL)animated resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     CPTemplate *template = [[RNCPStore sharedManager] findTemplateById:templateId];
     if (template) {
         CPMapTemplate *mapTemplate = (CPMapTemplate*) template;
-        [mapTemplate dismissNavigationAlertAnimated:animated completion:^(BOOL completion) { }];
+        [mapTemplate dismissNavigationAlertAnimated:animated completion:^(BOOL completion) {
+            resolve(completion);
+        }];
+    } else {
+        reject(@"template_not_found", @"Template not found", nil);
     }
 }
 
