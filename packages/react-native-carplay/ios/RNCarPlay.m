@@ -985,7 +985,11 @@ RCT_EXPORT_METHOD(dismissNavigationAlert:(NSString*)templateId animated:(BOOL)an
     if (template) {
         CPMapTemplate *mapTemplate = (CPMapTemplate*) template;
         [mapTemplate dismissNavigationAlertAnimated:animated completion:^(BOOL completion) {
-            resolve(completion);
+            if (completion) {
+                resolve(@YES);
+            } else {
+                resolve(@NO);
+            }   
         }];
     } else {
         reject(@"template_not_found", @"Template not found", nil);
@@ -1309,7 +1313,7 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
     return _actions;
 }
 
-- (NSArray<CPGridButton*>*)parseGridButtons:(NSArray*)buttons templateId:(NSString*)templateId {
+- (NSArray<CPGridButton*>*) parseGridButtons:(NSArray*)buttons templateId:(NSString*)templateId {
     NSMutableArray *result = [NSMutableArray array];
     int index = 0;
     for (NSDictionary *button in buttons) {
