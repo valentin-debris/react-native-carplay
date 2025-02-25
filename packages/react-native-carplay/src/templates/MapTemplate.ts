@@ -246,7 +246,7 @@ export class MapTemplate extends Template<MapTemplateConfig> {
   }
 
   public pauseNavigationSession(reason: PauseReason, description?: string) {
-    return CarPlay.bridge.pauseNavigation(reason, description);
+    return CarPlay.bridge.pauseNavigationSession(reason, description);
   }
 
   public updateManeuvers(maneuvers: Maneuver[]) {

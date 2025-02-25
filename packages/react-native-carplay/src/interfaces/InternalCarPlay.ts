@@ -22,7 +22,7 @@ export interface InternalCarPlay extends NativeModule {
   updateTravelEstimatesNavigationSession(index: number, estimates: TravelEstimates): void;
   cancelNavigationSession(): Promise<void>;
   finishNavigationSession(): Promise<void>;
-  pauseNavigation(reason: PauseReason, description?: string): Promise<void>;
+  pauseNavigationSession(reason: PauseReason, description?: string): Promise<void>;
   createTrip(id: string, config: TripConfig): void;
   updateInformationTemplateItems(id: string, config: unknown): void;
   updateInformationTemplateActions(id: string, config: unknown): void;
