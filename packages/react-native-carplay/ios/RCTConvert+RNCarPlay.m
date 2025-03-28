@@ -68,7 +68,13 @@ RCT_ENUM_CONVERTER(CPAssistantCellActionType, (@{
 }
 
 + (CPRouteChoice*)CPRouteChoice:(id)json {
-    return [[CPRouteChoice alloc] initWithSummaryVariants:[RCTConvert NSStringArray:json[@"additionalInformationVariants"]] additionalInformationVariants:[RCTConvert NSStringArray:json[@"selectionSummaryVariants"]] selectionSummaryVariants:[RCTConvert NSStringArray:json[@"summaryVariants"]]];
+    NSArray<NSString *> *additionalInformationVariants = json[@"additionalInformationVariants"] ? [RCTConvert NSStringArray:json[@"additionalInformationVariants"]] : @[];
+    NSArray<NSString *> *selectionSummaryVariants = json[@"selectionSummaryVariants"] ? [RCTConvert NSStringArray:json[@"selectionSummaryVariants"]] : @[];
+    NSArray<NSString *> *summaryVariants = json[@"summaryVariants"] ? [RCTConvert NSStringArray:json[@"summaryVariants"]] : @[];
+
+    return [[CPRouteChoice alloc] initWithSummaryVariants:summaryVariants
+                             additionalInformationVariants:additionalInformationVariants
+                                selectionSummaryVariants:selectionSummaryVariants];
 }
 
 + (CPPointOfInterest*)CPPointOfInterest:(id)json {
