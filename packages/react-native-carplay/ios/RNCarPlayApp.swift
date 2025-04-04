@@ -26,6 +26,19 @@ public class RNCarPlayApp: NSObject, CPInterfaceControllerDelegate {
         interfaceController: CPInterfaceController,
         window: UIWindow
     ) {
+        if let name = Bundle.main.object(
+            forInfoDictionaryKey: "RNCPSplashScreenStoryboard") as? String,
+            Bundle.main.path(forResource: name, ofType: "storyboardc") != nil
+        {
+            let storyboard = UIStoryboard(name: name, bundle: nil)
+            if let splashViewController =
+                storyboard.instantiateInitialViewController()
+            {
+                window.rootViewController = splashViewController
+                window.makeKeyAndVisible()
+            }
+        }
+
         self.interfaceController = interfaceController
         self.window = window
 
