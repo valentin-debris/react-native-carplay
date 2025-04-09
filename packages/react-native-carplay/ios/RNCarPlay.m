@@ -7,6 +7,7 @@
 {
     bool hasListeners;
     NSMutableArray<RNCarPlayNavigationAlertWrapper *> *navigationAlertWrappers;
+    NSDate *lastShowTripsTime;
 }
 
 @synthesize searchResultBlock;
@@ -959,6 +960,27 @@ RCT_EXPORT_METHOD(showTripPreviews:(NSString*)templateId tripIds:(NSArray*)tripI
     if (template) {
         CPMapTemplate *mapTemplate = (CPMapTemplate*) template;
         [mapTemplate showTripPreviews:trips textConfiguration:[self parseTripPreviewTextConfiguration:tripConfiguration]];
+        lastShowTripsTime = [NSDate date];
+    }
+}
+
+RCT_EXPORT_METHOD(showTripPreview:(NSString*)templateId tripIds:(NSArray*)tripIds selectedTripId:(NSString*)selectedTripId tripConfiguration:(NSDictionary*)tripConfiguration) {
+    CPTemplate *template = [[RNCPStore sharedManager] findTemplateById:templateId];
+    NSMutableArray *trips = [[NSMutableArray alloc] init];
+
+    for (NSString *tripId in tripIds) {
+        CPTrip *trip = [[RNCPStore sharedManager] findTripById:tripId];
+        if (trip) {
+            [trips addObject:trip];
+        }
+    }
+    
+    CPTrip *selectedTrip = [[RNCPStore sharedManager] findTripById:selectedTripId];
+
+    if (template) {
+        CPMapTemplate *mapTemplate = (CPMapTemplate*) template;
+        [mapTemplate showTripPreviews:trips selectedTrip:selectedTrip textConfiguration:[self parseTripPreviewTextConfiguration:tripConfiguration]];
+        lastShowTripsTime = [NSDate date];
     }
 }
 
@@ -1587,6 +1609,14 @@ RCT_EXPORT_METHOD(getRootTemplate: (RCTResponseSenderBlock)callback) {
 # pragma MapTemplate
 
 - (void)mapTemplate:(CPMapTemplate *)mapTemplate selectedPreviewForTrip:(CPTrip *)trip usingRouteChoice:(CPRouteChoice *)routeChoice {
+    NSTimeInterval timeSinceShow = [[NSDate date] timeIntervalSinceDate:lastShowTripsTime];
+    
+    if (timeSinceShow < 0.2) {
+        // Called too soon after showing trips — likely automatic
+        NSLog(@"Ignoring automatic trip selection (%.3f seconds after showTrips)", timeSinceShow);
+        return;
+    }
+    
     NSDictionary *userInfo = trip.userInfo;
     NSString *tripId = [userInfo valueForKey:@"id"];
 

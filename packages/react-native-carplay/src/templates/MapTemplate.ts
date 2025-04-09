@@ -328,6 +328,15 @@ export class MapTemplate extends Template<MapTemplateConfig> {
     );
   }
 
+  public showTripPreview(tripPreviews: Trip[], selectedTripId: string, textConfiguration: TextConfiguration = {}) {
+    CarPlay.bridge.showTripPreview(
+      this.id,
+      tripPreviews.map(trip => trip.id),
+      selectedTripId,
+      textConfiguration,
+    );
+  }
+
   public showRouteChoicesPreviewForTrip(trip: Trip, textConfiguration: TextConfiguration = {}) {
     CarPlay.bridge.showRouteChoicesPreviewForTrip(this.id, trip.id, textConfiguration);
   }

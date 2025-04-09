@@ -30,7 +30,7 @@ export interface TripConfig {
 
 /**
  * in case you do not pass an id on the config it will be auto generated.
- * make sure to keep a reference since it is required for startNavigationSession, updateTravelEstimatesForTrip, showTripPreviews, showRouteChoicesPreviewForTrip
+ * make sure to keep a reference since it is required for startNavigationSession, updateTravelEstimatesForTrip, showTripPreviews, showTripPreview, showRouteChoicesPreviewForTrip
  */
 export class Trip {
   public id!: string;
