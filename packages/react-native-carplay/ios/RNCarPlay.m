@@ -551,6 +551,8 @@ RCT_REMAP_METHOD(startNavigationSession,
             navigationSession = [mapTemplate startNavigationSessionForTrip:trip];
             [store setNavigationSession:navigationSession];
             resolve(nil);
+        } else {
+            reject(@"trip_not_found", @"Trip not found in store", nil);
         }
     } else {
         reject(@"template_not_found", @"Template not found in store", nil);
