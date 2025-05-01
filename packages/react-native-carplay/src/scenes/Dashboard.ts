@@ -86,9 +86,12 @@ export class Dashboard {
       });
 
       if (onStateChanged != null) {
-        this.stateSubscription = this.emitter.addListener("dashboardStateDidChange", e => {
-          onStateChanged(e.isVisible);
-        });
+        this.stateSubscription = this.emitter.addListener(
+          'dashboardStateDidChange',
+          ({ isVisible }: { isVisible: boolean }) => {
+            onStateChanged(isVisible);
+          },
+        );
       }
     }
 

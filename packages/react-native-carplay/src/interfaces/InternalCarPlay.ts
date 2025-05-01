@@ -40,7 +40,12 @@ export interface InternalCarPlay extends NativeModule {
   updateMapTemplateMapButtons(id: string, config: unknown): void;
   hideTripPreviews(id: string): void;
   showTripPreviews(id: string, previews: string[], config: TextConfiguration): void;
-  showTripPreview(id: string, previews: string[], selectedTripId: string, config: TextConfiguration): void;
+  showTripPreview(
+    id: string,
+    previews: string[],
+    selectedTripId: string,
+    config: TextConfiguration,
+  ): void;
   showRouteChoicesPreviewForTrip(id: string, tripId: string, config: TextConfiguration): void;
   presentNavigationAlert(id: string, config: unknown, animated: boolean): void;
   dismissNavigationAlert(id: string, animated: boolean): Promise<boolean>;

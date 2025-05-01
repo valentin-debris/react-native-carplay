@@ -166,7 +166,7 @@ export interface MapTemplateConfig extends TemplateConfig {
 
   /**
    * fired when the scene hosting the map template changes its state
-   * @param isVisible 
+   * @param isVisible
    */
   onStateChanged?: (isVisible: boolean) => void;
 }
@@ -203,7 +203,7 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       didCancelNavigation: 'onDidCancelNavigation',
       startedTrip: 'onStartedTrip',
       backButtonPressed: 'onBackButtonPressed',
-      stateDidChange: 'onStateChanged'
+      stateDidChange: 'onStateChanged',
     };
   }
 
@@ -328,7 +328,11 @@ export class MapTemplate extends Template<MapTemplateConfig> {
     );
   }
 
-  public showTripPreview(tripPreviews: Trip[], selectedTripId: string, textConfiguration: TextConfiguration = {}) {
+  public showTripPreview(
+    tripPreviews: Trip[],
+    selectedTripId: string,
+    textConfiguration: TextConfiguration = {},
+  ) {
     CarPlay.bridge.showTripPreview(
       this.id,
       tripPreviews.map(trip => trip.id),
