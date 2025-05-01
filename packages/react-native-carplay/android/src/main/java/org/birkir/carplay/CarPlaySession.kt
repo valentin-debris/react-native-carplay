@@ -8,9 +8,7 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import androidx.car.app.CarContext.SCREEN_SERVICE
 import androidx.car.app.Screen
-import androidx.car.app.ScreenManager
 import androidx.car.app.Session
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -19,8 +17,6 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.appregistry.AppRegistry
-import com.facebook.react.modules.core.TimingModule
-import com.facebook.react.modules.debug.DevSettingsModule
 import org.birkir.carplay.screens.CarScreen
 
 
@@ -32,7 +28,7 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
     Log.d(TAG, "On create screen " + intent.action + " - " + intent.dataString)
     val lifecycle = lifecycle
     lifecycle.addObserver(this)
-    screen = CarScreen(carContext)
+    screen = CarScreen(carContext, null)
     screen.marker = "root"
 
     // Handle reload events
@@ -76,16 +72,11 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
         appParams.putMap("initialProps", Arguments.fromBundle(appProperties))
       }
 
-      catalystInstance.getJSModule(AppRegistry::class.java)
-        .runApplication(jsAppModuleName, appParams)
+      catalystInstance.getJSModule(AppRegistry::class.java)?.runApplication(jsAppModuleName, appParams)
 
-      val timingModule = reactContext.getNativeModule(
-        TimingModule::class.java
-      )
       val carModule = reactInstanceManager
         .currentReactContext?.getNativeModule(CarPlayModule::class.java)
       carModule!!.setCarContext(carContext, screen)
-      timingModule!!.onHostResume()
 
     } catch (e: Exception) {
       e.printStackTrace()

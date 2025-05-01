@@ -6,7 +6,6 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
-
 class EventEmitter(
   private var reactContext: ReactContext? = null,
   private var templateId: String? = null
@@ -145,6 +144,22 @@ class EventEmitter(
 
   fun didShowPanningInterface() {
     emit(DidShowPanningInterface)
+  }
+
+  fun willAppear() {
+    emit(WillAppear)
+  }
+
+  fun didAppear() {
+    emit(DidAppear)
+  }
+
+  fun willDisappear() {
+    emit(WillDisappear)
+  }
+
+  fun didDisappear() {
+    emit(DidDisappear)
   }
 
   fun didDismissPanningInterface() {

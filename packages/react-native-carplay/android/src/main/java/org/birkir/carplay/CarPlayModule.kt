@@ -9,11 +9,8 @@ import androidx.car.app.AppManager
 import androidx.car.app.CarContext
 import androidx.car.app.CarToast
 import androidx.car.app.ScreenManager
-import androidx.car.app.SessionInfo
 import androidx.car.app.model.Alert
 import androidx.car.app.model.AlertCallback
-import androidx.car.app.model.CarText
-import androidx.car.app.model.Distance
 import androidx.car.app.model.Template
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Callback
@@ -44,19 +41,17 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   private var currentCarScreen: CarScreen? = null
   private var screenManager: ScreenManager? = null
   private val carScreens: WeakHashMap<String, CarScreen> = WeakHashMap()
-  private val carTemplates: WeakHashMap<String, ReadableMap> = WeakHashMap()
   private val carScreenContexts: WeakHashMap<CarScreen, CarScreenContext> =
     WeakHashMap()
   private val handler: Handler = Handler(Looper.getMainLooper())
 
 
   // Global event emitter (no templateId's)
-  private var eventEmitter: EventEmitter? = null
+  private var eventEmitter = EventEmitter(reactContext)
 
   init {
     reactContext.addLifecycleEventListener(object : LifecycleEventListener {
       override fun onHostResume() {
-        eventEmitter = EventEmitter(reactContext)
         reactContext.getNativeModule(DevSettingsModule::class.java)
           ?.addMenuItem("Reload Android Auto")
       }
@@ -71,17 +66,27 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   }
 
   fun setCarContext(carContext: CarContext, currentCarScreen: CarScreen) {
-    parser = Parser(carContext, CarScreenContext("", eventEmitter!!, carScreens));
+    parser = Parser(carContext, CarScreenContext("", eventEmitter, carScreens));
     this.carContext = carContext
     this.currentCarScreen = currentCarScreen
     screenManager = currentCarScreen.screenManager
     carScreens["root"] = this.currentCarScreen
     carContext.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
-        eventEmitter?.backButtonPressed(screenManager?.top?.marker)
+        val topScreen = screenManager?.top
+        if (topScreen is CarScreen) {
+          // handle back key only for rn-cp screens
+          eventEmitter.backButtonPressed(screenManager?.top?.marker)
+          return
+        }
+
+        isEnabled = false
+        carContext.onBackPressedDispatcher.onBackPressed()
+        isEnabled = true
+
       }
     })
-    eventEmitter?.didConnect()
+    eventEmitter.didConnect()
   }
 
   private fun parseTemplate(
@@ -94,7 +99,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
 
   @ReactMethod
   fun checkForConnection() {
-    eventEmitter?.didConnect()
+    eventEmitter.didConnect()
   }
 
   @ReactMethod
@@ -102,11 +107,8 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     handler.post {
       Log.d(TAG, "Creating template $templateId")
 
-      // Store the template
-      carTemplates[templateId] = config;
-
       try {
-        createScreen(templateId);
+        createScreen(templateId, config)
         callback?.invoke()
       } catch (err: IllegalArgumentException) {
         val args = Arguments.createMap()
@@ -119,13 +121,12 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   @ReactMethod
   fun updateTemplate(templateId: String, config: ReadableMap) {
     handler.post {
-      carTemplates[templateId] = config;
-      val screen = carScreens[name]
+      val screen = carScreens[templateId]
       if (screen != null) {
         val carScreenContext = carScreenContexts[screen];
         if (carScreenContext != null) {
           val template = parseTemplate(config, carScreenContext);
-          screen.setTemplate(template, templateId, config);
+          screen.setTemplate(template, templateId, config)
           screen.invalidate()
         }
       }
@@ -168,8 +169,10 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     handler.post {
       screenManager!!.pop()
       removeScreen(currentCarScreen)
-      currentCarScreen = screenManager!!.top as CarScreen
-      currentCarScreen?.invalidate()
+      val topScreen = screenManager?.top
+      if (topScreen != null && topScreen is CarScreen) {
+        topScreen.invalidate()
+      }
     }
   }
 
@@ -205,10 +208,10 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
               AlertCallback.REASON_NOT_SUPPORTED -> "notSupported"
               else -> "unknown"
             }
-            eventEmitter?.alertActionPressed("cancel", reasonString);
+            eventEmitter.alertActionPressed("cancel", reasonString);
           }
           override fun onDismiss() {
-            eventEmitter?.alertActionPressed("dismiss" );
+            eventEmitter.alertActionPressed("dismiss" );
           }
         })
         props.getString("subtitle")?.let { setSubtitle(parser.parseCarText(it, props)) }
@@ -265,24 +268,39 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     Log.d(TAG, "remove listeners $count")
   }
 
-  private fun createCarScreenContext(screen: CarScreen): CarScreenContext {
-    val templateId = screen.marker!!
-    return CarScreenContext(templateId, EventEmitter(reactContext, templateId), carScreens)
+  @ReactMethod
+  fun checkForDashboardConnection() {
+    //TODO
   }
 
-  private fun createScreen(templateId: String): CarScreen? {
-    val config = carTemplates[templateId];
-    if (config != null) {
-      val screen = CarScreen(carContext)
+  @ReactMethod
+  fun createDashboard(dashboardId: String, config: ReadableMap) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun updateDashboardShortcutButtons(config: ReadableMap) {
+    //TODO
+  }
+
+  private fun createCarScreenContext(screen: CarScreen, emitter: EventEmitter): CarScreenContext {
+    val templateId = screen.marker!!
+    return CarScreenContext(templateId, emitter, carScreens)
+  }
+
+  private fun createScreen(templateId: String, templateConfig: ReadableMap?): CarScreen? {
+    if (templateConfig != null) {
+      val emitter = EventEmitter(reactContext, templateId)
+      val screen = CarScreen(carContext, emitter)
       screen.marker = templateId;
 
       // context
       carScreenContexts.remove(screen)
-      val carScreenContext = createCarScreenContext(screen)
+      val carScreenContext = createCarScreenContext(screen, emitter)
       carScreenContexts[screen] = carScreenContext
 
-      val template = parseTemplate(config, carScreenContext);
-      screen.setTemplate(template, templateId, config)
+      val template = parseTemplate(templateConfig, carScreenContext);
+      screen.setTemplate(template, templateId, templateConfig)
       carScreens[templateId] = screen;
 
       return screen;
@@ -291,7 +309,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   }
 
   private fun getScreen(name: String): CarScreen? {
-    return carScreens[name] ?: createScreen(name);
+    return carScreens[name] ?: createScreen(name, null)
   }
 
   private fun removeScreen(screen: CarScreen?) {

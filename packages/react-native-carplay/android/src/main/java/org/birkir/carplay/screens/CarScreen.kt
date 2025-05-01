@@ -15,9 +15,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.facebook.react.bridge.ReadableMap
+import org.birkir.carplay.utils.EventEmitter
 import org.birkir.carplay.utils.VirtualRenderer
 
-class CarScreen(carContext: CarContext) : Screen(carContext) {
+class CarScreen(carContext: CarContext, emitter: EventEmitter?) : Screen(carContext) {
 
   var template: Template? = null
   private var virtualRenderer: VirtualRenderer? = null
@@ -25,6 +26,26 @@ class CarScreen(carContext: CarContext) : Screen(carContext) {
   init {
     lifecycle.addObserver(object : LifecycleEventObserver {
       override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event) {
+          Lifecycle.Event.ON_CREATE -> {
+            emitter?.willAppear()
+          }
+
+          Lifecycle.Event.ON_RESUME -> {
+            emitter?.didAppear()
+          }
+
+          Lifecycle.Event.ON_PAUSE -> {
+            emitter?.willDisappear()
+          }
+
+          Lifecycle.Event.ON_DESTROY -> {
+            emitter?.didDisappear()
+          }
+
+          else -> {}
+        }
+
         if (event == Lifecycle.Event.ON_DESTROY && virtualRenderer != null) {
           Log.d(TAG, "onStateChanged: got $event, removing virtual renderer")
           virtualRenderer = null
