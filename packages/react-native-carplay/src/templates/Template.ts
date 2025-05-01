@@ -161,7 +161,7 @@ export class Template<P> {
         if (obj[i] !== null && typeof obj[i] === 'object') {
           traverse(obj[i]);
         }
-        if (String(i).match(/[Ii]mage$/)) {
+        if (String(i).match(/[Ii]mage$/) || String(i).match(/[Ii]con$/)) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           obj[i] = resolveAssetSource(obj[i]);
         }
