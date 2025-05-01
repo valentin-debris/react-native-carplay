@@ -283,6 +283,13 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     //TODO
   }
 
+  @ReactMethod
+  fun popToRootTemplate(animated: Boolean?) {
+    handler.post {
+      screenManager?.popToRoot()
+    }
+  }
+
   private fun createCarScreenContext(screen: CarScreen, emitter: EventEmitter): CarScreenContext {
     val templateId = screen.marker!!
     return CarScreenContext(templateId, emitter, carScreens)
