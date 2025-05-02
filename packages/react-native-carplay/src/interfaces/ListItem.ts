@@ -72,7 +72,7 @@ export interface ListItem {
    * If a row has a toggle set, then no Action or numeric decoration can be set.
    * @namespace Android
    */
-  toggle?: number;
+  toggle?: boolean;
   /**
    * Adds an additional action to the end of the row.
    * @namespace Android

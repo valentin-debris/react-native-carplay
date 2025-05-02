@@ -50,7 +50,7 @@ export interface ListTemplateConfig extends TemplateConfig {
    * When the returned promise is resolved the spinner will hide.
    * @param item Object with the selected index
    */
-  onItemSelect?(item: { templateId: string; index: number }): Promise<void>;
+  onItemSelect?(item: { templateId: string; index: number; id: string }): Promise<void>;
 
   /**
    * Fired when image row item is selected.
@@ -130,7 +130,7 @@ export class ListTemplate extends Template<ListTemplateConfig> {
 
     let subscription = CarPlay.emitter.addListener(
       'didSelectListItem',
-      (e: { templateId: string; index: number }) => {
+      (e: { templateId: string; index: number; id: string }) => {
         if (config.onItemSelect && e.templateId === this.id) {
           void Promise.resolve(config.onItemSelect(e)).then(() => {
             if (Platform.OS === 'ios') {

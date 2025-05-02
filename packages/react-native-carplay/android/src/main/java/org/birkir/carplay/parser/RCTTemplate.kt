@@ -26,6 +26,7 @@ import androidx.car.app.model.Place
 import androidx.car.app.model.PlaceMarker
 import androidx.car.app.model.Row
 import androidx.car.app.model.Template
+import androidx.car.app.model.Toggle
 import androidx.car.app.navigation.model.Lane
 import androidx.car.app.navigation.model.LaneDirection
 import androidx.car.app.navigation.model.Maneuver
@@ -171,6 +172,14 @@ abstract class RCTTemplate(
             index
           )
         }
+      }
+      if (item.hasKey("toggle")) {
+        setToggle(
+          Toggle.Builder {
+            eventEmitter.didSelectListItem(id, index)
+          }.setChecked(item.getBoolean("toggle"))
+            .build()
+        )
       }
     }.build()
   }
