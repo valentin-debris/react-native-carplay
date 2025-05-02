@@ -9,7 +9,7 @@ export type NavigationStep = {
   lanesImage: ImageResolvedAssetSource;
   maneuver?: {
     type: number;
-    icon: ImageResolvedAssetSource;
+    image: ImageResolvedAssetSource;
     roundaboutExitAngle: number;
     roundaboutExitNumber: number;
   };

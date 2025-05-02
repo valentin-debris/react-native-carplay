@@ -72,7 +72,7 @@ export interface InternalCarPlay extends NativeModule {
     title: string;
     duration: number;
     subtitle?: string;
-    icon?: ImageSourcePropType;
+    image?: ImageSourcePropType;
     actions?: Action[];
   }): void;
   createDashboard(id: string, config: unknown): void;

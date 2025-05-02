@@ -27,7 +27,7 @@ export class PaneTemplate extends Template<PaneTemplateConfig> {
   get eventMap() {
     return {
       backButtonPressed: 'onBackButtonPressed',
-      buttonPressed: 'onActionButtonPressed'
+      buttonPressed: 'onActionButtonPressed',
     };
   }
 }

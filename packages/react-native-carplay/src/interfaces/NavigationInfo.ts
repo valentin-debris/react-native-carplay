@@ -13,7 +13,7 @@ export type NavigationRoutingInfo = {
 export type NavigationMessageInfo = {
   type: 'messageInfo';
   title: string;
-  icon?: ImageResolvedAssetSource;
+  image?: ImageResolvedAssetSource;
 };
 
 export type NavigationInfo = NavigationRoutingInfo | NavigationMessageInfo;

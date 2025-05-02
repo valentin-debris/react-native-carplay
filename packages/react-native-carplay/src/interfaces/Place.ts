@@ -8,5 +8,5 @@ export interface Place {
   latitude: number;
   longitude: number;
   // Marker icon on the map
-  icon: ImageSourcePropType;
+  image: ImageSourcePropType;
 }

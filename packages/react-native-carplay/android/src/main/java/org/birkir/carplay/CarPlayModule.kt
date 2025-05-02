@@ -215,7 +215,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
           }
         })
         props.getString("subtitle")?.let { setSubtitle(parser.parseCarText(it, props)) }
-        props.getMap("icon")?.let { setIcon(parser.parseCarIcon(it)) }
+        props.getMap("image")?.let { setIcon(parser.parseCarIcon(it)) }
         props.getArray("actions")?.let {
           for (i in 0 until it.size()) {
             addAction(parser.parseAction(it.getMap(i)));

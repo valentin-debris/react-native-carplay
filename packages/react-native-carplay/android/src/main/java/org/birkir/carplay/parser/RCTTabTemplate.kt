@@ -37,7 +37,7 @@ class RCTTabTemplate(
     return Tab.Builder().apply {
       props.getString("id")?.let { setContentId(it) }
       props.getString("title")?.let { setTitle(it) }
-      props.getMap("icon")?.let { setIcon(parseCarIcon(it)) }
+      props.getMap("image")?.let { setIcon(parseCarIcon(it)) }
     }.build()
   }
 

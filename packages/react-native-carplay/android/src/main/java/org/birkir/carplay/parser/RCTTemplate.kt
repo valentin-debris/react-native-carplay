@@ -2,7 +2,6 @@ package org.birkir.carplay.parser
 
 // import androidx.car.app.model.Template
 
-import android.graphics.Bitmap
 import android.text.Spannable
 import android.text.SpannableString
 import android.util.Log
@@ -37,11 +36,9 @@ import androidx.car.app.navigation.model.Step
 import androidx.car.app.navigation.model.TravelEstimate
 import androidx.core.graphics.drawable.IconCompat
 import com.facebook.common.references.CloseableReference
-import com.facebook.datasource.DataSource
 import com.facebook.datasource.DataSources
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.image.CloseableBitmap
-import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -111,7 +108,7 @@ abstract class RCTTemplate(
       map.getString("title")?.let {
         builder.setTitle(it)
       }
-      map.getMap("icon")?.let {
+      map.getMap("image")?.let {
         builder.setIcon(parseCarIcon(it))
       }
       map.getString("visibility")?.let {
@@ -211,7 +208,7 @@ abstract class RCTTemplate(
       )
     )
     PlaceMarker.Builder().apply {
-      setIcon(parseCarIcon(props.getMap("icon")!!), PlaceMarker.TYPE_IMAGE)
+      setIcon(parseCarIcon(props.getMap("image")!!), PlaceMarker.TYPE_IMAGE)
       builder.setMarker(this.build())
 
     }
@@ -344,7 +341,7 @@ abstract class RCTTemplate(
   protected fun parseManeuver(map: ReadableMap): Maneuver {
     val type = map.getInt("type")
     val builder = Maneuver.Builder(type)
-    builder.setIcon(parseCarIcon(map.getMap("icon")!!))
+    builder.setIcon(parseCarIcon(map.getMap("image")!!))
     if (type == Maneuver.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CW_WITH_ANGLE
       || type == Maneuver.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CCW_WITH_ANGLE
     ) {
@@ -364,7 +361,7 @@ abstract class RCTTemplate(
 
   protected fun parseMessageInfo(map: ReadableMap): MessageInfo {
     val builder = MessageInfo.Builder(map.getString("title")!!)
-    map.getMap("icon")?.let { builder.setImage(parseCarIcon(it)) }
+    map.getMap("image")?.let { builder.setImage(parseCarIcon(it)) }
     return builder.build()
   }
 

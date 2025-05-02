@@ -1,9 +1,6 @@
-import { EmitterSubscription, ImageSourcePropType, Platform } from 'react-native';
+import { EmitterSubscription, Image, ImageSourcePropType, Platform } from 'react-native';
 import { CarPlay } from '../CarPlay';
 import { BarButton } from '../interfaces/BarButton';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const resolveAssetSource = require('react-native/Libraries/Image/resolveAssetSource');
 
 export interface BaseEvent {
   /**
@@ -157,13 +154,13 @@ export class Template<P> {
   public parseConfig(config: any) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function traverse(obj: any) {
-      for (const i in obj) {
-        if (obj[i] !== null && typeof obj[i] === 'object') {
-          traverse(obj[i]);
+      for (const key in obj) {
+        if (obj[key] != null && typeof obj[key] === 'object') {
+          traverse(obj[key]);
         }
-        if (String(i).match(/[Ii]mage$/) || String(i).match(/[Ii]con$/)) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-          obj[i] = resolveAssetSource(obj[i]);
+        if (key === 'image') {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          obj[key] = Image.resolveAssetSource(obj[key]);
         }
       }
     }

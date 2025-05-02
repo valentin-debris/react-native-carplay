@@ -7,7 +7,7 @@ export interface MessageTemplateConfig extends TemplateConfig {
   loading?: boolean;
   headerAction?: HeaderAction;
   actions?: Action[];
-  icon?: ImageSourcePropType;
+  image?: ImageSourcePropType;
   title?: string;
   debugMessage?: string;
 }

@@ -15,7 +15,7 @@ class RCTMessageTemplate(
     return MessageTemplate.Builder(messageText).apply {
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
       props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
-      props.getMap("icon")?.let { setIcon(parseCarIcon(it)) }
+      props.getMap("image")?.let { setIcon(parseCarIcon(it)) }
       props.getString("title")?.let { setTitle(it) }
       props.getString("debugMessage")?.let { setDebugMessage(it) }
       setLoading(props.isLoading())
