@@ -78,4 +78,9 @@ export interface ListItem {
    * @namespace Android
    */
   action?: Action<'custom'>;
+  /**
+   * If a row has a selected defined the list is treated as radio button list, all items have to have the selected prop then
+   * @namespace Android
+   */
+  selected?: boolean;
 }

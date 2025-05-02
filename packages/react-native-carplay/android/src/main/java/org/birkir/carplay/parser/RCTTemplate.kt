@@ -149,11 +149,32 @@ abstract class RCTTemplate(
     type: String = "row"
   ): ItemList {
     return ItemList.Builder().apply {
-      for (i in 0 until items!!.size()) {
-        if (type == "row") {
-          addItem(parseRowItem(items.getMap(i), i))
-        } else if (type == "grid") {
-          addItem(parseGridItem(items.getMap(i), i))
+      var selectedIndex: Int? = null
+      val itemIds = mutableListOf<String>()
+
+      items?.let {
+        for (i in 0 until it.size()) {
+          val item = it.getMap(i)
+          val id = if (item.hasKey("id")) item.getString("id") else null
+          itemIds.add(i, id ?: "")
+
+          if (item.hasKey("selected") && item.getBoolean("selected")) {
+            selectedIndex = i
+          }
+
+          if (type == "row") {
+            addItem(parseRowItem(item, i))
+          } else if (type == "grid") {
+            addItem(parseGridItem(item, i))
+          }
+        }
+      }
+
+      selectedIndex?.let {
+        setSelectedIndex(it)
+        setOnSelectedListener {
+          val id = itemIds.get(it)
+          eventEmitter.didSelectListItem(id, it)
         }
       }
     }.build()
