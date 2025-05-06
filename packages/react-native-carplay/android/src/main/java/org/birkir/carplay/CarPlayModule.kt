@@ -234,7 +234,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   @ReactMethod
   fun invalidate(templateId: String) {
     handler.post {
-      val screen = getScreen(templateId)
+      val screen = getScreen(templateId) ?: return@post
       if (screen === screenManager!!.top) {
         Log.d(TAG, "Invalidated screen $templateId")
         screen.invalidate()
