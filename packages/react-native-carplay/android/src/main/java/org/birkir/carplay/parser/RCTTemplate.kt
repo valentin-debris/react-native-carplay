@@ -202,6 +202,12 @@ abstract class RCTTemplate(
             .build()
         )
       }
+
+      if (item.hasKey("action")) {
+        addAction(
+          parseAction(item.getMap("action"))
+        )
+      }
     }.build()
   }
 
