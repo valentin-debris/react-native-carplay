@@ -90,21 +90,23 @@ export class SearchTemplate extends Template<SearchTemplateConfig> {
 
     let subscription = CarPlay.emitter.addListener(
       'updatedSearchText',
-      (e: { searchText: string; templateId: string }) => {
+      async (e: { searchText: string; templateId: string }) => {
         if (config.onSearch && e.templateId === this.id) {
-          void Promise.resolve(config.onSearch(e.searchText)).then((result = []) => {
-            const parsedResults = result.map(item => ({
-              ...item,
-              image: item.image ? Image.resolveAssetSource(item.image) : undefined,
-            }));
+          const result = await config.onSearch(e.searchText).catch(() => null);
+          if (result == null) {
+            return;
+          }
+          const parsedResults = result.map(item => ({
+            ...item,
+            image: item.image ? Image.resolveAssetSource(item.image) : undefined,
+          }));
 
-            if (Platform.OS === 'ios') {
-              CarPlay.bridge.reactToUpdatedSearchText(e.templateId, parsedResults);
-            } else if (Platform.OS === 'android') {
-              config = { ...config, items: parsedResults };
-              CarPlay.bridge.updateTemplate(e.templateId, JSON.parse(JSON.stringify({ ...config, type: this.type })));
-            }
-          });
+          if (Platform.OS === 'ios') {
+            CarPlay.bridge.reactToUpdatedSearchText(e.templateId, parsedResults);
+          } else if (Platform.OS === 'android') {
+            config = { ...config, items: parsedResults };
+            CarPlay.bridge.updateTemplate(e.templateId, JSON.parse(JSON.stringify({ ...config, type: this.type })));
+          }
         }
       },
     );
