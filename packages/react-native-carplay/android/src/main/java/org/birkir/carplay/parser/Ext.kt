@@ -9,3 +9,10 @@ fun ReadableMap.isLoading(): Boolean {
     return false
   }
 }
+
+enum class ItemListType(val value: Int) {
+  Row(1),
+  Grid(2),
+  PlaceListNavigation(3),
+  RouteList(4)
+}

@@ -17,7 +17,7 @@ class RCTGridTemplate(
       props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
       this.setSingleList(
-        parseItemList(props.getArray("buttons"), "grid")
+        parseItemList(props.getArray("buttons"), ItemListType.Grid)
       )
     }.build()
   }

@@ -45,6 +45,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.views.imagehelper.ImageSource
+import org.birkir.carplay.BuildConfig
 import org.birkir.carplay.screens.CarScreenContext
 import org.birkir.carplay.utils.EventEmitter
 import java.util.TimeZone
@@ -148,16 +149,23 @@ abstract class RCTTemplate(
 
   protected fun parseItemList(
     items: ReadableArray?,
-    type: String = "row"
+    type: ItemListType = ItemListType.Row
   ): ItemList {
     return ItemList.Builder().apply {
       var selectedIndex: Int? = null
       val itemIds = mutableListOf<String>()
 
+      val contentType = when(type) {
+        ItemListType.Row -> ConstraintManager.CONTENT_LIMIT_TYPE_LIST
+        ItemListType.Grid -> ConstraintManager.CONTENT_LIMIT_TYPE_GRID
+        ItemListType.PlaceListNavigation -> ConstraintManager.CONTENT_LIMIT_TYPE_PLACE_LIST
+        ItemListType.RouteList -> ConstraintManager.CONTENT_LIMIT_TYPE_ROUTE_LIST
+      }
+
       items?.let {
         for (i in 0 until getMaxContentSize(
           carContext = context,
-          contentType = if (type == "grid") ConstraintManager.CONTENT_LIMIT_TYPE_GRID else ConstraintManager.CONTENT_LIMIT_TYPE_LIST,
+          contentType = contentType,
           preferredContentSize = it.size()
         )) {
           val item = it.getMap(i)
@@ -168,9 +176,9 @@ abstract class RCTTemplate(
             selectedIndex = i
           }
 
-          if (type == "row") {
+          if (type == ItemListType.Row || type == ItemListType.RouteList || type == ItemListType.PlaceListNavigation) {
             addItem(parseRowItem(item, i))
-          } else if (type == "grid") {
+          } else if (type == ItemListType.Grid) {
             addItem(parseGridItem(item, i))
           }
         }
@@ -462,6 +470,9 @@ abstract class RCTTemplate(
         carContext,
         contentType
       )
+    if (BuildConfig.DEBUG && preferredContentSize > maxContentSize) {
+      Log.w(TAG, "tried to fit more items then possible $maxContentSize used instead of $preferredContentSize for contentType $contentType")
+    }
     return min(preferredContentSize, maxContentSize)
   }
 

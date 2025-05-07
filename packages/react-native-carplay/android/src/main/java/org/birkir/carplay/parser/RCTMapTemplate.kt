@@ -28,9 +28,6 @@ class RCTMapTemplate(
     val headerAction = props.getMap("headerAction")?.let {
       parseAction(it)
     }
-    val itemList = props.getArray("items")?.let {
-      parseItemList(it, "row")
-    }
     val pane = props.getMap("pane")?.let {
       parsePane(it)
     }
@@ -74,7 +71,9 @@ class RCTMapTemplate(
             setCurrentLocationEnabled(props.getBoolean("currentLocationEnabled"))
           }
           headerAction?.let { setHeaderAction(it) }
-          itemList?.let { setItemList(it) }
+          props.getArray("items")?.let {
+            setItemList(parseItemList(it, ItemListType.PlaceListNavigation))
+          }
           setLoading(props.isLoading())
           setOnContentRefreshListener {
             // @todo eventEmitter?.contentDidRefresh
@@ -87,7 +86,9 @@ class RCTMapTemplate(
         return PlaceListNavigationTemplate.Builder().apply {
           actionStrip?.let { setActionStrip(it) }
           header?.let { setHeader(it) }
-          itemList?.let { setItemList(it) }
+          props.getArray("items")?.let {
+            setItemList(parseItemList(it, ItemListType.PlaceListNavigation))
+          }
           setLoading(props.isLoading())
           mapActionStrip?.let { setActionStrip(it) }
           setOnContentRefreshListener {
@@ -102,7 +103,9 @@ class RCTMapTemplate(
           actionStrip?.let { setActionStrip(it) }
           header?.let { setHeader(it) }
           headerAction?.let { setHeaderAction(headerAction) }
-          itemList?.let { setItemList(it) }
+          props.getArray("items")?.let {
+            setItemList(parseItemList(it, ItemListType.RouteList))
+          }
           setLoading(props.isLoading())
           mapActionStrip?.let { setMapActionStrip(it); }
           props.getMap("navigateAction")?.let { setNavigateAction(parseAction(it)) }
@@ -113,7 +116,9 @@ class RCTMapTemplate(
       else -> {
         return MapTemplate.Builder().apply {
           header?.let { setHeader(it) }
-          itemList?.let { setItemList(it) }
+          props.getArray("items")?.let {
+            setItemList(parseItemList(it))
+          }
           actionStrip?.let { setActionStrip(it) }
           setMapController(mapController)
           pane?.let { setPane(it) }

@@ -26,7 +26,7 @@ class RCTSearchTemplate(
       props.getString("initialSearchText")?.let {
         setInitialSearchText(it)
       }
-      props.getArray("items")?.let { setItemList(parseItemList(it, "row")) }
+      props.getArray("items")?.let { setItemList(parseItemList(it)) }
       setLoading(props.isLoading())
       props.getString("searchHint")?.let { setSearchHint(it) }
       if (props.hasKey("showKeyboardByDefault")) {
