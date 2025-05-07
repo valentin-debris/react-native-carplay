@@ -1,11 +1,11 @@
 package org.birkir.carplay.parser
 
-// import androidx.car.app.model.Template
-
 import android.text.Spannable
 import android.text.SpannableString
 import android.util.Log
 import androidx.car.app.CarContext
+import androidx.car.app.HostException
+import androidx.car.app.constraints.ConstraintManager
 import androidx.car.app.model.Action
 import androidx.car.app.model.Action.FLAG_IS_PERSISTENT
 import androidx.car.app.model.Action.FLAG_PRIMARY
@@ -35,6 +35,7 @@ import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.car.app.navigation.model.RoutingInfo
 import androidx.car.app.navigation.model.Step
 import androidx.car.app.navigation.model.TravelEstimate
+import androidx.car.app.versioning.CarAppApiLevels
 import androidx.core.graphics.drawable.IconCompat
 import com.facebook.common.references.CloseableReference
 import com.facebook.datasource.DataSources
@@ -47,6 +48,7 @@ import com.facebook.react.views.imagehelper.ImageSource
 import org.birkir.carplay.screens.CarScreenContext
 import org.birkir.carplay.utils.EventEmitter
 import java.util.TimeZone
+import kotlin.math.min
 
 
 /**
@@ -153,7 +155,11 @@ abstract class RCTTemplate(
       val itemIds = mutableListOf<String>()
 
       items?.let {
-        for (i in 0 until it.size()) {
+        for (i in 0 until getMaxContentSize(
+          carContext = context,
+          contentType = if (type == "grid") ConstraintManager.CONTENT_LIMIT_TYPE_GRID else ConstraintManager.CONTENT_LIMIT_TYPE_LIST,
+          preferredContentSize = it.size()
+        )) {
           val item = it.getMap(i)
           val id = if (item.hasKey("id")) item.getString("id") else null
           itemIds.add(i, id ?: "")
@@ -338,7 +344,11 @@ abstract class RCTTemplate(
         }
       }
       item.getArray("items")?.let {
-        for (i in 0 until it.size()) {
+        for (i in 0 until getMaxContentSize(
+          carContext = context,
+          contentType = ConstraintManager.CONTENT_LIMIT_TYPE_PANE,
+          it.size()
+        )) {
           addRow(parseRowItem(it.getMap(i), i))
         }
       }
@@ -443,6 +453,31 @@ abstract class RCTTemplate(
       parseRoutingInfo(map.getMap("info")!!)
     } else {
       parseMessageInfo(map.getMap("info")!!)
+    }
+  }
+
+  fun getMaxContentSize(carContext: CarContext, contentType: Int, preferredContentSize: Int): Int {
+    val maxContentSize =
+      if (carContext.carAppApiLevel < CarAppApiLevels.LEVEL_2) getMaxContentDefaults(contentType) else getMaxContentSize(
+        carContext,
+        contentType
+      )
+    return min(preferredContentSize, maxContentSize)
+  }
+
+  private fun getMaxContentDefaults(contentType: Int): Int {
+    if (contentType == ConstraintManager.CONTENT_LIMIT_TYPE_ROUTE_LIST) {
+      return 3
+    }
+    return 6
+  }
+
+  private fun getMaxContentSize(carContext: CarContext, contentType: Int): Int {
+    return try {
+      carContext.getCarService(ConstraintManager::class.java).getContentLimit(contentType)
+    } catch (exception: HostException) {
+      // we sometimes still get exceptions here due to missing API level (which is a bug on AA side)
+      getMaxContentDefaults(contentType)
     }
   }
 
