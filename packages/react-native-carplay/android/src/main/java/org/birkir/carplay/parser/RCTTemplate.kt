@@ -229,7 +229,7 @@ abstract class RCTTemplate(
     val id = item.getString("id") ?: index.toString()
     return GridItem.Builder().apply {
       val titleVariants = item.getArray("titleVariants")
-      val metadata = item.getMap("metadata");
+      val metadata = item.getMap("metadata")
 
       if (titleVariants != null) {
         if (titleVariants.size() > 0) {

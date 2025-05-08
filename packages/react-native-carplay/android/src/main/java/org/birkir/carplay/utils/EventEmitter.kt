@@ -123,9 +123,9 @@ class EventEmitter(
 
   fun alertActionPressed(type: String, reason: String? = null) {
     emit(AlertActionPressed, Arguments.createMap().apply {
-      putString("type", type);
+      putString("type", type)
       reason?.let { putString("reason", reason) }
-    });
+    })
   }
 
   fun selectedResult(index: Int, id: String?) {

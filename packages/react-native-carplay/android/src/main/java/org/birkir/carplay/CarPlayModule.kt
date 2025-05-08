@@ -36,7 +36,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   ReactContextBaseJavaModule(reactContext) {
 
   private lateinit var carContext: CarContext
-  private lateinit var parser: Parser;
+  private lateinit var parser: Parser
 
   private var currentCarScreen: CarScreen? = null
   private var screenManager: ScreenManager? = null
@@ -66,7 +66,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   }
 
   fun setCarContext(carContext: CarContext, currentCarScreen: CarScreen) {
-    parser = Parser(carContext, CarScreenContext("", eventEmitter, carScreens));
+    parser = Parser(carContext, CarScreenContext("", eventEmitter, carScreens))
     this.carContext = carContext
     this.currentCarScreen = currentCarScreen
     screenManager = currentCarScreen.screenManager
@@ -123,9 +123,9 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     handler.post {
       val screen = carScreens[templateId]
       if (screen != null) {
-        val carScreenContext = carScreenContexts[screen];
+        val carScreenContext = carScreenContexts[screen]
         if (carScreenContext != null) {
-          val template = parseTemplate(config, carScreenContext);
+          val template = parseTemplate(config, carScreenContext)
           screen.setTemplate(template, templateId, config)
           screen.invalidate()
         }
@@ -151,7 +151,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     handler.post {
       val screen = getScreen(templateId)
       if (screen != null) {
-        currentCarScreen = screen;
+        currentCarScreen = screen
         screenManager?.push(screen)
       }
     }
@@ -160,7 +160,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   @ReactMethod
   fun popToTemplate(templateId: String, animated: Boolean?) {
     handler.post {
-      screenManager?.popTo(templateId);
+      screenManager?.popTo(templateId)
     }
   }
 
@@ -196,9 +196,9 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   @ReactMethod
   fun alert(props: ReadableMap) {
     handler.post {
-      val id = props.getInt("id");
-      val title = parser.parseCarText(props.getString("title")!!, props);
-      val duration = props.getInt("duration").toLong();
+      val id = props.getInt("id")
+      val title = parser.parseCarText(props.getString("title")!!, props)
+      val duration = props.getInt("duration").toLong()
       val alert = Alert.Builder(id, title, duration).apply {
         setCallback(object : AlertCallback {
           override fun onCancel(reason: Int) {
@@ -208,17 +208,17 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
               AlertCallback.REASON_NOT_SUPPORTED -> "notSupported"
               else -> "unknown"
             }
-            eventEmitter.alertActionPressed("cancel", reasonString);
+            eventEmitter.alertActionPressed("cancel", reasonString)
           }
           override fun onDismiss() {
-            eventEmitter.alertActionPressed("dismiss" );
+            eventEmitter.alertActionPressed("dismiss" )
           }
         })
         props.getString("subtitle")?.let { setSubtitle(parser.parseCarText(it, props)) }
         props.getMap("image")?.let { setIcon(parser.parseCarIcon(it)) }
         props.getArray("actions")?.let {
           for (i in 0 until it.size()) {
-            addAction(parser.parseAction(it.getMap(i)));
+            addAction(parser.parseAction(it.getMap(i)))
           }
         }
       }.build()
@@ -253,7 +253,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     return promise.resolve(Arguments.createMap().apply {
       carContext.hostInfo?.packageName?.let { putString("packageName", it) }
       carContext.hostInfo?.uid?.let { putInt("uid", it) }
-    });
+    })
   }
 
   // Others
@@ -299,20 +299,20 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     if (templateConfig != null) {
       val emitter = EventEmitter(reactContext, templateId)
       val screen = CarScreen(carContext, emitter)
-      screen.marker = templateId;
+      screen.marker = templateId
 
       // context
       carScreenContexts.remove(screen)
       val carScreenContext = createCarScreenContext(screen, emitter)
       carScreenContexts[screen] = carScreenContext
 
-      val template = parseTemplate(templateConfig, carScreenContext);
+      val template = parseTemplate(templateConfig, carScreenContext)
       screen.setTemplate(template, templateId, templateConfig)
-      carScreens[templateId] = screen;
+      carScreens[templateId] = screen
 
-      return screen;
+      return screen
     }
-    return null;
+    return null
   }
 
   private fun getScreen(name: String): CarScreen? {

@@ -42,7 +42,7 @@ class RCTMapTemplate(
       }
     }
     val mapController = MapController.Builder().apply {
-      mapActionStrip?.let { setMapActionStrip(it); }
+      mapActionStrip?.let { setMapActionStrip(it) }
       setPanModeListener(panModeListener)
     }.build()
     when (type) {
@@ -107,7 +107,7 @@ class RCTMapTemplate(
             setItemList(parseItemList(it, ItemListType.RouteList))
           }
           setLoading(props.isLoading())
-          mapActionStrip?.let { setMapActionStrip(it); }
+          mapActionStrip?.let { setMapActionStrip(it) }
           props.getMap("navigateAction")?.let { setNavigateAction(parseAction(it)) }
           setPanModeListener(panModeListener)
         }.build()

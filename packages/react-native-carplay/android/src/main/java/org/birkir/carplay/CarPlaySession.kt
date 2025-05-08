@@ -35,7 +35,7 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
     carContext.registerReceiver(object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent) {
         if ("org.birkir.carplay.APP_RELOAD" == intent.action) {
-          invokeStartTask(reactInstanceManager.currentReactContext!!);
+          invokeStartTask(reactInstanceManager.currentReactContext!!)
         }
       }
     }, IntentFilter("org.birkir.carplay.APP_RELOAD"))
