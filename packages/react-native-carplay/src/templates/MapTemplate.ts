@@ -139,7 +139,9 @@ export interface MapTemplateConfig extends TemplateConfig {
   onPanWithDirection?(e: PanEvent): void;
   onPanBeganWithDirection?(e: PanEvent): void;
   onPanEndedWithDirection?(e: PanEvent): void;
+  onDidBeginPanGesture?(): void;
   onDidUpdatePanGestureWithTranslation?(e: PanGestureWithTranslationEvent): void;
+  onDidEndPanGestureWithVelocity?(e: {velocity: PanGestureWithTranslationEvent["velocity"]}): void;
   onSelectedPreviewForTrip?(e: TripEvent): void;
   /**
    * Fired when the vehicles built in navigation system is started by the user,
@@ -198,7 +200,9 @@ export class MapTemplate extends Template<MapTemplateConfig> {
       panWithDirection: 'onPanWithDirection',
       panBeganWithDirection: 'onPanBeganWithDirection',
       panEndedWithDirection: 'onPanEndedWithDirection',
+      didBeginPanGesture: 'onDidBeginPanGesture',
       didUpdatePanGestureWithTranslation: 'onDidUpdatePanGestureWithTranslation',
+      didEndPanGestureWithVelocity: 'onDidEndPanGestureWithVelocity',
       selectedPreviewForTrip: 'onSelectedPreviewForTrip',
       didCancelNavigation: 'onDidCancelNavigation',
       startedTrip: 'onStartedTrip',
