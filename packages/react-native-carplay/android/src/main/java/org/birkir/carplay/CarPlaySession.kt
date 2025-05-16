@@ -1,11 +1,11 @@
 package org.birkir.carplay
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.car.app.Screen
@@ -14,16 +14,28 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.facebook.react.ReactInstanceManager
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.appregistry.AppRegistry
 import org.birkir.carplay.screens.CarScreen
 
 
-class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : Session(), DefaultLifecycleObserver {
+class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : Session(), DefaultLifecycleObserver, LifecycleEventListener {
   private lateinit var screen: CarScreen
 
-  @SuppressLint("UnspecifiedRegisterReceiverFlag")
+  init {
+      reactInstanceManager.currentReactContext?.addLifecycleEventListener(this)
+  }
+
+  val restartReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+      if (CarPlayModule.APP_RELOAD == intent.action) {
+        invokeStartTask(reactInstanceManager.currentReactContext!!)
+      }
+    }
+  }
+
   override fun onCreateScreen(intent: Intent): Screen {
     Log.d(TAG, "On create screen " + intent.action + " - " + intent.dataString)
     val lifecycle = lifecycle
@@ -32,13 +44,11 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
     screen.marker = "root"
 
     // Handle reload events
-    carContext.registerReceiver(object : BroadcastReceiver() {
-      override fun onReceive(context: Context, intent: Intent) {
-        if ("org.birkir.carplay.APP_RELOAD" == intent.action) {
-          invokeStartTask(reactInstanceManager.currentReactContext!!)
-        }
-      }
-    }, IntentFilter("org.birkir.carplay.APP_RELOAD"))
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      carContext.registerReceiver(restartReceiver, IntentFilter(CarPlayModule.APP_RELOAD), Context.RECEIVER_NOT_EXPORTED)
+    } else {
+      carContext.registerReceiver(restartReceiver, IntentFilter(CarPlayModule.APP_RELOAD))
+    }
 
     // Run JS
     runJsApplication()
@@ -101,6 +111,16 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
 
   companion object {
     const val TAG = "CarPlaySession"
+  }
+
+  override fun onHostDestroy() {
+    carContext.finishCarApp()
+  }
+
+  override fun onHostPause() {
+  }
+
+  override fun onHostResume() {
   }
 }
 

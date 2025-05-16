@@ -1,9 +1,5 @@
 package org.birkir.carplay
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.util.Log
 import androidx.car.app.CarAppService
 import androidx.car.app.Session
@@ -14,6 +10,7 @@ import com.facebook.react.ReactInstanceManager
 
 class CarPlayService : CarAppService() {
   private lateinit var reactInstanceManager: ReactInstanceManager
+
   override fun onCreate() {
     super.onCreate()
     reactInstanceManager =

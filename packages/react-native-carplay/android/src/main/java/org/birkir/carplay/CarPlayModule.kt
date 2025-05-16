@@ -328,5 +328,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   companion object {
     const val NAME = "RNCarPlay"
     const val TAG = "CarPlay"
+    const val APP_RELOAD = "org.birkir.carplay.AppReload"
   }
 }

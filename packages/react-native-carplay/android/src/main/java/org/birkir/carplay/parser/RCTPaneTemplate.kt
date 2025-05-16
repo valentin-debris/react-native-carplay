@@ -1,6 +1,8 @@
 package org.birkir.carplay.parser
 
 import androidx.car.app.CarContext
+import androidx.car.app.model.Action
+import androidx.car.app.model.Header
 import androidx.car.app.model.PaneTemplate
 import com.facebook.react.bridge.ReadableMap
 import org.birkir.carplay.screens.CarScreenContext
@@ -13,8 +15,10 @@ class RCTPaneTemplate(
     val pane = parsePane(props.getMap("pane")!!)
     return PaneTemplate.Builder(pane).apply {
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
-      props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
-      props.getString("title")?.let { setTitle(it) }
+      setHeader(Header.Builder().apply {
+        props.getString("title")?.let { setTitle(it) }
+        props.getMap("headerAction")?.let { setStartHeaderAction(parseAction(it)) }
+      }.build())
     }.build()
   }
 

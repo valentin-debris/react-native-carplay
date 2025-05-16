@@ -12,6 +12,11 @@ export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
 
   onDidShowPanningInterface?(): void;
   onDidDismissPanningInterface?(): void;
+
+  /**
+   * Fired when a button is pressed
+   */
+  onButtonPressed?(e: {buttonId: string}): void;
 }
 
 export class AndroidNavigationBaseTemplate<
@@ -21,6 +26,7 @@ export class AndroidNavigationBaseTemplate<
     return {
       didShowPanningInterface: 'onDidShowPanningInterface',
       didDismissPanningInterface: 'onDidDismissPanningInterface',
+      buttonPressed: 'onButtonPressed',
     };
   }
 
