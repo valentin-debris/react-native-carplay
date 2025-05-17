@@ -19,6 +19,7 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.module.annotations.ReactModule
@@ -283,6 +284,36 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
 
   @ReactMethod
   fun updateDashboardShortcutButtons(config: ReadableMap) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun updateListTemplateSections(templateId: String, config: ReadableArray) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun updateListTemplateItem(templateId: String, config: ReadableMap) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun getMaximumListItemCount(templateId: String) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun getMaximumListItemImageSize(templateId: String) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun getMaximumNumberOfGridImages(templateId: String) {
+    //TODO
+  }
+
+  @ReactMethod
+  fun getMaximumListImageRowItemImageSize(templateId: String) {
     //TODO
   }
 
