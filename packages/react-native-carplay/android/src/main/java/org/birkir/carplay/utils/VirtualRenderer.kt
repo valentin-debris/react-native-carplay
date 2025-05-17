@@ -44,11 +44,11 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       container.surface,
       DisplayManager.VIRTUAL_DISPLAY_FLAG_PRESENTATION,
     )
-    val presentation = MapPresentation(context, display.display, moduleName)
+    val presentation = MapPresentation(context, display.display, moduleName, container)
     presentation.show()
   }
 
-  inner class MapPresentation(context: Context, display: Display, private val moduleName: String) :
+  inner class MapPresentation(private val context: CarContext, display: Display, private val moduleName: String, private val container: SurfaceContainer) :
     Presentation(context, display) {
     override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
@@ -56,8 +56,17 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
         (context.applicationContext as ReactApplication).reactNativeHost.reactInstanceManager
       if (rootView == null) {
         Log.d(TAG, "onCreate: rootView is null, initializing rootView")
+        val initialProperties = Bundle().apply {
+          putString("id", moduleName)
+          putString("colorScheme", if (context.isDarkMode) "dark" else "light")
+          putBundle("window", Bundle().apply {
+            putInt("height", container.height)
+            putInt("width", container.width)
+            putFloat("scale", context.resources.displayMetrics.density)
+          })
+        }
         rootView = ReactRootView(context).apply {
-          startReactApplication(instanceManager, moduleName)
+          startReactApplication(instanceManager, moduleName, initialProperties)
           runApplication()
         }
       } else {
