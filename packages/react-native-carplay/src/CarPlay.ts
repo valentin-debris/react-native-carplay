@@ -140,7 +140,9 @@ export class CarPlayInterface {
 
     // check if already connected this will fire any 'didConnect' events
     // if a connected is already present.
-    this.bridge.checkForConnection();
+    if (Platform.OS === 'ios') {
+      this.bridge.checkForConnection();
+    }
   }
 
   /**
