@@ -137,11 +137,19 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   fun setRootTemplate(templateId: String, animated: Boolean?) {
     Log.d(TAG, "set Root Template for $templateId")
     handler.post {
-      val screen = getScreen(templateId)
-      if (screen != null) {
-        currentCarScreen = screen
-        screenManager?.popToRoot()
-        screenManager?.push(screen)
+      screenManager?.let {
+        val screen = getScreen(templateId)
+        if (screen != null) {
+          currentCarScreen = screen
+          it.popToRoot()
+          val root = it.top
+          it.push(screen)
+
+          if (root is CarScreen) {
+            removeScreen(root)
+          }
+          it.remove(root)
+        }
       }
     }
   }
