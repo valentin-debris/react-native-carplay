@@ -38,7 +38,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   private lateinit var carContext: CarContext
   private lateinit var parser: Parser
 
-  private var currentCarScreen: CarScreen? = null
   private var screenManager: ScreenManager? = null
   private val carScreens: WeakHashMap<String, CarScreen> = WeakHashMap()
   private val carScreenContexts: WeakHashMap<CarScreen, CarScreenContext> =
@@ -68,9 +67,8 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   fun setCarContext(carContext: CarContext, currentCarScreen: CarScreen) {
     parser = Parser(carContext, CarScreenContext("", eventEmitter, carScreens))
     this.carContext = carContext
-    this.currentCarScreen = currentCarScreen
     screenManager = currentCarScreen.screenManager
-    carScreens["root"] = this.currentCarScreen
+    carScreens["root"] = currentCarScreen
     carContext.onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
       override fun handleOnBackPressed() {
         val topScreen = screenManager?.top
@@ -140,7 +138,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
       screenManager?.let {
         val screen = getScreen(templateId)
         if (screen != null) {
-          currentCarScreen = screen
           it.popToRoot()
           val root = it.top
           it.push(screen)
@@ -159,7 +156,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     handler.post {
       val screen = getScreen(templateId)
       if (screen != null) {
-        currentCarScreen = screen
         screenManager?.push(screen)
       }
     }
@@ -176,7 +172,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   fun popTemplate(animated: Boolean?) {
     handler.post {
       screenManager!!.pop()
-      removeScreen(currentCarScreen)
       val topScreen = screenManager?.top
       if (topScreen != null && topScreen is CarScreen) {
         topScreen.invalidate()
