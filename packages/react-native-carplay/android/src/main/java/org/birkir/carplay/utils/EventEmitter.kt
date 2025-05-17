@@ -14,6 +14,7 @@ class EventEmitter(
   companion object {
     const val DidConnect = "didConnect"
     const val DidDisconnect = "didDisconnect"
+    const val DidFinish = "didFinish" //CarPlayService finished/killed
 
     // interface
     const val BarButtonPressed = "barButtonPressed"
@@ -76,6 +77,10 @@ class EventEmitter(
 
   fun didDisconnect() {
     emit(DidDisconnect)
+  }
+
+  fun didFinish() {
+    emit(DidFinish)
   }
 
   fun buttonPressed(buttonId: String) {

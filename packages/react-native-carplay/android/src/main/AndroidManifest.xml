@@ -23,6 +23,7 @@
         <data android:scheme="geo" />
       </intent-filter>
     </service>
+    <service android:name=".CarPlayHeadlessTaskService" />
     <meta-data
       android:name="androidx.car.app.minCarApiLevel"
       android:value="1" />

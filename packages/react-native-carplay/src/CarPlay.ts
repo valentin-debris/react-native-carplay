@@ -22,6 +22,7 @@ import { InternalCarPlay } from './interfaces/InternalCarPlay';
 import { WindowInformation } from './interfaces/WindowInformation';
 import { OnClusterControllerConnectCallback } from './interfaces/Cluster';
 import { Cluster } from './scenes/Cluster';
+import registerHeadlessTask from './CarPlayHeadlessJsTask';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -100,6 +101,8 @@ export class CarPlayInterface {
   private onOnSafeAreaInsetsDidChangeCallbacks = new Set<OnSafeAreaInsetsDidChangeCallback>();
 
   constructor() {
+    registerHeadlessTask();
+
     this.emitter.addListener('didConnect', (window: WindowInformation) => {
       console.log('we are connected yes!');
       this.connected = true;
