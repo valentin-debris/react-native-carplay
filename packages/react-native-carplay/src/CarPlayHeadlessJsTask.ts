@@ -1,16 +1,17 @@
-import type { Task, TaskProvider } from 'react-native';
+import type { EmitterSubscription, Task, TaskProvider } from 'react-native';
 import { AppRegistry, DeviceEventEmitter, Platform } from 'react-native';
+import { CarPlay } from './CarPlay';
 
 // this headless task is required on Android (Auto) to make sure timers are working fine when screen is off
 
-const headlessTask: TaskProvider = (): Task => taskData =>
+const headlessTask: TaskProvider = (): Task => _ =>
   new Promise((resolve, reject) => {
-    let finishListener: ReturnType<typeof DeviceEventEmitter.addListener> | null = null;
+    let subscription: EmitterSubscription | null = null;
 
     try {
-      finishListener = DeviceEventEmitter.addListener('didFinish', () => {
+      subscription = CarPlay.emitter.addListener('didFinish', () => {
         try {
-          finishListener?.remove();
+          subscription?.remove();
           resolve();
         } catch (error) {
           console.error('Error in CarPlayHeadlessJsTask didFinish listener:', error);
@@ -19,7 +20,7 @@ const headlessTask: TaskProvider = (): Task => taskData =>
       });
     } catch (error) {
       console.error('Error in headless task:', error);
-      finishListener?.remove();
+      subscription?.remove();
       reject(error);
     }
   });
