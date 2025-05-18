@@ -20,8 +20,12 @@ import com.facebook.react.ReactRootView
 class VirtualRenderer(private val context: CarContext, private val moduleName: String) {
 
   private var rootView: ReactRootView? = null
+  private var emitter: EventEmitter
 
   init {
+    val reactContext =  (context.applicationContext as ReactApplication).reactNativeHost.reactInstanceManager.currentReactContext
+    emitter = EventEmitter(reactContext = reactContext, templateId = moduleName)
+
     context.getCarService(AppManager::class.java).setSurfaceCallback(object : SurfaceCallback {
       override fun onSurfaceAvailable(surfaceContainer: SurfaceContainer) {
         val surface = surfaceContainer.surface
@@ -30,6 +34,18 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
         } else {
           renderPresentation(surfaceContainer)
         }
+      }
+
+      override fun onClick(x: Float, y: Float) {
+        super.onClick(x, y)
+      }
+
+      override fun onScale(focusX: Float, focusY: Float, scaleFactor: Float) {
+        super.onScale(focusX, focusY, scaleFactor)
+      }
+
+      override fun onScroll(distanceX: Float, distanceY: Float) {
+        emitter.didUpdatePanGestureWithTranslation(-distanceX, -distanceY)
       }
     })
   }

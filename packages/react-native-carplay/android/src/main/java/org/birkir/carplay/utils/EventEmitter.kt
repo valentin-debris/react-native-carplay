@@ -171,6 +171,15 @@ class EventEmitter(
     emit(DidDismissPanningInterface)
   }
 
+  fun didUpdatePanGestureWithTranslation(distanceX: Float, distanceY: Float) {
+    emit(DidUpdatePanGestureWithTranslation, Arguments.createMap().apply {
+      putMap("translation", Arguments.createMap().apply {
+        putDouble("x", distanceX.toDouble())
+        putDouble("y", distanceY.toDouble())
+      })
+    })
+  }
+
   private fun emit(eventName: String, data: WritableMap = Arguments.createMap()) {
     if (reactContext == null) {
       Log.e("RNCarPlay", "Could not send event $eventName. React context is null!")
