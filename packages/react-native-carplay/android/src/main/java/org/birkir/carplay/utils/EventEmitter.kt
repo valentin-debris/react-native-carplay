@@ -15,6 +15,7 @@ class EventEmitter(
     const val DidConnect = "didConnect"
     const val DidDisconnect = "didDisconnect"
     const val DidFinish = "didFinish" //CarPlayService finished/killed
+    const val SafeAreaInsetsDidChange = "safeAreaInsetsDidChange"
 
     // interface
     const val BarButtonPressed = "barButtonPressed"
@@ -177,6 +178,16 @@ class EventEmitter(
         putDouble("x", distanceX.toDouble())
         putDouble("y", distanceY.toDouble())
       })
+    })
+  }
+
+  fun safeAreaInsetsDidChange(top: Int, bottom: Int, left: Int, right: Int) {
+    emit(SafeAreaInsetsDidChange, Arguments.createMap().apply {
+      putInt("top", top)
+      putInt("bottom", bottom)
+      putInt("left", left)
+      putInt("right", right)
+      putString("id", templateId)
     })
   }
 

@@ -2,6 +2,7 @@ package org.birkir.carplay.utils
 
 import android.app.Presentation
 import android.content.Context
+import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.Log
@@ -27,6 +28,10 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
     emitter = EventEmitter(reactContext = reactContext, templateId = moduleName)
 
     context.getCarService(AppManager::class.java).setSurfaceCallback(object : SurfaceCallback {
+
+      var height = 0
+      var width = 0
+
       override fun onSurfaceAvailable(surfaceContainer: SurfaceContainer) {
         val surface = surfaceContainer.surface
         if (surface == null) {
@@ -34,6 +39,9 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
         } else {
           renderPresentation(surfaceContainer)
         }
+
+        height = surfaceContainer.height
+        width = surfaceContainer.width
       }
 
       override fun onClick(x: Float, y: Float) {
@@ -46,6 +54,18 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
 
       override fun onScroll(distanceX: Float, distanceY: Float) {
         emitter.didUpdatePanGestureWithTranslation(-distanceX, -distanceY)
+      }
+
+      override fun onStableAreaChanged(stableArea: Rect) {
+        super.onStableAreaChanged(stableArea)
+      }
+
+      override fun onVisibleAreaChanged(visibleArea: Rect) {
+        val top = visibleArea.top
+        val bottom = height - visibleArea.bottom
+        val left = visibleArea.left
+        val right = width - visibleArea.right
+        emitter.safeAreaInsetsDidChange(top = top, bottom = bottom, left = left, right = right)
       }
     })
   }
