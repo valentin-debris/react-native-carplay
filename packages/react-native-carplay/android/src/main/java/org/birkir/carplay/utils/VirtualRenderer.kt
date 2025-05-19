@@ -2,18 +2,24 @@ package org.birkir.carplay.utils
 
 import android.app.Presentation
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Display
 import android.view.ViewGroup
+import android.widget.AbsoluteLayout
+import android.widget.FrameLayout
+import android.widget.RelativeLayout
 import androidx.car.app.AppManager
 import androidx.car.app.CarContext
 import androidx.car.app.SurfaceCallback
 import androidx.car.app.SurfaceContainer
+import androidx.core.graphics.scaleMatrix
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
+import com.facebook.react.uimanager.DisplayMetricsHolder
 
 /**
  * Renders the view tree into a surface using VirtualDisplay. It runs the ReactNative component registered
@@ -101,7 +107,20 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
             putFloat("scale", context.resources.displayMetrics.density)
           })
         }
+
+        val mainScreenDensity = DisplayMetricsHolder.getScreenDisplayMetrics().density
+        val virtualScreenDensity = context.resources.displayMetrics.density
+        val scale = virtualScreenDensity / mainScreenDensity
+
         rootView = ReactRootView(context).apply {
+          layoutParams = FrameLayout.LayoutParams(
+            (container.width / scale).toInt(),
+            (container.height / scale).toInt()
+          )
+          scaleX = scale
+          scaleY = scale
+          pivotX = 0f
+          pivotY = 0f
           startReactApplication(instanceManager, moduleName, initialProperties)
           runApplication()
         }
@@ -109,7 +128,17 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
         (rootView?.parent as? ViewGroup)?.removeView(rootView)
       }
       rootView?.let {
-        setContentView(it)
+        val container = FrameLayout(context).apply {
+          layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+          )
+          clipChildren = false // Allow content to extend beyond bounds
+        }
+
+        container.addView(it)
+
+        setContentView(container)
       }
     }
   }
