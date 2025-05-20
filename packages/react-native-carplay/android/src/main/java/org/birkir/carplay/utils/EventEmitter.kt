@@ -61,6 +61,8 @@ class EventEmitter(
     const val DidDismissPanningInterface = "didDismissPanningInterface"
     const val WillDismissPanningInterface = "willDismissPanningInterface"
     const val DidShowPanningInterface = "didShowPanningInterface"
+    const val DidUpdatePinchGesture = "didUpdatePinchGesture"
+    const val DidPress = "didPress"
     const val DidDismissNavigationAlert = "didDismissNavigationAlert"
     const val WillDismissNavigationAlert = "willDismissNavigationAlert"
     const val DidShowNavigationAlert = "didShowNavigationAlert"
@@ -178,6 +180,21 @@ class EventEmitter(
         putDouble("x", distanceX.toDouble())
         putDouble("y", distanceY.toDouble())
       })
+    })
+  }
+
+  fun didUpdatePinchGesture(focusX: Float, focusY: Float, scaleFactor: Float) {
+    emit(DidUpdatePinchGesture, Arguments.createMap().apply {
+      putDouble("x", focusX.toDouble())
+      putDouble("y", focusY.toDouble())
+      putDouble("scaleFactor", scaleFactor.toDouble())
+    })
+  }
+
+  fun didPress(x: Float, y: Float) {
+    emit(DidPress, Arguments.createMap().apply {
+      putDouble("x", x.toDouble())
+      putDouble("y", y.toDouble())
     })
   }
 

@@ -55,11 +55,11 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       }
 
       override fun onClick(x: Float, y: Float) {
-        super.onClick(x, y)
+        emitter.didPress(x = x / scale, y = y / scale)
       }
 
       override fun onScale(focusX: Float, focusY: Float, scaleFactor: Float) {
-        super.onScale(focusX, focusY, scaleFactor)
+        emitter.didUpdatePinchGesture(focusX = focusX / scale, focusY = focusY / scale, scaleFactor = scaleFactor)
       }
 
       override fun onScroll(distanceX: Float, distanceY: Float) {
@@ -71,10 +71,10 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       }
 
       override fun onVisibleAreaChanged(visibleArea: Rect) {
-        val top = visibleArea.top
-        val bottom = height - visibleArea.bottom
-        val left = visibleArea.left
-        val right = width - visibleArea.right
+        val top = (visibleArea.top * scale).toInt()
+        val bottom = ((height - visibleArea.bottom) * scale).toInt()
+        val left = (visibleArea.left * scale).toInt()
+        val right = ((width - visibleArea.right) * scale).toInt()
         emitter.safeAreaInsetsDidChange(top = top, bottom = bottom, left = left, right = right)
       }
     })

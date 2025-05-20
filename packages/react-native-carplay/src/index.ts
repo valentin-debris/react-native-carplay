@@ -47,7 +47,7 @@ export * from './interfaces/TextConfiguration';
 export * from './interfaces/TimeRemainingColor';
 export * from './interfaces/TravelEstimates';
 export * from './interfaces/VoiceControlState';
-export * from './interfaces/PanGestureWithTranslationEvent';
+export * from './interfaces/GestureEvent';
 export * from './interfaces/WindowInformation';
 export * from './interfaces/RootComponentInitialProps';
 
