@@ -69,7 +69,7 @@ android {
   defaultConfig {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
-
+    buildConfigField "float", "CARPLAY_SCALE_FACTOR", "1.5f"
   }
 
   buildTypes {

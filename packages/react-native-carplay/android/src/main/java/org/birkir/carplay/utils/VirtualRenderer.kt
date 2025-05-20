@@ -2,24 +2,21 @@ package org.birkir.carplay.utils
 
 import android.app.Presentation
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Display
 import android.view.ViewGroup
-import android.widget.AbsoluteLayout
 import android.widget.FrameLayout
-import android.widget.RelativeLayout
 import androidx.car.app.AppManager
 import androidx.car.app.CarContext
 import androidx.car.app.SurfaceCallback
 import androidx.car.app.SurfaceContainer
-import androidx.core.graphics.scaleMatrix
 import com.facebook.react.ReactApplication
 import com.facebook.react.ReactRootView
 import com.facebook.react.uimanager.DisplayMetricsHolder
+import org.birkir.carplay.BuildConfig
 
 /**
  * Renders the view tree into a surface using VirtualDisplay. It runs the ReactNative component registered
@@ -28,6 +25,13 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
 
   private var rootView: ReactRootView? = null
   private var emitter: EventEmitter
+
+  /**
+   * since react-native renders everything with the density/scaleFactor from the main display we have to adjust scaling on AA to take this into account
+   */
+  private val mainScreenDensity = DisplayMetricsHolder.getScreenDisplayMetrics().density
+  private val virtualScreenDensity = context.resources.displayMetrics.density
+  val scale = virtualScreenDensity / mainScreenDensity * BuildConfig.CARPLAY_SCALE_FACTOR
 
   init {
     val reactContext =  (context.applicationContext as ReactApplication).reactNativeHost.reactInstanceManager.currentReactContext
@@ -59,7 +63,7 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       }
 
       override fun onScroll(distanceX: Float, distanceY: Float) {
-        emitter.didUpdatePanGestureWithTranslation(-distanceX, -distanceY)
+        emitter.didUpdatePanGestureWithTranslation(distanceX = -distanceX / scale,  distanceY = -distanceY / scale)
       }
 
       override fun onStableAreaChanged(stableArea: Rect) {
@@ -108,11 +112,7 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
           })
         }
 
-        val mainScreenDensity = DisplayMetricsHolder.getScreenDisplayMetrics().density
-        val virtualScreenDensity = context.resources.displayMetrics.density
-        val scale = virtualScreenDensity / mainScreenDensity
-
-        rootView = ReactRootView(context).apply {
+        rootView = ReactRootView(context.applicationContext).apply {
           layoutParams = FrameLayout.LayoutParams(
             (container.width / scale).toInt(),
             (container.height / scale).toInt()
