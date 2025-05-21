@@ -12,6 +12,9 @@ import androidx.car.app.ScreenManager
 import androidx.car.app.model.Alert
 import androidx.car.app.model.AlertCallback
 import androidx.car.app.model.Template
+import androidx.car.app.navigation.NavigationManager
+import androidx.car.app.navigation.NavigationManagerCallback
+import androidx.car.app.navigation.model.NavigationTemplate
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.LifecycleEventListener
@@ -28,6 +31,7 @@ import org.birkir.carplay.parser.Parser
 import org.birkir.carplay.parser.TemplateParser
 import org.birkir.carplay.screens.CarScreen
 import org.birkir.carplay.screens.CarScreenContext
+import org.birkir.carplay.utils.CarNavigationManager
 import org.birkir.carplay.utils.EventEmitter
 import java.util.WeakHashMap
 
@@ -44,7 +48,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   private val carScreenContexts: WeakHashMap<CarScreen, CarScreenContext> =
     WeakHashMap()
   private val handler: Handler = Handler(Looper.getMainLooper())
-
 
   // Global event emitter (no templateId's)
   private var eventEmitter = EventEmitter(reactContext)
@@ -142,6 +145,13 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
           it.popToRoot()
           val root = it.top
           it.push(screen)
+
+          if (screen.template is NavigationTemplate) {
+            CarNavigationManager.init(
+              carContext = carContext,
+              eventEmitter = EventEmitter(reactContext = reactContext, templateId = templateId)
+            )
+          }
 
           if (root is CarScreen) {
             removeScreen(root)

@@ -48,7 +48,9 @@ export class AndroidNavigationBaseTemplate<
       buttonPressed: 'onButtonPressed',
       didUpdatePanGestureWithTranslation: 'onDidUpdatePanGestureWithTranslation',
       didUpdatePinchGesture: 'onDidUpdatePinchGesture',
-      didPress: 'onDidPress'
+      didPress: 'onDidPress',
+      didCancelNavigation: 'onDidCancelNavigation',
+      didEnableAutoDrive: 'onAutoDriveEnabled'
     };
   }
 

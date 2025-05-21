@@ -7,7 +7,8 @@ export type NavigationRoutingInfo = {
   junctionImage?: ImageResolvedAssetSource;
   nextStep?: NavigationStep;
   distance: number;
-  distanceUnits: number;
+  distanceUnits: 'meters' | 'miles' | 'kilometers' | 'yards' | 'feet';
+  step: NavigationStep;
 };
 
 export type NavigationMessageInfo = {

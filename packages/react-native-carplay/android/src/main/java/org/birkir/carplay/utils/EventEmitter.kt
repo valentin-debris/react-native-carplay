@@ -68,6 +68,7 @@ class EventEmitter(
     const val DidShowNavigationAlert = "didShowNavigationAlert"
     const val WillShowNavigationAlert = "willShowNavigationAlert"
     const val DidCancelNavigation = "didCancelNavigation"
+    const val DidEnableAutoDrive = "didEnableAutoDrive"
     const val AlertActionPressed = "alertActionPressed"
     const val SelectedPreviewForTrip = "selectedPreviewForTrip"
     const val StartedTrip = "startedTrip"
@@ -206,6 +207,14 @@ class EventEmitter(
       putInt("right", right)
       putString("id", templateId)
     })
+  }
+
+  fun didCancelNavigation() {
+    emit(DidCancelNavigation)
+  }
+
+  fun didEnableAutoDrive() {
+    emit(DidEnableAutoDrive)
   }
 
   private fun emit(eventName: String, data: WritableMap = Arguments.createMap()) {

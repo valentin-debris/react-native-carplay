@@ -458,9 +458,9 @@ abstract class RCTTemplate(
   protected fun parseNavigationInfo(map: ReadableMap): NavigationTemplate.NavigationInfo {
     val type = map.getString("type")
     return if (type == "routingInfo") {
-      parseRoutingInfo(map.getMap("info")!!)
+      parseRoutingInfo(map)
     } else {
-      parseMessageInfo(map.getMap("info")!!)
+      parseMessageInfo(map)
     }
   }
 

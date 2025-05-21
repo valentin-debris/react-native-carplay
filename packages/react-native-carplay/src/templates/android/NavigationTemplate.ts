@@ -35,6 +35,19 @@ export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateC
    * Unless set with this method, navigation info won't be displayed on the template.
    */
   navigationInfo?: NavigationInfo;
+
+  /**
+   * Notifies the app to stop active navigation, which may occurs when another source such as the car head unit starts navigating.
+   * When receiving this callback, the app must stop all routing including navigation voice guidance, routing-related notifications, and updating trip information
+   */
+  onDidCancelNavigation?(): void;
+
+  /**
+   * Notifies the app that, from this point onwards, when the user chooses to navigate to a destination, the app should start simulating a drive towards that destination.
+   * This mode should remain active until finishCarApp is called.
+   * This functionality is used to allow verifying the app's navigation capabilities without being in an actual car.
+   */
+  onAutoDriveEnabled:() => void;
 }
 
 /**
