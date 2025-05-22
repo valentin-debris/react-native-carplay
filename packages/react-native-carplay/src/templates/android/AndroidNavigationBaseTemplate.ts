@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry, ComponentProvider, Platform } from 'react-native';
 import { Template, TemplateConfig } from '../Template';
 import { CarPlay } from '../../CarPlay';
 import {
@@ -7,7 +7,6 @@ import {
   PinchGestureEvent,
   PressEvent,
 } from 'src/interfaces/GestureEvent';
-
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
   /**
    * Your component to render inside Android Auto Map view
@@ -63,10 +62,11 @@ export class AndroidNavigationBaseTemplate<
     super(config);
 
     if (config.component) {
+      const template = this;
+
       AppRegistry.registerComponent(
         this.id,
-        //@ts-ignore
-        () => props => React.createElement(config.component, { ...props, template: this }),
+        () => props => React.createElement(config.component, { ...props, template: template }),
       );
     }
 
