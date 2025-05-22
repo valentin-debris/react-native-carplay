@@ -1,7 +1,11 @@
 import { AppRegistry, Platform } from 'react-native';
 import { Template, TemplateConfig } from '../Template';
 import { CarPlay } from '../../CarPlay';
-import { PanGestureWithTranslationEvent, PinchGestureEvent, PressEvent } from 'src/interfaces/GestureEvent';
+import {
+  PanGestureWithTranslationEvent,
+  PinchGestureEvent,
+  PressEvent,
+} from 'src/interfaces/GestureEvent';
 
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
   /**
@@ -17,7 +21,7 @@ export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
   /**
    * Fired when a button is pressed
    */
-  onButtonPressed?(e: {buttonId: string}): void;
+  onButtonPressed?(e: { buttonId: string }): void;
 
   /**
    * Fired when a pan gesture is happening
@@ -50,7 +54,7 @@ export class AndroidNavigationBaseTemplate<
       didUpdatePinchGesture: 'onDidUpdatePinchGesture',
       didPress: 'onDidPress',
       didCancelNavigation: 'onDidCancelNavigation',
-      didEnableAutoDrive: 'onAutoDriveEnabled'
+      didEnableAutoDrive: 'onAutoDriveEnabled',
     };
   }
 

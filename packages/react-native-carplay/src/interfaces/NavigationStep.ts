@@ -1,12 +1,12 @@
 import { ImageResolvedAssetSource } from 'react-native';
 
 export type NavigationStep = {
-  lane: {
-    shape: number;
+  lane?: {
+    shape: Shape;
     recommended: boolean;
   };
   cue?: string;
-  lanesImage: ImageResolvedAssetSource;
+  lanesImage?: ImageResolvedAssetSource;
   maneuver?: Maneuver;
   road?: string;
 };
@@ -91,4 +91,37 @@ export enum AndroidAutoManeuverType {
   TYPE_FERRY_BOAT_RIGHT = 48,
   TYPE_FERRY_TRAIN_LEFT = 49,
   TYPE_FERRY_TRAIN_RIGHT = 50,
+}
+
+export enum Shape {
+  UNKNOWN = 1,
+  STRAIGHT = 2,
+
+  /** Slight left turn, from 10 (included) to 45 (excluded) degrees. */
+  SLIGHT_LEFT = 3,
+
+  /** Slight right turn, from 10 (included) to 45 (excluded) degrees. */
+  SLIGHT_RIGHT = 4,
+
+  /** Regular left turn, from 45 (included) to 135 (excluded) degrees. */
+  NORMAL_LEFT = 5,
+
+  /** Regular right turn, from 45 (included) to 135 (excluded) degrees. */
+  NORMAL_RIGHT = 6,
+
+  /** Sharp left turn, from 135 (included) to 175 (excluded) degrees. */
+  SHARP_LEFT = 7,
+
+  /** Sharp right turn, from 135 (included) to 175 (excluded) degrees. */
+  SHARP_RIGHT = 8,
+
+  /**
+   * A left turn onto the opposite side of the same street, from 175 (included) to 180 (included) degrees
+   */
+  U_TURN_LEFT = 9,
+
+  /**
+   * A right turn onto the opposite side of the same street, from 175 (included) to 180 (included) degrees
+   */
+  U_TURN_RIGHT = 10,
 }
