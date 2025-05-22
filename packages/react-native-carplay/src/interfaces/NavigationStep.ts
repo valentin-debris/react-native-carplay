@@ -1,12 +1,26 @@
-import { ImageResolvedAssetSource } from 'react-native';
+import { ImageSourcePropType } from 'react-native';
+
+export enum CarIconSpanAlignment {
+  ALIGN_BOTTOM = 0,
+  ALIGN_BASELINE = 1,
+  ALIGN_CENTER = 2,
+}
 
 export type NavigationStep = {
   lane?: {
     shape: Shape;
     recommended: boolean;
   };
-  cue?: string;
-  lanesImage?: ImageResolvedAssetSource;
+  cue?:
+    | string
+    | {
+        text: string;
+        image: ImageSourcePropType;
+        alignment: CarIconSpanAlignment;
+        start: number;
+        end: number;
+      };
+  lanesImage?: ImageSourcePropType;
   maneuver?: Maneuver;
   road?: string;
 };
@@ -19,7 +33,7 @@ type BaseManeuver = {
     | AndroidAutoManeuverType.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CW_WITH_ANGLE
     | AndroidAutoManeuverType.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CCW_WITH_ANGLE
   >;
-  image: ImageResolvedAssetSource;
+  image: ImageSourcePropType;
 };
 
 type RoundaboutManeuver = {
@@ -27,7 +41,7 @@ type RoundaboutManeuver = {
     | AndroidAutoManeuverType.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CW
     | AndroidAutoManeuverType.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CCW;
   roundaboutExitNumber: number;
-  image: ImageResolvedAssetSource;
+  image: ImageSourcePropType;
 };
 
 type RoundaboutWithAngleManeuver = {
@@ -36,7 +50,7 @@ type RoundaboutWithAngleManeuver = {
     | AndroidAutoManeuverType.TYPE_ROUNDABOUT_ENTER_AND_EXIT_CCW_WITH_ANGLE;
   roundaboutExitNumber: number;
   roundaboutExitAngle: number;
-  image: ImageResolvedAssetSource;
+  image: ImageSourcePropType;
 };
 
 type Maneuver = BaseManeuver | RoundaboutManeuver | RoundaboutWithAngleManeuver;

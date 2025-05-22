@@ -12,6 +12,7 @@ import androidx.car.app.model.Action.FLAG_PRIMARY
 import androidx.car.app.model.ActionStrip
 import androidx.car.app.model.CarColor
 import androidx.car.app.model.CarIcon
+import androidx.car.app.model.CarIconSpan
 import androidx.car.app.model.CarLocation
 import androidx.car.app.model.CarText
 import androidx.car.app.model.DateTimeWithZone
@@ -44,6 +45,7 @@ import com.facebook.imagepipeline.image.CloseableBitmap
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableType
 import com.facebook.react.views.imagehelper.ImageSource
 import org.birkir.carplay.BuildConfig
 import org.birkir.carplay.screens.CarScreenContext
@@ -378,11 +380,37 @@ abstract class RCTTemplate(
   protected fun parseStep(map: ReadableMap): Step {
     return Step.Builder().apply {
       map.getMap("lane")?.let { addLane(parseLane(it)) }
-      map.getString("cue")?.let { setCue(it) }
+      parseCue(map)?.let { setCue(it) }
       map.getMap("lanesImage")?.let { setLanesImage(parseCarIcon(it)) }
       map.getMap("maneuver")?.let { setManeuver(parseManeuver(it)) }
       map.getString("road")?.let { setRoad(it) }
     }.build()
+  }
+
+  protected fun parseCue(map: ReadableMap): SpannableString? {
+    if (!map.hasKey("cue")) {
+      return null
+    }
+    val cue = map.getDynamic("cue")
+    if (cue.isNull) {
+      return null
+    }
+    if (cue.type == ReadableType.String) {
+      return SpannableString(cue.asString())
+    }
+    if (cue.type == ReadableType.Map) {
+      val cueMap = cue.asMap()
+      val text = cueMap.getString("text")
+      val image = parseCarIcon(cueMap.getMap("image")!!)
+      val alignment = cueMap.getInt("alignment")
+      val start = cueMap.getInt("start")
+      val end = cueMap.getInt("end")
+
+      return SpannableString(text).apply {
+        setSpan(CarIconSpan.create(image, alignment), start, end, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+      }
+    }
+    throw IllegalArgumentException("unsupported type ${cue.type}")
   }
 
   protected fun parseLane(map: ReadableMap): Lane {
