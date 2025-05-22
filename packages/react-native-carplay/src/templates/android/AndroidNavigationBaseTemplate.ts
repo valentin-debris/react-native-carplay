@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { AppRegistry, Platform } from 'react-native';
 import { Template, TemplateConfig } from '../Template';
 import { CarPlay } from '../../CarPlay';
@@ -62,7 +63,11 @@ export class AndroidNavigationBaseTemplate<
     super(config);
 
     if (config.component) {
-      AppRegistry.registerComponent(this.id, () => config.component);
+      AppRegistry.registerComponent(
+        this.id,
+        //@ts-ignore
+        () => props => React.createElement(config.component, { ...props, template: this }),
+      );
     }
 
     const callbackFn = Platform.select({
