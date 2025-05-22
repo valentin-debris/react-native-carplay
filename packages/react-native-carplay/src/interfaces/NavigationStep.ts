@@ -7,10 +7,10 @@ export enum CarIconSpanAlignment {
 }
 
 export type NavigationStep = {
-  lane?: {
+  lanes?: Array<{
     shape: Shape;
     recommended: boolean;
-  };
+  }>;
   cue?:
     | string
     | {

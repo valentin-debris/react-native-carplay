@@ -379,7 +379,7 @@ abstract class RCTTemplate(
 
   protected fun parseStep(map: ReadableMap): Step {
     return Step.Builder().apply {
-      map.getMap("lane")?.let { addLane(parseLane(it)) }
+      map.getArray("lanes")?.let { parseLanes(it, this) }
       parseCue(map)?.let { setCue(it) }
       map.getMap("lanesImage")?.let { setLanesImage(parseCarIcon(it)) }
       map.getMap("maneuver")?.let { setManeuver(parseManeuver(it)) }
@@ -413,11 +413,15 @@ abstract class RCTTemplate(
     throw IllegalArgumentException("unsupported type ${cue.type}")
   }
 
-  protected fun parseLane(map: ReadableMap): Lane {
-    val laneBuilder = Lane.Builder()
-    val shape = map.getInt("shape")
-    val recommended = map.getBoolean("recommended")
-    return laneBuilder.addDirection(LaneDirection.create(shape, recommended)).build()
+  protected fun parseLanes(lanes: ReadableArray, builder: Step.Builder) {
+    for (i in 0 until lanes.size()) {
+      val map = lanes.getMap(i)
+      val laneBuilder = Lane.Builder()
+      val shape = map.getInt("shape")
+      val recommended = map.getBoolean("recommended")
+      val lane = laneBuilder.addDirection(LaneDirection.create(shape, recommended)).build()
+      builder.addLane(lane)
+    }
   }
 
   protected fun parseManeuver(map: ReadableMap): Maneuver {
