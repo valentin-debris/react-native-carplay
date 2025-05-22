@@ -1,5 +1,6 @@
 import { ImageResolvedAssetSource } from 'react-native';
 import { NavigationStep } from './NavigationStep';
+import { DistanceUnits } from './TravelEstimates';
 
 export type NavigationRoutingInfo = {
   type: 'routingInfo';
@@ -7,7 +8,7 @@ export type NavigationRoutingInfo = {
   junctionImage?: ImageResolvedAssetSource;
   nextStep?: NavigationStep;
   distance: number;
-  distanceUnits: 'meters' | 'miles' | 'kilometers' | 'yards' | 'feet';
+  distanceUnits: DistanceUnits;
   step: NavigationStep;
 };
 

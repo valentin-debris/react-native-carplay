@@ -16,7 +16,7 @@ export interface TravelEstimates {
    * distance, defaults to kilometer
    * @namespace iOS
    */
-  distanceUnits?: DistanceUnits;
+  distanceUnits: DistanceUnits;
 
   /**
    * Color of the distance remaining
@@ -28,12 +28,4 @@ export interface TravelEstimates {
    * @namespace Android
    */
   timeRemainingColor?: CarColor;
-  /**
-   * Destination time
-   * @namespace Android
-   */
-  destinationTime?: {
-    timeSinceEpochMillis: number;
-    id: string;
-  };
 }

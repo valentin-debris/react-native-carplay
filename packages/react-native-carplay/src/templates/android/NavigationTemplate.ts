@@ -22,7 +22,16 @@ export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateC
   /**
    * Sets the TravelEstimate to the final destination.
    */
-  travelEstimate?: TravelEstimates;
+  travelEstimate?: TravelEstimates & {
+    /**
+     * Destination time
+     * @namespace Android
+     */
+    destinationTime: {
+      timeSinceEpochMillis: number;
+      id: string;
+    };
+  };
   /**
    * Sets an ActionStrip with a list of map-control related actions for this template, such as pan or zoom.
    * The host will draw the buttons in an area that is associated with map controls.
@@ -47,7 +56,7 @@ export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateC
    * This mode should remain active until finishCarApp is called.
    * This functionality is used to allow verifying the app's navigation capabilities without being in an actual car.
    */
-  onAutoDriveEnabled:() => void;
+  onAutoDriveEnabled: () => void;
 }
 
 /**
