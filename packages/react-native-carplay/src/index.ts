@@ -50,6 +50,7 @@ export * from './interfaces/VoiceControlState';
 export * from './interfaces/GestureEvent';
 export * from './interfaces/WindowInformation';
 export * from './interfaces/RootComponentInitialProps';
+export * from './interfaces/GestureEvent';
 
 // Scenes
 export * from './interfaces/Dashboard';
