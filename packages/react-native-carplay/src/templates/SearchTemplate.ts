@@ -105,7 +105,10 @@ export class SearchTemplate extends Template<SearchTemplateConfig> {
             CarPlay.bridge.reactToUpdatedSearchText(e.templateId, parsedResults);
           } else if (Platform.OS === 'android') {
             config = { ...config, items: parsedResults };
-            CarPlay.bridge.updateTemplate(e.templateId, JSON.parse(JSON.stringify({ ...config, type: this.type })));
+            CarPlay.bridge.updateTemplate(
+              e.templateId,
+              JSON.parse(JSON.stringify({ ...config, type: this.type })),
+            );
           }
         }
       },

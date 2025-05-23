@@ -1,10 +1,11 @@
-import { Action, HeaderAction } from '../../interfaces/Action';
+import { AndroidAction, HeaderAction } from '../../interfaces/Action';
 import {
   AndroidNavigationBaseTemplate,
   AndroidNavigationBaseTemplateConfig,
 } from './AndroidNavigationBaseTemplate';
 import { Place } from '../../interfaces/Place';
 import { ListItem } from '../../interfaces/ListItem';
+import { AndroidRenderTemplates } from '../../interfaces/AndroidRenderTemplates';
 
 export interface PlaceListMapTemplateConfig extends AndroidNavigationBaseTemplateConfig {
   /**
@@ -12,7 +13,7 @@ export interface PlaceListMapTemplateConfig extends AndroidNavigationBaseTemplat
    * The Action buttons in Map Based Template are automatically adjusted based on the screen size. On narrow width screen, icon Actions show by default. If no icon specify, showing title Actions instead. On wider width screen, title Actions show by default. If no title specify, showing icon Actions instead.
    * @limit This template allows up to 4 Actions in its ActionStrip. Of the 4 allowed Actions, it can either be a title Action as set via setTitle, or a icon Action as set via setIcon.
    */
-  actions?: Action[];
+  actions?: Array<AndroidAction>;
   /**
    * Sets the anchor maker on the map.
    * An anchor marker will not be displayed unless set with this method.
@@ -59,6 +60,6 @@ export interface PlaceListMapTemplateConfig extends AndroidNavigationBaseTemplat
  */
 export class PlaceListMapTemplate extends AndroidNavigationBaseTemplate<PlaceListMapTemplateConfig> {
   public get type(): string {
-    return 'place-list-map';
+    return AndroidRenderTemplates.PlaceListMap;
   }
 }

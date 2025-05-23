@@ -13,3 +13,7 @@ export interface Action<T extends ActionType = ActionType> {
 }
 
 export type HeaderAction = Action<'appIcon' | 'back'>;
+
+export type CallbackAction = Omit<Action, 'id'> & { onPress: () => void };
+
+export type AndroidAction = CallbackAction | (Action & { type: 'appIcon' | 'back' | 'pan' });

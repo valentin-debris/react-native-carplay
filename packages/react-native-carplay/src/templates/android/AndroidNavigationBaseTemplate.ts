@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppRegistry, ComponentProvider, Platform } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import { Template, TemplateConfig } from '../Template';
 import { CarPlay } from '../../CarPlay';
 import {
@@ -7,6 +7,35 @@ import {
   PinchGestureEvent,
   PressEvent,
 } from 'src/interfaces/GestureEvent';
+import { Action, CallbackAction } from 'src/interfaces/Action';
+
+function hasArrayProperty<K extends string, V>(
+  config: AndroidNavigationBaseTemplateConfig,
+  key: K,
+): config is AndroidNavigationBaseTemplateConfig & { [P in K]: Array<CallbackAction> } {
+  const prop = (config as Partial<Record<K, V[]>>)[key];
+  if (!Array.isArray(prop)) {
+    return false;
+  }
+  return prop.every(isCallbackAction);
+}
+
+function hasCallbackActionProperty<K extends string>(
+  config: AndroidNavigationBaseTemplateConfig,
+  key: K,
+): config is AndroidNavigationBaseTemplateConfig & { [P in K]: CallbackAction } {
+  const prop = (config as Partial<Record<K, unknown>>)[key];
+  return isCallbackAction(prop);
+}
+
+function isCallbackAction(value: unknown): value is CallbackAction {
+  return typeof value === 'object' && value !== null && 'onPress' in value;
+}
+
+function getId() {
+  return `${performance.now()}-${Math.round(Math.random() * Number.MAX_SAFE_INTEGER)}`;
+}
+
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
   /**
    * Your component to render inside Android Auto Map view
@@ -17,11 +46,6 @@ export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
 
   onDidShowPanningInterface?(): void;
   onDidDismissPanningInterface?(): void;
-
-  /**
-   * Fired when a button is pressed
-   */
-  onButtonPressed?(e: { buttonId: string }): void;
 
   /**
    * Fired when a pan gesture is happening
@@ -49,7 +73,6 @@ export class AndroidNavigationBaseTemplate<
     return {
       didShowPanningInterface: 'onDidShowPanningInterface',
       didDismissPanningInterface: 'onDidDismissPanningInterface',
-      buttonPressed: 'onButtonPressed',
       didUpdatePanGestureWithTranslation: 'onDidUpdatePanGestureWithTranslation',
       didUpdatePinchGesture: 'onDidUpdatePinchGesture',
       didPress: 'onDidPress',
@@ -59,9 +82,45 @@ export class AndroidNavigationBaseTemplate<
   }
 
   constructor(public config: T) {
+    const pressableCallbacks: { [key: string]: () => void } = {};
+
+    const updatedConfig: T & {
+      actions?: Array<Action>;
+      mapButtons?: Array<Action>;
+      navigateAction?: Action;
+    } = { ...config };
+
+    if (hasArrayProperty(config, 'actions')) {
+      updatedConfig.actions = config.actions.map(action => {
+        const id = getId();
+        const { onPress, ...rest } = action;
+        pressableCallbacks[id] = onPress;
+        return { ...rest, id };
+      });
+    }
+
+    if (hasArrayProperty(config, 'mapButtons')) {
+      updatedConfig.mapButtons = config.mapButtons.map(mapButton => {
+        const id = getId();
+        const { onPress, ...rest } = mapButton;
+        pressableCallbacks[id] = onPress;
+        return { ...rest, id };
+      });
+    }
+
+    if (hasCallbackActionProperty(config, 'navigateAction')) {
+      const id = getId();
+      const { onPress, ...rest } = config.navigateAction;
+      pressableCallbacks[id] = onPress;
+      updatedConfig.navigateAction = { ...rest, id };
+    }
+
+    config = updatedConfig;
+
     super(config);
 
     if (config.component) {
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const template = this;
 
       AppRegistry.registerComponent(
@@ -69,6 +128,19 @@ export class AndroidNavigationBaseTemplate<
         () => props => React.createElement(config.component, { ...props, template: template }),
       );
     }
+
+    const subscription = CarPlay.emitter.addListener(
+      'buttonPressed',
+      ({ buttonId }: { templateId?: string; buttonId: string }) => {
+        const callback = pressableCallbacks[buttonId];
+        if (callback == null || typeof callback !== 'function') {
+          return;
+        }
+        callback();
+      },
+    );
+
+    this.listenerSubscriptions.push(subscription);
 
     const callbackFn = Platform.select({
       android: ({ error }: { error?: string } = {}) => {

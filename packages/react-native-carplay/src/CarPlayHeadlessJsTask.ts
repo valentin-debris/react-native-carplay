@@ -1,5 +1,5 @@
 import type { EmitterSubscription, Task, TaskProvider } from 'react-native';
-import { AppRegistry, DeviceEventEmitter, Platform } from 'react-native';
+import { AppRegistry, Platform } from 'react-native';
 import { CarPlay } from './CarPlay';
 
 // this headless task is required on Android (Auto) to make sure timers are working fine when screen is off

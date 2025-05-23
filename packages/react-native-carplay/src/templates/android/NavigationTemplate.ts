@@ -1,4 +1,5 @@
-import { Action } from '../../interfaces/Action';
+import { AndroidRenderTemplates } from '../../interfaces/AndroidRenderTemplates';
+import { AndroidAction } from '../../interfaces/Action';
 import { CarColor } from '../../interfaces/CarColor';
 import { NavigationInfo } from '../../interfaces/NavigationInfo';
 import { TravelEstimates } from '../../interfaces/TravelEstimates';
@@ -13,7 +14,7 @@ export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateC
    * The Action buttons in Map Based Template are automatically adjusted based on the screen size. On narrow width screen, icon Actions show by default. If no icon specify, showing title Actions instead. On wider width screen, title Actions show by default. If no title specify, showing icon Actions instead.
    * Requirements This template allows up to 4 Actions in its ActionStrip. Of the 4 allowed Actions, it can either be a title Action as set via setTitle, or a icon Action as set via setIcon.
    */
-  actions: Action[];
+  actions: Array<AndroidAction>;
   /**
    * Sets the background color to use for the navigation information.
    * Depending on contrast requirements, capabilities of the vehicle screens, or other factors, the color may be ignored by the host or overridden by the vehicle system.
@@ -38,7 +39,7 @@ export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateC
    * If the app does not include the PAN button in this ActionStrip, the app will not receive the user input for panning gestures from SurfaceCallback methods, and the host will exit any previously activated pan mode.
    * Requirements This template allows up to 4 Actions in its map ActionStrip. Only Actions with icons set via setIcon are allowed.
    */
-  mapButtons?: Action[];
+  mapButtons?: Array<AndroidAction>;
   /**
    * Sets the navigation information to display on the template.
    * Unless set with this method, navigation info won't be displayed on the template.
@@ -67,6 +68,6 @@ export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateC
  */
 export class NavigationTemplate extends AndroidNavigationBaseTemplate<NavigationTemplateConfig> {
   public get type(): string {
-    return 'navigation';
+    return AndroidRenderTemplates.Navigation;
   }
 }

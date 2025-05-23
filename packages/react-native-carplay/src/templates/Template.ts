@@ -1,6 +1,7 @@
 import { EmitterSubscription, Image, ImageSourcePropType, Platform } from 'react-native';
 import { CarPlay } from '../CarPlay';
 import { BarButton } from '../interfaces/BarButton';
+import { AndroidRenderTemplates } from '../interfaces/AndroidRenderTemplates';
 
 export interface BaseEvent {
   /**
@@ -132,7 +133,9 @@ export class Template<P> {
       this.listenerSubscriptions.push(subscription);
     });
 
-    if (this.type !== 'map') {
+    const types = Object.values<string>(AndroidRenderTemplates);
+
+    if (!types.includes(this.type)) {
       const callbackFn = Platform.select({
         android: ({ error }: { error?: string } = {}) => {
           error && console.error(error);

@@ -1,4 +1,5 @@
-import { Action } from '../../interfaces/Action';
+import { AndroidRenderTemplates } from '../../interfaces/AndroidRenderTemplates';
+import { AndroidAction } from '../../interfaces/Action';
 import { Header } from '../../interfaces/Header';
 import { ListItem } from '../../interfaces/ListItem';
 import {
@@ -12,7 +13,7 @@ export interface RoutePreviewNavigationTemplateConfig extends AndroidNavigationB
    * The Action buttons in Map Based Template are automatically adjusted based on the screen size. On narrow width screen, icon Actions show by default. If no icon specify, showing title Actions instead. On wider width screen, title Actions show by default. If no title specify, showing icon Actions instead.
    * @limit This template allows up to 4 Actions in its ActionStrip. Of the 4 allowed Actions, it can either be a title Action as set via setTitle, or a icon Action as set via setIcon.
    */
-  actions?: Action[];
+  actions?: Array<AndroidAction>;
   /**
    * Sets the Header for this template.
    */
@@ -34,13 +35,13 @@ export interface RoutePreviewNavigationTemplateConfig extends AndroidNavigationB
    * If the app does not include the PAN button in this ActionStrip, the app will not receive the user input for panning gestures from SurfaceCallback methods, and the host will exit any previously activated pan mode.
    * @limit This template allows up to 4 Actions in its map ActionStrip. Only Actions with icons set via setIcon are allowed.
    */
-  mapButtons?: Action[];
+  mapButtons?: Array<AndroidAction>;
   /**
    * Sets the Action to allow users to request navigation using the currently selected route.
    * This should not be null if the template is not in a loading state (see #setIsLoading}), and the Action's title must be set.
    * Spans are not supported in the navigate action and will be ignored.
    */
-  navigateAction?: Action;
+  navigateAction?: AndroidAction;
   /**
    * Title for the map
    */
@@ -61,6 +62,6 @@ export interface RoutePreviewNavigationTemplateConfig extends AndroidNavigationB
  */
 export class RoutePreviewNavigationTemplate extends AndroidNavigationBaseTemplate<RoutePreviewNavigationTemplateConfig> {
   public get type(): string {
-    return 'route-preview-navigation';
+    return AndroidRenderTemplates.RoutePreviewNavigation;
   }
 }

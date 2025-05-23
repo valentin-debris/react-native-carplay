@@ -1,4 +1,5 @@
-import { Action } from '../../interfaces/Action';
+import { AndroidRenderTemplates } from '../../interfaces/AndroidRenderTemplates';
+import { AndroidAction } from '../../interfaces/Action';
 import { Header } from '../../interfaces/Header';
 import { ListItem } from '../../interfaces/ListItem';
 import {
@@ -12,7 +13,7 @@ export interface PlaceListNavigationTemplateConfig extends AndroidNavigationBase
    * The Action buttons in Map Based Template are automatically adjusted based on the screen size. On narrow width screen, icon Actions show by default. If no icon specify, showing title Actions instead. On wider width screen, title Actions show by default. If no title specify, showing icon Actions instead.
    * @limit This template allows up to 4 Actions in its ActionStrip. Of the 4 allowed Actions, it can either be a title Action as set via setTitle, or a icon Action as set via setIcon.
    */
-  actions?: Action[];
+  actions?: Array<AndroidAction>;
   /**
    * Sets the Header for this template.
    */
@@ -34,7 +35,7 @@ export interface PlaceListNavigationTemplateConfig extends AndroidNavigationBase
    * If the app does not include the PAN button in this ActionStrip, the app will not receive the user input for panning gestures from SurfaceCallback methods, and the host will exit any previously activated pan mode.
    * @limit This template allows up to 4 Actions in its map ActionStrip. Only Actions with icons set via setIcon are allowed.
    */
-  mapButtons?: Action[];
+  mapButtons?: Array<AndroidAction>;
   /**
    * Title for the map
    */
@@ -52,6 +53,6 @@ export interface PlaceListNavigationTemplateConfig extends AndroidNavigationBase
  */
 export class PlaceListNavigationTemplate extends AndroidNavigationBaseTemplate<PlaceListNavigationTemplateConfig> {
   public get type(): string {
-    return 'place-navigation-map';
+    return AndroidRenderTemplates.PlaceNavigationMap;
   }
 }
