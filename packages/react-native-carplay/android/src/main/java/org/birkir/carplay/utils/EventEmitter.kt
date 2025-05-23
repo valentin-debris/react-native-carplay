@@ -25,6 +25,7 @@ class EventEmitter(
     const val WillAppear = "willAppear"
     const val WillDisappear = "willDisappear"
     const val ButtonPressed = "buttonPressed"
+    const val PoppedToRoot = "poppedToRoot"
 
     // grid
     const val GridButtonPressed = "gridButtonPressed"
@@ -217,6 +218,10 @@ class EventEmitter(
     emit(DidEnableAutoDrive)
   }
 
+  fun didPopToRoot() {
+    emit(PoppedToRoot)
+  }
+
   private fun emit(eventName: String, data: WritableMap = Arguments.createMap()) {
     if (reactContext == null) {
       Log.e("RNCarPlay", "Could not send event $eventName. React context is null!")
@@ -229,5 +234,4 @@ class EventEmitter(
       .getJSModule(RCTDeviceEventEmitter::class.java)
       .emit(eventName, data)
   }
-
 }

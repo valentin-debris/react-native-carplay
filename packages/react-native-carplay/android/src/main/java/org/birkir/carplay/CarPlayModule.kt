@@ -15,6 +15,8 @@ import androidx.car.app.model.Template
 import androidx.car.app.navigation.NavigationManager
 import androidx.car.app.navigation.NavigationManagerCallback
 import androidx.car.app.navigation.model.NavigationTemplate
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.LifecycleEventListener
@@ -152,6 +154,16 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
               eventEmitter = EventEmitter(reactContext = reactContext, templateId = templateId)
             )
           }
+
+          screen.lifecycle.addObserver(object: DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+              eventEmitter.didPopToRoot()
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+              screen.lifecycle.removeObserver(this)
+            }
+          })
 
           if (root is CarScreen) {
             removeScreen(root)
