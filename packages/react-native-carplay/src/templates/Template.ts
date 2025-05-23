@@ -150,7 +150,8 @@ export class Template<P> {
   }
 
   updateTemplate = (config: P) => {
-    CarPlay.bridge.updateTemplate(this.id, this.parseConfig({ type: this.type, ...config }));
+    this.config = this.parseConfig({ type: this.type, ...config });
+    CarPlay.bridge.updateTemplate(this.id, this.config);
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

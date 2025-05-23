@@ -7,7 +7,7 @@ import {
   PinchGestureEvent,
   PressEvent,
 } from 'src/interfaces/GestureEvent';
-import { Action, CallbackAction } from 'src/interfaces/Action';
+import { Action, AndroidAction, CallbackAction } from 'src/interfaces/Action';
 
 function hasArrayProperty<K extends string, V>(
   config: AndroidNavigationBaseTemplateConfig,
@@ -81,58 +81,31 @@ export class AndroidNavigationBaseTemplate<
     };
   }
 
+  private pressableCallbacks: {
+    [key: string]: () => void;
+  } = {};
+
   constructor(public config: T) {
-    const pressableCallbacks: { [key: string]: () => void } = {};
-
-    const updatedConfig: T & {
-      actions?: Array<Action>;
-      mapButtons?: Array<Action>;
-      navigateAction?: Action;
-    } = { ...config };
-
-    if (hasArrayProperty(config, 'actions')) {
-      updatedConfig.actions = config.actions.map(action => {
-        const id = getId();
-        const { onPress, ...rest } = action;
-        pressableCallbacks[id] = onPress;
-        return { ...rest, id };
-      });
-    }
-
-    if (hasArrayProperty(config, 'mapButtons')) {
-      updatedConfig.mapButtons = config.mapButtons.map(mapButton => {
-        const id = getId();
-        const { onPress, ...rest } = mapButton;
-        pressableCallbacks[id] = onPress;
-        return { ...rest, id };
-      });
-    }
-
-    if (hasCallbackActionProperty(config, 'navigateAction')) {
-      const id = getId();
-      const { onPress, ...rest } = config.navigateAction;
-      pressableCallbacks[id] = onPress;
-      updatedConfig.navigateAction = { ...rest, id };
-    }
-
-    config = updatedConfig;
+    const { component, ...rest } = config;
 
     super(config);
 
-    if (config.component) {
+    this.config = this.parseConfig({ type: this.type, ...rest, render: true });
+
+    if (component) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
       const template = this;
 
       AppRegistry.registerComponent(
         this.id,
-        () => props => React.createElement(config.component, { ...props, template: template }),
+        () => props => React.createElement(component, { ...props, template: template }),
       );
     }
 
     const subscription = CarPlay.emitter.addListener(
       'buttonPressed',
       ({ buttonId }: { templateId?: string; buttonId: string }) => {
-        const callback = pressableCallbacks[buttonId];
+        const callback = this.pressableCallbacks[buttonId];
         if (callback == null || typeof callback !== 'function') {
           return;
         }
@@ -148,10 +121,80 @@ export class AndroidNavigationBaseTemplate<
       },
     });
 
-    CarPlay.bridge.createTemplate(
-      this.id,
-      this.parseConfig({ type: this.type, ...config, render: true }),
-      callbackFn,
+    CarPlay.bridge.createTemplate(this.id, this.config, callbackFn);
+  }
+
+  public parseConfig(
+    config: TemplateConfig & {
+      actions?: Array<AndroidAction>;
+      mapButtons?: Array<AndroidAction>;
+      navigateAction?: AndroidAction;
+    },
+  ) {
+    const { actions, mapButtons, navigateAction, ...rest } = config;
+
+    const updatedConfig: TemplateConfig & {
+      actions?: Array<Action>;
+      mapButtons?: Array<Action>;
+      navigateAction?: Action;
+    } = { ...rest };
+
+    const callbackIds = new Array<string>();
+
+    if (actions != null) {
+      updatedConfig.actions = actions.map(action => {
+        const id = 'id' in action ? action.id : getId();
+        if (id == null) {
+          return action;
+        }
+
+        callbackIds.push(id);
+
+        if (!('onPress' in action)) {
+          return action;
+        }
+        const { onPress, ...rest } = action;
+        this.pressableCallbacks[id] = onPress;
+        return { ...rest, id };
+      });
+    }
+
+    if (mapButtons) {
+      updatedConfig.mapButtons = mapButtons.map(mapButton => {
+        const id = 'id' in mapButton ? mapButton.id : getId();
+        if (id == null) {
+          return mapButton;
+        }
+
+        callbackIds.push(id);
+
+        if (!('onPress' in mapButton)) {
+          return mapButton;
+        }
+        const { onPress, ...rest } = mapButton;
+        this.pressableCallbacks[id] = onPress;
+        return { ...rest, id };
+      });
+    }
+
+    if (navigateAction) {
+      const id = 'id' in navigateAction ? navigateAction.id : getId();
+
+      if (id != null) {
+        callbackIds.push(id);
+
+        if ('onPress' in navigateAction) {
+          const { onPress, ...rest } = navigateAction;
+          this.pressableCallbacks[id] = onPress;
+          updatedConfig.navigateAction = { ...rest, id };
+        }
+      }
+    }
+
+    this.pressableCallbacks = Object.fromEntries(
+      Object.entries(this.pressableCallbacks).filter(([id]) => callbackIds.includes(id)),
     );
+
+    return super.parseConfig(updatedConfig);
   }
 }
