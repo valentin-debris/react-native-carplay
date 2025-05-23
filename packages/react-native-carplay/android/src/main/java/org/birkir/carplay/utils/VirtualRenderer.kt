@@ -21,7 +21,11 @@ import org.birkir.carplay.BuildConfig
 /**
  * Renders the view tree into a surface using VirtualDisplay. It runs the ReactNative component registered
  */
-class VirtualRenderer(private val context: CarContext, private val moduleName: String) {
+class VirtualRenderer(
+  private val context: CarContext,
+  private val moduleName: String,
+  private val isCluster: Boolean
+) {
 
   private var rootView: ReactRootView? = null
   private var emitter: EventEmitter
@@ -34,7 +38,8 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
   val scale = virtualScreenDensity / mainScreenDensity * BuildConfig.CARPLAY_SCALE_FACTOR
 
   init {
-    val reactContext =  (context.applicationContext as ReactApplication).reactNativeHost.reactInstanceManager.currentReactContext
+    val reactContext =
+      (context.applicationContext as ReactApplication).reactNativeHost.reactInstanceManager.currentReactContext
     emitter = EventEmitter(reactContext = reactContext, templateId = moduleName)
 
     context.getCarService(AppManager::class.java).setSurfaceCallback(object : SurfaceCallback {
@@ -59,11 +64,18 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       }
 
       override fun onScale(focusX: Float, focusY: Float, scaleFactor: Float) {
-        emitter.didUpdatePinchGesture(focusX = focusX / scale, focusY = focusY / scale, scaleFactor = scaleFactor)
+        emitter.didUpdatePinchGesture(
+          focusX = focusX / scale,
+          focusY = focusY / scale,
+          scaleFactor = scaleFactor
+        )
       }
 
       override fun onScroll(distanceX: Float, distanceY: Float) {
-        emitter.didUpdatePanGestureWithTranslation(distanceX = -distanceX / scale,  distanceY = -distanceY / scale)
+        emitter.didUpdatePanGestureWithTranslation(
+          distanceX = -distanceX / scale,
+          distanceY = -distanceY / scale
+        )
       }
 
       override fun onStableAreaChanged(stableArea: Rect) {
@@ -81,9 +93,10 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
   }
 
   private fun renderPresentation(container: SurfaceContainer) {
+    val name = if (isCluster) "AndroidAutoClusterMapTemplate" else "AndroidAutoMapTemplate"
     val manager = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
     val display = manager.createVirtualDisplay(
-      "AndroidAutoMapTemplate",
+      name,
       container.width,
       container.height,
       container.dpi,
@@ -94,8 +107,12 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
     presentation.show()
   }
 
-  inner class MapPresentation(private val context: CarContext, display: Display, private val moduleName: String, private val container: SurfaceContainer) :
-    Presentation(context, display) {
+  inner class MapPresentation(
+    private val context: CarContext,
+    display: Display,
+    private val moduleName: String,
+    private val container: SurfaceContainer
+  ) : Presentation(context, display) {
     override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
       val instanceManager =
@@ -114,8 +131,7 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
 
         rootView = ReactRootView(context.applicationContext).apply {
           layoutParams = FrameLayout.LayoutParams(
-            (container.width / scale).toInt(),
-            (container.height / scale).toInt()
+            (container.width / scale).toInt(), (container.height / scale).toInt()
           )
           scaleX = scale
           scaleY = scale
@@ -130,8 +146,7 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       rootView?.let {
         val container = FrameLayout(context).apply {
           layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
           )
           clipChildren = false // Allow content to extend beyond bounds
         }

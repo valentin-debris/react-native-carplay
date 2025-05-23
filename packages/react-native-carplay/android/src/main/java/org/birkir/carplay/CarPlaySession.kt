@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.car.app.Screen
 import androidx.car.app.Session
+import androidx.car.app.SessionInfo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.facebook.react.ReactInstanceManager
@@ -18,20 +19,29 @@ import com.facebook.react.bridge.LifecycleEventListener
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.appregistry.AppRegistry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import org.birkir.carplay.parser.RCTMapTemplate
 import org.birkir.carplay.screens.CarScreen
+import org.birkir.carplay.screens.CarScreenContext
+import org.birkir.carplay.utils.EventEmitter
+import java.util.WeakHashMap
+import kotlin.coroutines.resume
 
-
-class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : Session(), DefaultLifecycleObserver, LifecycleEventListener {
+class CarPlaySession(
+  private val reactInstanceManager: ReactInstanceManager,
+  private val sessionInfo: SessionInfo
+) : Session(), DefaultLifecycleObserver, LifecycleEventListener {
   private lateinit var screen: CarScreen
-
-  init {
-      reactInstanceManager.currentReactContext?.addLifecycleEventListener(this)
-  }
+  private val isCluster = sessionInfo.displayType == SessionInfo.DISPLAY_TYPE_CLUSTER
+  private lateinit var reactContext: ReactContext
 
   val restartReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       if (CarPlayModule.APP_RELOAD == intent.action) {
-        invokeStartTask(reactInstanceManager.currentReactContext!!)
+        invokeStartTask()
       }
     }
   }
@@ -40,41 +50,83 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
     Log.d(TAG, "On create screen " + intent.action + " - " + intent.dataString)
     val lifecycle = lifecycle
     lifecycle.addObserver(this)
-    screen = CarScreen(carContext, null)
-    screen.marker = "root"
+
+    screen = CarScreen(carContext, null, isCluster)
+    screen.marker = if (isCluster) "AndroidAutoCluster" else "root"
 
     // Handle reload events
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      carContext.registerReceiver(restartReceiver, IntentFilter(CarPlayModule.APP_RELOAD), Context.RECEIVER_NOT_EXPORTED)
+      carContext.registerReceiver(
+        restartReceiver,
+        IntentFilter(CarPlayModule.APP_RELOAD),
+        Context.RECEIVER_NOT_EXPORTED
+      )
     } else {
       carContext.registerReceiver(restartReceiver, IntentFilter(CarPlayModule.APP_RELOAD))
     }
 
-    // Run JS
-    runJsApplication()
+    CoroutineScope(Dispatchers.Main).launch {
+      this@CarPlaySession.reactContext = getReactContext()
+      reactContext.addLifecycleEventListener(this@CarPlaySession)
+
+      // Run JS
+      invokeStartTask()
+
+      // set up cluster
+      if (isCluster) {
+        val emitter = EventEmitter(reactContext, "AndroidAutoCluster")
+        val screenMap = WeakHashMap<String, CarScreen>().apply {
+          put("AndroidAutoCluster", screen)
+        }
+        val carScreenContext = CarScreenContext("AndroidAutoCluster", emitter, screenMap)
+        val props = Arguments.createMap()
+        props.putString("type", "navigation")
+        // actions are not visible on a cluster screen but we have to put one in there so AA does not crash
+        props.putArray("actions", Arguments.createArray().apply {
+          pushMap(Arguments.createMap().apply {
+            putString("type", "appIcon")
+          })
+        })
+        screen.setTemplate(
+          RCTMapTemplate(carContext, carScreenContext).parse(props),
+          "AndroidAutoCluster",
+          props
+        )
+      }
+
+    }
+
     return screen
   }
 
-  private fun runJsApplication() {
-    val reactContext = reactInstanceManager.currentReactContext
-    if (reactContext == null) {
-      reactInstanceManager.addReactInstanceEventListener(
-        object : ReactInstanceManager.ReactInstanceEventListener {
-          override fun onReactContextInitialized(reactContext: ReactContext) {
-            invokeStartTask(reactContext)
-            reactInstanceManager.removeReactInstanceEventListener(this)
-          }
-        })
+
+  suspend fun getReactContext(): ReactContext {
+    return suspendCancellableCoroutine { continuation ->
+      reactInstanceManager.currentReactContext?.let {
+        continuation.resume(it)
+        return@suspendCancellableCoroutine
+      }
+
+      val listener = object : ReactInstanceManager.ReactInstanceEventListener {
+        override fun onReactContextInitialized(context: ReactContext) {
+          reactInstanceManager.removeReactInstanceEventListener(this)
+          continuation.resume(context)
+        }
+      }
+      reactInstanceManager.addReactInstanceEventListener(listener)
+
+      continuation.invokeOnCancellation {
+        reactInstanceManager.removeReactInstanceEventListener(listener)
+      }
+
       reactInstanceManager.createReactContextInBackground()
-    } else {
-      invokeStartTask(reactContext)
     }
   }
 
-  private fun invokeStartTask(reactContext: ReactContext) {
+  private fun invokeStartTask() {
     try {
       val catalystInstance = reactContext.catalystInstance
-      val jsAppModuleName = "AndroidAuto"
+      val jsAppModuleName = if (isCluster) "AndroidAutoCluster" else "AndroidAuto"
       val appParams = WritableNativeMap()
       appParams.putDouble("rootTag", 1.0)
       val appProperties = Bundle.EMPTY
@@ -82,10 +134,10 @@ class CarPlaySession(private val reactInstanceManager: ReactInstanceManager) : S
         appParams.putMap("initialProps", Arguments.fromBundle(appProperties))
       }
 
-      catalystInstance.getJSModule(AppRegistry::class.java)?.runApplication(jsAppModuleName, appParams)
+      catalystInstance.getJSModule(AppRegistry::class.java)
+        ?.runApplication(jsAppModuleName, appParams)
 
-      val carModule = reactInstanceManager
-        .currentReactContext?.getNativeModule(CarPlayModule::class.java)
+      val carModule = reactContext.getNativeModule(CarPlayModule::class.java)
       carModule!!.setCarContext(carContext, screen)
 
     } catch (e: Exception) {

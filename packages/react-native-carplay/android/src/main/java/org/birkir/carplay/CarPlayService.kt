@@ -22,8 +22,7 @@ class CarPlayService : CarAppService() {
 
   private val connection: ServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(
-      className: ComponentName,
-      service: IBinder
+      className: ComponentName, service: IBinder
     ) {
       mServiceBound = true
     }
@@ -34,10 +33,9 @@ class CarPlayService : CarAppService() {
   }
 
   override fun onCreate() {
-    Log.d(TAG,"CarPlayService onCreate")
+    Log.d(TAG, "CarPlayService onCreate")
     super.onCreate()
-    reactInstanceManager =
-      (application as ReactApplication).reactNativeHost.reactInstanceManager
+    reactInstanceManager = (application as ReactApplication).reactNativeHost.reactInstanceManager
 
     emitter = EventEmitter(reactContext = reactInstanceManager.currentReactContext)
   }
@@ -47,16 +45,23 @@ class CarPlayService : CarAppService() {
   }
 
   override fun onCreateSession(sessionInfo: SessionInfo): Session {
-    Log.d(TAG, "onCreateSession: sessionId = ${sessionInfo.sessionId}, display = ${sessionInfo.displayType}")
-    val session = CarPlaySession(reactInstanceManager)
-    
+    Log.d(
+      TAG,
+      "onCreateSession: sessionId = ${sessionInfo.sessionId}, display = ${sessionInfo.displayType}"
+    )
+
+    val session = CarPlaySession(reactInstanceManager, sessionInfo)
+
+    if (sessionInfo.displayType == SessionInfo.DISPLAY_TYPE_CLUSTER) {
+      return session
+    }
+
     session.lifecycle.addObserver(object : DefaultLifecycleObserver {
       override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
         // let the headlessTask know that AA is ready and make sure Timers are working even when the screen is off
-        val serviceIntent =
-          Intent(applicationContext, CarPlayHeadlessTaskService::class.java)
+        val serviceIntent = Intent(applicationContext, CarPlayHeadlessTaskService::class.java)
         bindService(serviceIntent, connection, BIND_AUTO_CREATE)
       }
 
@@ -69,7 +74,7 @@ class CarPlayService : CarAppService() {
         }
       }
     })
-    
+
     return session
   }
 
