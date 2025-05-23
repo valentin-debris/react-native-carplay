@@ -71,10 +71,10 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
       }
 
       override fun onVisibleAreaChanged(visibleArea: Rect) {
-        val top = (visibleArea.top * scale).toInt()
-        val bottom = ((height - visibleArea.bottom) * scale).toInt()
-        val left = (visibleArea.left * scale).toInt()
-        val right = ((width - visibleArea.right) * scale).toInt()
+        val top = (visibleArea.top / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
+        val bottom = ((height - visibleArea.bottom) / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
+        val left = (visibleArea.left / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
+        val right = ((width - visibleArea.right) / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
         emitter.safeAreaInsetsDidChange(top = top, bottom = bottom, left = left, right = right)
       }
     })
@@ -106,8 +106,8 @@ class VirtualRenderer(private val context: CarContext, private val moduleName: S
           putString("id", moduleName)
           putString("colorScheme", if (context.isDarkMode) "dark" else "light")
           putBundle("window", Bundle().apply {
-            putInt("height", container.height)
-            putInt("width", container.width)
+            putInt("height", (container.height / BuildConfig.CARPLAY_SCALE_FACTOR).toInt())
+            putInt("width", (container.width / BuildConfig.CARPLAY_SCALE_FACTOR).toInt())
             putFloat("scale", context.resources.displayMetrics.density)
           })
         }
