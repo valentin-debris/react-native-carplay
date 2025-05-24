@@ -26,6 +26,16 @@ export interface ClusterConfig {
   onStateChanged?: (isVisible: boolean) => void;
 }
 
+export type AndroidClusterConfig = Omit<
+  ClusterConfig,
+  | 'inactiveDescriptionVariants'
+  | 'onZoomIn'
+  | 'onZoomOut'
+  | 'onDidChangeCompassSetting'
+  | 'onDidChangeSpeedLimitSetting'
+  | 'id'
+> & { id: 'AndroidAutoCluster' };
+
 export type OnClusterControllerConnectCallback = ({ id }: { id: string }) => void;
 
 export interface InactiveDescriptionVariant {

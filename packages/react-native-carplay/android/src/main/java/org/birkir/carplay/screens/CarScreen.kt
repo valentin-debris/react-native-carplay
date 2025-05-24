@@ -3,8 +3,10 @@ package org.birkir.carplay.screens
 import android.util.Log
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
-import androidx.car.app.model.Pane
-import androidx.car.app.model.PaneTemplate
+import androidx.car.app.model.Action
+import androidx.car.app.model.ActionStrip
+import androidx.car.app.model.CarIcon
+import androidx.car.app.model.MessageTemplate
 import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.Template
 import androidx.car.app.navigation.model.MapTemplate
@@ -18,7 +20,9 @@ import com.facebook.react.bridge.ReadableMap
 import org.birkir.carplay.utils.EventEmitter
 import org.birkir.carplay.utils.VirtualRenderer
 
-class CarScreen(carContext: CarContext, emitter: EventEmitter?) : Screen(carContext) {
+class CarScreen(
+  carContext: CarContext, emitter: EventEmitter?, private val isCluster: Boolean = false
+) : Screen(carContext) {
 
   var template: Template? = null
   private var virtualRenderer: VirtualRenderer? = null
@@ -56,11 +60,8 @@ class CarScreen(carContext: CarContext, emitter: EventEmitter?) : Screen(carCont
 
   fun setTemplate(template: Template?, templateId: String, props: ReadableMap) {
     // allow MapTemplate, NavigationTemplate and PlaceListMapTemplate
-    val isSurfaceTemplate = template is MapTemplate
-      || template is NavigationTemplate
-      || template is PlaceListMapTemplate
-      || template is PlaceListNavigationTemplate
-      || template is RoutePreviewNavigationTemplate
+    val isSurfaceTemplate =
+      template is MapTemplate || template is NavigationTemplate || template is PlaceListMapTemplate || template is PlaceListNavigationTemplate || template is RoutePreviewNavigationTemplate
 
     if (isSurfaceTemplate && virtualRenderer == null) {
       Log.d(TAG, "setTemplate: received navigation template with args: $templateId")
@@ -71,17 +72,29 @@ class CarScreen(carContext: CarContext, emitter: EventEmitter?) : Screen(carCont
         )
         return
       }
-      virtualRenderer = VirtualRenderer(carContext, templateId)
+      virtualRenderer = VirtualRenderer(carContext, templateId, isCluster)
     }
     this.template = template
   }
 
   override fun onGetTemplate(): Template {
     Log.d(TAG, "onGetTemplate for $marker")
-    return template ?: PaneTemplate.Builder(
-      Pane.Builder().setLoading(true).build()
-    ).setTitle("RNCarPlay loading...").build()
-    // @todo allow set the loading title by translatable resource.
+    template?.let {
+      return it
+    }
+
+    if (isCluster) {
+      return NavigationTemplate.Builder().apply {
+        setActionStrip(ActionStrip.Builder().apply { addAction(Action.APP_ICON) }.build()).build()
+      }.build()
+    }
+
+    val appNameId = carContext.resources.getIdentifier("app_name", "string", carContext.packageName)
+    val appNme = if (appNameId != 0) carContext.resources.getString(appNameId) else "RNCarPlay"
+
+    return MessageTemplate.Builder(appNme).apply {
+      setIcon(CarIcon.APP_ICON)
+    }.build()
   }
 
   companion object {

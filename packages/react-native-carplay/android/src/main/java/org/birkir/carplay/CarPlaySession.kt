@@ -32,7 +32,7 @@ import kotlin.coroutines.resume
 
 class CarPlaySession(
   private val reactInstanceManager: ReactInstanceManager,
-  private val sessionInfo: SessionInfo
+  sessionInfo: SessionInfo
 ) : Session(), DefaultLifecycleObserver, LifecycleEventListener {
   private lateinit var screen: CarScreen
   private val isCluster = sessionInfo.displayType == SessionInfo.DISPLAY_TYPE_CLUSTER

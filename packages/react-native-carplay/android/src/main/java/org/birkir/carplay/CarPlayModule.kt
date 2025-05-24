@@ -12,8 +12,6 @@ import androidx.car.app.ScreenManager
 import androidx.car.app.model.Alert
 import androidx.car.app.model.AlertCallback
 import androidx.car.app.model.Template
-import androidx.car.app.navigation.NavigationManager
-import androidx.car.app.navigation.NavigationManagerCallback
 import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner

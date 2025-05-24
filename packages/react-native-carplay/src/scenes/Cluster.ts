@@ -1,5 +1,5 @@
-import { AppRegistry, Image, type NativeEventEmitter } from 'react-native';
-import { ClusterConfig } from 'src/interfaces/Cluster';
+import { AppRegistry, Image, Platform, type NativeEventEmitter } from 'react-native';
+import { AndroidClusterConfig, ClusterConfig } from 'src/interfaces/Cluster';
 import type { InternalCarPlay } from 'src/interfaces/InternalCarPlay';
 
 type Events =
@@ -68,20 +68,24 @@ export class Cluster {
     });
   }
 
-  public create(config: ClusterConfig) {
+  public create(config: ClusterConfig | AndroidClusterConfig) {
     const {
       id,
       component,
-      inactiveDescriptionVariants,
       onDisconnect,
-      onDidChangeCompassSetting,
-      onDidChangeSpeedLimitSetting,
-      onZoomIn,
-      onZoomOut,
       onWindowDidConnect,
       onContentStyleDidChange,
       onStateChanged,
     } = config;
+
+    const inactiveDescriptionVariants =
+      'inactiveDescriptionVariants' in config ? config.inactiveDescriptionVariants : [];
+    const onDidChangeCompassSetting =
+      'onDidChangeCompassSetting' in config ? config.onDidChangeCompassSetting : undefined;
+    const onDidChangeSpeedLimitSetting =
+      'onDidChangeSpeedLimitSetting' in config ? config.onDidChangeSpeedLimitSetting : undefined;
+    const onZoomIn = 'onZoomIn' in config ? config.onZoomIn : undefined;
+    const onZoomOut = 'onZoomOut' in config ? config.onZoomOut : undefined;
 
     this.subscriptions[id] = {
       onDisconnect,
@@ -94,6 +98,14 @@ export class Cluster {
       onStateChanged,
     };
 
+    AppRegistry.registerComponent(id, () => component);
+    this.clusterIds.add(id);
+
+    if (Platform.OS === "android") {
+      // on Android Auto we have a single cluster that is set up on native side only
+      return;
+    }
+
     const clusterConfig = {
       inactiveDescriptionVariants: inactiveDescriptionVariants.map(description => ({
         ...description,
@@ -101,8 +113,6 @@ export class Cluster {
       })),
     };
 
-    AppRegistry.registerComponent(id, () => component);
-    this.clusterIds.add(id);
     this.bridge.initCluster(id, clusterConfig);
   }
 
