@@ -78,11 +78,11 @@ class VirtualRenderer(
         )
       }
 
-      override fun onStableAreaChanged(stableArea: Rect) {
-        super.onStableAreaChanged(stableArea)
-      }
-
       override fun onVisibleAreaChanged(visibleArea: Rect) {
+        if (visibleArea.top == 0 && visibleArea.bottom == 0 && visibleArea.left == 0 && visibleArea.right == 0) {
+          // we sometimes get no proper visible area on the cluster display
+          return
+        }
         val top = (visibleArea.top / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
         val bottom = ((height - visibleArea.bottom) / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
         val left = (visibleArea.left / BuildConfig.CARPLAY_SCALE_FACTOR).toInt()
