@@ -496,7 +496,7 @@ abstract class RCTTemplate(
     }
   }
 
-  fun getMaxContentSize(carContext: CarContext, contentType: Int, preferredContentSize: Int): Int {
+  private fun getMaxContentSize(carContext: CarContext, contentType: Int, preferredContentSize: Int): Int {
     val maxContentSize =
       if (carContext.carAppApiLevel < CarAppApiLevels.LEVEL_2) getMaxContentDefaults(contentType) else getMaxContentSize(
         carContext,

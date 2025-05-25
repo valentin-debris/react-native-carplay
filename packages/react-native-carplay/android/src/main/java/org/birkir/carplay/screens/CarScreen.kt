@@ -16,7 +16,6 @@ import androidx.car.app.navigation.model.RoutePreviewNavigationTemplate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.facebook.react.bridge.ReadableMap
 import org.birkir.carplay.utils.EventEmitter
 import org.birkir.carplay.utils.VirtualRenderer
 
@@ -58,23 +57,20 @@ class CarScreen(
     })
   }
 
-  fun setTemplate(template: Template?, templateId: String, props: ReadableMap) {
+  fun setTemplate(template: Template, invalidate: Boolean = false) {
     // allow MapTemplate, NavigationTemplate and PlaceListMapTemplate
     val isSurfaceTemplate =
       template is MapTemplate || template is NavigationTemplate || template is PlaceListMapTemplate || template is PlaceListNavigationTemplate || template is RoutePreviewNavigationTemplate
 
     if (isSurfaceTemplate && virtualRenderer == null) {
-      Log.d(TAG, "setTemplate: received navigation template with args: $templateId")
-      if (templateId == null) {
-        Log.w(
-          TAG,
-          "setTemplate: moduleName is null, please make sure you are setting id for map-template in ReactNative",
-        )
-        return
-      }
-      virtualRenderer = VirtualRenderer(carContext, templateId, isCluster)
+      Log.d(TAG, "firing up virtual renderer for $marker")
+      virtualRenderer = VirtualRenderer(carContext, marker!!, isCluster)
     }
     this.template = template
+
+    if (invalidate) {
+      invalidate()
+    }
   }
 
   override fun onGetTemplate(): Template {

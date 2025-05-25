@@ -47,6 +47,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   private val carScreens: WeakHashMap<String, CarScreen> = WeakHashMap()
   private val carScreenContexts: WeakHashMap<CarScreen, CarScreenContext> =
     WeakHashMap()
+  val clusterScreens: WeakHashMap<CarScreen, CarScreenContext> = WeakHashMap()
   private val handler: Handler = Handler(Looper.getMainLooper())
 
   // Global event emitter (no templateId's)
@@ -123,13 +124,17 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   @ReactMethod
   fun updateTemplate(templateId: String, config: ReadableMap) {
     handler.post {
-      val screen = carScreens[templateId]
-      if (screen != null) {
-        val carScreenContext = carScreenContexts[screen]
-        if (carScreenContext != null) {
+      carScreens[templateId]?.let { screen ->
+        carScreenContexts[screen]?.let { carScreenContext ->
           val template = parseTemplate(config, carScreenContext)
-          screen.setTemplate(template, templateId, config)
-          screen.invalidate()
+          screen.setTemplate(template, invalidate = true)
+
+          if (template is NavigationTemplate) {
+            clusterScreens.filter { it.key.template is NavigationTemplate }.forEach{
+              val clusterTemplate = parseTemplate(config, it.value)
+              it.key.setTemplate(clusterTemplate, true)
+            }
+          }
         }
       }
     }
@@ -361,7 +366,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
       carScreenContexts[screen] = carScreenContext
 
       val template = parseTemplate(templateConfig, carScreenContext)
-      screen.setTemplate(template, templateId, templateConfig)
+      screen.setTemplate(template)
       carScreens[templateId] = screen
 
       return screen

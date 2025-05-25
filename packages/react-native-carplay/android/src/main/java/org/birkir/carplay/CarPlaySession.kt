@@ -88,10 +88,10 @@ class CarPlaySession(
           })
         })
         screen.setTemplate(
-          RCTMapTemplate(carContext, carScreenContext).parse(props),
-          "AndroidAutoCluster",
-          props
+          RCTMapTemplate(carContext, carScreenContext).parse(props)
         )
+
+        reactContext.getNativeModule(CarPlayModule::class.java)?.clusterScreens?.put(screen, carScreenContext)
       }
 
     }
@@ -147,8 +147,9 @@ class CarPlaySession(
 
   override fun onDestroy(owner: LifecycleOwner) {
     Log.i(TAG, "onDestroy")
-    val context = carContext
-    // stop services here, if any
+    if (isCluster) {
+      reactContext.getNativeModule(CarPlayModule::class.java)?.clusterScreens?.remove(screen)
+    }
   }
 
   override fun onNewIntent(intent: Intent) {
@@ -158,7 +159,7 @@ class CarPlaySession(
 
   override fun onCarConfigurationChanged(configuration: Configuration) {
     // we should report this over the bridge
-    Log.d(TAG, "CarPlaySession.onCarConfigurationChanged")
+    Log.d(TAG, "CarPlaySession.onCarConfigurationChanged ${configuration}")
   }
 
   companion object {
