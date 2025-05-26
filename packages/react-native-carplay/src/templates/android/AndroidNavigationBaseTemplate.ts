@@ -7,42 +7,19 @@ import {
   PinchGestureEvent,
   PressEvent,
 } from 'src/interfaces/GestureEvent';
-import { Action, AndroidAction, CallbackAction } from 'src/interfaces/Action';
-
-function hasArrayProperty<K extends string, V>(
-  config: AndroidNavigationBaseTemplateConfig,
-  key: K,
-): config is AndroidNavigationBaseTemplateConfig & { [P in K]: Array<CallbackAction> } {
-  const prop = (config as Partial<Record<K, V[]>>)[key];
-  if (!Array.isArray(prop)) {
-    return false;
-  }
-  return prop.every(isCallbackAction);
-}
-
-function hasCallbackActionProperty<K extends string>(
-  config: AndroidNavigationBaseTemplateConfig,
-  key: K,
-): config is AndroidNavigationBaseTemplateConfig & { [P in K]: CallbackAction } {
-  const prop = (config as Partial<Record<K, unknown>>)[key];
-  return isCallbackAction(prop);
-}
-
-function isCallbackAction(value: unknown): value is CallbackAction {
-  return typeof value === 'object' && value !== null && 'onPress' in value;
-}
+import { Action, AndroidAction } from 'src/interfaces/Action';
 
 function getId() {
   return `${performance.now()}-${Math.round(Math.random() * Number.MAX_SAFE_INTEGER)}`;
 }
 
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
-  /**
+    /**
    * Your component to render inside Android Auto Map view
-   * Example `component: MyComponent`
+   * NavigationTemplate is required to have this, other templates might skip this if a NavigationTemplate is in place already
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  component: React.ComponentType<any>;
+  component?: React.ComponentType<any>;
 
   onDidShowPanningInterface?(): void;
   onDidDismissPanningInterface?(): void;

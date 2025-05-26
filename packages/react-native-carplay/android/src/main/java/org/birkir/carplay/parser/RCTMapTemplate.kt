@@ -1,10 +1,12 @@
 package org.birkir.carplay.parser
 
 import androidx.car.app.CarContext
+import androidx.car.app.model.ListTemplate
 import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.Template
 import androidx.car.app.navigation.model.MapController
 import androidx.car.app.navigation.model.MapTemplate
+import androidx.car.app.navigation.model.MapWithContentTemplate
 import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.car.app.navigation.model.PanModeListener
 import androidx.car.app.navigation.model.PlaceListNavigationTemplate
@@ -99,17 +101,22 @@ class RCTMapTemplate(
       }
 
       "route-preview" -> {
-        return RoutePreviewNavigationTemplate.Builder().apply {
+        return MapWithContentTemplate.Builder().apply {
           actionStrip?.let { setActionStrip(it) }
-          header?.let { setHeader(it) }
-          headerAction?.let { setHeaderAction(headerAction) }
-          props.getArray("items")?.let {
-            setItemList(parseItemList(it, ItemListType.RouteList))
+          mapActionStrip?.let {
+            setMapController(MapController.Builder().apply {
+              setMapActionStrip(it)
+            }.build())
           }
-          setLoading(props.isLoading())
-          mapActionStrip?.let { setMapActionStrip(it) }
-          props.getMap("navigateAction")?.let { setNavigateAction(parseAction(it)) }
-          setPanModeListener(panModeListener)
+          setContentTemplate(ListTemplate.Builder().apply {
+            header?.let {
+              setHeader(it)
+            }
+            props.getArray("items")?.let {
+              setSingleList(parseItemList(it, ItemListType.RouteList))
+            }
+            setLoading(props.isLoading())
+          }.build())
         }.build()
       }
 

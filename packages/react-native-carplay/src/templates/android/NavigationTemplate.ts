@@ -8,7 +8,15 @@ import {
   AndroidNavigationBaseTemplateConfig,
 } from './AndroidNavigationBaseTemplate';
 
-export interface NavigationTemplateConfig extends AndroidNavigationBaseTemplateConfig {
+export interface NavigationTemplateConfig
+  extends Omit<AndroidNavigationBaseTemplateConfig, 'component'> {
+  /**
+   * Your component to render inside Android Auto Map view
+   * NavigationTemplate is required to have this
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  component: React.ComponentType<any>;
+
   /**
    * Sets an ActionStrip with a list of template-scoped actions for this template.
    * The Action buttons in Map Based Template are automatically adjusted based on the screen size. On narrow width screen, icon Actions show by default. If no icon specify, showing title Actions instead. On wider width screen, title Actions show by default. If no title specify, showing icon Actions instead.
