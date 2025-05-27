@@ -33,6 +33,7 @@ import org.birkir.carplay.screens.CarScreen
 import org.birkir.carplay.screens.CarScreenContext
 import org.birkir.carplay.utils.CarNavigationManager
 import org.birkir.carplay.utils.EventEmitter
+import java.lang.UnsupportedOperationException
 import java.util.WeakHashMap
 
 
@@ -349,6 +350,28 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     handler.post {
       screenManager?.popToRoot()
     }
+  }
+
+  @ReactMethod
+  fun navigationStarted(promise: Promise) {
+    if (!CarNavigationManager.isInitialized()) {
+      promise.reject(UnsupportedOperationException("CarNavigationManager not initialized, make sure to set a navigation root template first!"))
+    }
+    handler.post {
+      CarNavigationManager.navigationStarted()
+    }
+    promise.resolve(null)
+  }
+
+  @ReactMethod
+  fun navigationEnded(promise: Promise) {
+    if (!CarNavigationManager.isInitialized()) {
+      promise.reject(UnsupportedOperationException("CarNavigationManager not initialized, make sure to set a navigation root template first!"))
+    }
+    handler.post {
+      CarNavigationManager.navigationEnded()
+    }
+    promise.resolve(null)
   }
 
   private fun createCarScreenContext(screen: CarScreen, emitter: EventEmitter): CarScreenContext {

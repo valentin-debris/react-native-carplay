@@ -7,6 +7,7 @@ import {
   AndroidNavigationBaseTemplate,
   AndroidNavigationBaseTemplateConfig,
 } from './AndroidNavigationBaseTemplate';
+import { CarPlay } from '../../CarPlay';
 
 export interface NavigationTemplateConfig
   extends Omit<AndroidNavigationBaseTemplateConfig, 'component'> {
@@ -77,5 +78,13 @@ export interface NavigationTemplateConfig
 export class NavigationTemplate extends AndroidNavigationBaseTemplate<NavigationTemplateConfig> {
   public get type(): string {
     return AndroidRenderTemplates.Navigation;
+  }
+
+  public navigationStarted() {
+    return CarPlay.bridge.navigationStarted();
+  }
+
+  public navigationEnded() {
+    return CarPlay.bridge.navigationEnded();
   }
 }

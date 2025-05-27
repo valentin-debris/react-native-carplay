@@ -30,4 +30,12 @@ object CarNavigationManager {
 
     fun isInitialized(): Boolean =
         this::navigationManager.isInitialized && this::eventEmitter.isInitialized
+
+    fun navigationStarted() {
+        navigationManager.navigationStarted()
+    }
+
+    fun navigationEnded() {
+        navigationManager.navigationEnded()
+    }
 }
