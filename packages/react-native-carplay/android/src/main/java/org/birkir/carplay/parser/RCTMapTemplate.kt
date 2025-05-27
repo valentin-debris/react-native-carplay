@@ -1,10 +1,12 @@
 package org.birkir.carplay.parser
 
 import androidx.car.app.CarContext
+import androidx.car.app.model.ListTemplate
 import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.Template
 import androidx.car.app.navigation.model.MapController
 import androidx.car.app.navigation.model.MapTemplate
+import androidx.car.app.navigation.model.MapWithContentTemplate
 import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.car.app.navigation.model.PanModeListener
 import androidx.car.app.navigation.model.PlaceListNavigationTemplate
@@ -110,6 +112,13 @@ class RCTMapTemplate(
           mapActionStrip?.let { setMapActionStrip(it) }
           props.getMap("navigateAction")?.let { setNavigateAction(parseAction(it)) }
           setPanModeListener(panModeListener)
+        }.build()
+      }
+
+      "map-with-list" -> {
+        return MapWithContentTemplate.Builder().apply {
+          setMapController(mapController)
+          setContentTemplate(RCTListTemplate(context, carScreenContext).parse(props))
         }.build()
       }
 

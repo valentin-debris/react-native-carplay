@@ -20,6 +20,7 @@ class TemplateParser internal constructor(
       "place-list-map" -> RCTMapTemplate(context, carScreenContext)
       "place-list-navigation" -> RCTMapTemplate(context, carScreenContext)
       "route-preview" -> RCTMapTemplate(context, carScreenContext)
+      "map-with-list" -> RCTMapTemplate(context, carScreenContext)
       "pane" -> RCTPaneTemplate(context, carScreenContext)
       "search" -> RCTSearchTemplate(context, carScreenContext)
       "tabbar" -> RCTTabTemplate(context, carScreenContext)

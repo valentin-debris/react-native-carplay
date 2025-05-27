@@ -20,6 +20,7 @@ export * from './templates/android/PaneTemplate';
 export * from './templates/android/PlaceListMapTemplate';
 export * from './templates/android/PlaceListNavigationTemplate';
 export * from './templates/android/RoutePreviewNavigationTemplate';
+export * from './templates/android/MapWithListTemplate';
 
 // Others
 export * from './CarPlay';

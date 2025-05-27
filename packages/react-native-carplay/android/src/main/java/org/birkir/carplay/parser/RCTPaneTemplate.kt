@@ -1,7 +1,6 @@
 package org.birkir.carplay.parser
 
 import androidx.car.app.CarContext
-import androidx.car.app.model.Action
 import androidx.car.app.model.Header
 import androidx.car.app.model.PaneTemplate
 import com.facebook.react.bridge.ReadableMap

@@ -23,6 +23,7 @@ import { WindowInformation } from './interfaces/WindowInformation';
 import { OnClusterControllerConnectCallback } from './interfaces/Cluster';
 import { Cluster } from './scenes/Cluster';
 import registerHeadlessTask from './CarPlayHeadlessJsTask';
+import { MapWithListTemplate } from './templates/android/MapWithListTemplate';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -40,7 +41,8 @@ export type PushableTemplates =
   | NavigationTemplate
   | PlaceListMapTemplate
   | PlaceListNavigationTemplate
-  | RoutePreviewNavigationTemplate;
+  | RoutePreviewNavigationTemplate
+  | MapWithListTemplate;
 
 export type PresentableTemplates = AlertTemplate | ActionSheetTemplate | VoiceControlTemplate;
 

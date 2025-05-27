@@ -99,7 +99,7 @@ export interface ListTemplateConfig extends TemplateConfig {
    */
   headerAction?: Action<'appIcon' | 'back'>;
   /**
-   * Sets the ActionStrip for this template or null to not display an .
+   * Sets the ActionStrip for this template or null to not display any.
    * This template allows up to 2 Actions. Of the 2 allowed Actions, one of them can contain a title as set via setTitle. Otherwise, only Actions with icons are allowed.
    */
   actions?: [Action<'custom'>] | [Action<'custom'>, Action<'custom'>];
