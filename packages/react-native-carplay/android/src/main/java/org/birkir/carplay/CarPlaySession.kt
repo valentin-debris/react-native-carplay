@@ -88,7 +88,9 @@ class CarPlaySession(
           })
         })
         screen.setTemplate(
-          RCTMapTemplate(carContext, carScreenContext).parse(props)
+          RCTMapTemplate(carContext, carScreenContext).parse(props),
+          // cluster can hold NavigationTemplate only and always has a surface to render to
+          isSurfaceTemplate = true
         )
 
         reactContext.getNativeModule(CarPlayModule::class.java)?.clusterScreens?.put(screen, carScreenContext)

@@ -14,7 +14,7 @@ function getId() {
 }
 
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
-    /**
+  /**
    * Your component to render inside Android Auto Map view
    * NavigationTemplate is required to have this, other templates might skip this if a NavigationTemplate is in place already
    */
@@ -41,6 +41,11 @@ export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
    * @param e PressEvent
    */
   onDidPress?(e: PressEvent): void;
+
+  /**
+   * Fired when the back button is pressed
+   */
+  onBackButtonPressed?(): void;
 }
 
 export class AndroidNavigationBaseTemplate<
@@ -55,6 +60,8 @@ export class AndroidNavigationBaseTemplate<
       didPress: 'onDidPress',
       didCancelNavigation: 'onDidCancelNavigation',
       didEnableAutoDrive: 'onAutoDriveEnabled',
+      didSelectListItem: 'onItemSelect',
+      backButtonPressed: 'onBackButtonPressed',
     };
   }
 
@@ -67,7 +74,7 @@ export class AndroidNavigationBaseTemplate<
 
     super(config);
 
-    this.config = this.parseConfig({ type: this.type, ...rest, render: true });
+    this.config = this.parseConfig({ type: this.type, ...rest, render: component != null });
 
     if (component) {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -164,6 +171,8 @@ export class AndroidNavigationBaseTemplate<
           const { onPress, ...rest } = navigateAction;
           this.pressableCallbacks[id] = onPress;
           updatedConfig.navigateAction = { ...rest, id };
+        } else {
+          updatedConfig.navigateAction = navigateAction;
         }
       }
     }

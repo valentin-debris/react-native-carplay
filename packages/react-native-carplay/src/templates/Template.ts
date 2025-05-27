@@ -175,5 +175,6 @@ export class Template<P> {
 
   public destroy() {
     this.listenerSubscriptions.forEach(listener => listener.remove());
+    this.listenerSubscriptions = [];
   }
 }

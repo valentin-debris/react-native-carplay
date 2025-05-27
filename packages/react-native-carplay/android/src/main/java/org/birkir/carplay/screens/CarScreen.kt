@@ -57,11 +57,7 @@ class CarScreen(
     })
   }
 
-  fun setTemplate(template: Template, invalidate: Boolean = false) {
-    // allow MapTemplate, NavigationTemplate and PlaceListMapTemplate
-    val isSurfaceTemplate =
-      template is MapTemplate || template is NavigationTemplate || template is PlaceListMapTemplate || template is PlaceListNavigationTemplate || template is RoutePreviewNavigationTemplate
-
+  fun setTemplate(template: Template, invalidate: Boolean = false, isSurfaceTemplate: Boolean) {
     if (isSurfaceTemplate && virtualRenderer == null) {
       Log.d(TAG, "firing up virtual renderer for $marker")
       virtualRenderer = VirtualRenderer(carContext, marker!!, isCluster)

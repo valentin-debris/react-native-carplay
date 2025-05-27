@@ -18,6 +18,7 @@ import androidx.car.app.model.CarText
 import androidx.car.app.model.DateTimeWithZone
 import androidx.car.app.model.Distance
 import androidx.car.app.model.DistanceSpan
+import androidx.car.app.model.DurationSpan
 import androidx.car.app.model.GridItem
 import androidx.car.app.model.Header
 import androidx.car.app.model.ItemList
@@ -188,6 +189,9 @@ abstract class RCTTemplate(
 
       selectedIndex?.let {
         setSelectedIndex(it)
+      }
+
+      if (type === ItemListType.RouteList || selectedIndex != null) {
         setOnSelectedListener {
           val id = itemIds.get(it)
           eventEmitter.didSelectListItem(id, it)
@@ -199,7 +203,22 @@ abstract class RCTTemplate(
   protected fun parseRowItem(item: ReadableMap, index: Int): Row {
     val id = item.getString("id") ?: index.toString()
     return Row.Builder().apply {
-      item.getString("text")?.let { setTitle(it) }
+      item.getString("text")?.let {
+        val text = SpannableString(it)
+        item.getMap("distance")?.let { distance ->
+          val distanceSpan = DistanceSpan.create(parseDistance(distance))
+          val start = distance.getInt("start")
+          val end = distance.getInt("end")
+          text.setSpan(distanceSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        item.getMap("duration")?.let { duration ->
+          val durationSpan = DurationSpan.create(duration.getDouble("seconds").toLong())
+          val start = duration.getInt("start")
+          val end = duration.getInt("end")
+          text.setSpan(durationSpan, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        setTitle(text)
+      }
       item.getString("detailText")?.let { addText(it) }
       item.getMap("image")?.let { setImage(parseCarIcon(it)) }
       if (item.hasKey("browsable") && item.getBoolean("browsable")) {

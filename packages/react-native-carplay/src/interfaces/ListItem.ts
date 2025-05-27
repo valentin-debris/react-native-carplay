@@ -1,5 +1,6 @@
 import { ImageSourcePropType } from 'react-native';
 import { Action } from './Action';
+import { DistanceUnits } from './TravelEstimates';
 
 /**
  * A list item that appears in a list template.
@@ -84,3 +85,31 @@ export interface ListItem {
    */
   selected?: boolean;
 }
+
+type Distance = {
+  distance: number;
+  distanceUnits: DistanceUnits;
+  start: number;
+  end: number;
+};
+
+type Duration = {
+  seconds: number;
+  start: number;
+  end: number;
+};
+
+export type RoutePreviewListItem =
+  | ListItem &
+      (
+        | {
+            distance: Distance;
+          }
+        | {
+            duration: Duration;
+          }
+        | {
+            distance: Distance;
+            duration: Duration;
+          }
+      );

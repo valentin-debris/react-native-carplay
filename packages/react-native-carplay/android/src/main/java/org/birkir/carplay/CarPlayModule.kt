@@ -127,12 +127,14 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
       carScreens[templateId]?.let { screen ->
         carScreenContexts[screen]?.let { carScreenContext ->
           val template = parseTemplate(config, carScreenContext)
-          screen.setTemplate(template, invalidate = true)
+          val isSurfaceTemplate = config.hasKey("render") && config.getBoolean("render")
+          screen.setTemplate(template = template, invalidate = true, isSurfaceTemplate = isSurfaceTemplate)
 
           if (template is NavigationTemplate) {
             clusterScreens.filter { it.key.template is NavigationTemplate }.forEach{
               val clusterTemplate = parseTemplate(config, it.value)
-              it.key.setTemplate(clusterTemplate, true)
+              // cluster can hold NavigationTemplate only and always has a surface to render to
+              it.key.setTemplate(template = clusterTemplate, invalidate = true, isSurfaceTemplate = true)
             }
           }
         }
@@ -366,7 +368,8 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
       carScreenContexts[screen] = carScreenContext
 
       val template = parseTemplate(templateConfig, carScreenContext)
-      screen.setTemplate(template)
+      val isSurfaceTemplate = templateConfig.hasKey("render") && templateConfig.getBoolean("render")
+      screen.setTemplate(template = template, isSurfaceTemplate = isSurfaceTemplate)
       carScreens[templateId] = screen
 
       return screen
