@@ -37,6 +37,7 @@ class CarPlaySession(
   private lateinit var screen: CarScreen
   private val isCluster = sessionInfo.displayType == SessionInfo.DISPLAY_TYPE_CLUSTER
   private lateinit var reactContext: ReactContext
+  private lateinit var eventEmitter: EventEmitter
 
   val restartReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -67,6 +68,7 @@ class CarPlaySession(
 
     CoroutineScope(Dispatchers.Main).launch {
       this@CarPlaySession.reactContext = getReactContext()
+      this@CarPlaySession.eventEmitter = EventEmitter(reactContext)
       reactContext.addLifecycleEventListener(this@CarPlaySession)
 
       // Run JS
@@ -162,6 +164,7 @@ class CarPlaySession(
   override fun onCarConfigurationChanged(configuration: Configuration) {
     // we should report this over the bridge
     Log.d(TAG, "CarPlaySession.onCarConfigurationChanged ${configuration}")
+    eventEmitter.appearanceDidChange(carContext.isDarkMode)
   }
 
   companion object {

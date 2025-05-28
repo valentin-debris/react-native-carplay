@@ -16,6 +16,7 @@ class EventEmitter(
     const val DidDisconnect = "didDisconnect"
     const val DidFinish = "didFinish" //CarPlayService finished/killed
     const val SafeAreaInsetsDidChange = "safeAreaInsetsDidChange"
+    const val AppearanceDidChange = "appearanceDidChange"
 
     // interface
     const val BarButtonPressed = "barButtonPressed"
@@ -220,6 +221,12 @@ class EventEmitter(
 
   fun didPopToRoot() {
     emit(PoppedToRoot)
+  }
+
+  fun appearanceDidChange(isDarkMode: Boolean) {
+    emit(AppearanceDidChange, Arguments.createMap().apply {
+      putString("colorScheme", if (isDarkMode) "dark" else "light")
+    })
   }
 
   private fun emit(eventName: String, data: WritableMap = Arguments.createMap()) {
