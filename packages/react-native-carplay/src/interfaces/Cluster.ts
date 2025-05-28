@@ -3,7 +3,7 @@ import { WindowInformation } from './WindowInformation';
 
 export interface ClusterConfig {
   /**
-   * the id you got from the onClusterConnect callback using CarPlay.registerOnClusterConnect
+   * the id you got from the onClusterConnect callback using CarPlay.registerOnClusterConnect or from your AndroidAutoCluster runnable
    */
   id: string;
   /**
@@ -32,9 +32,7 @@ export type AndroidClusterConfig = Omit<
   | 'onZoomIn'
   | 'onZoomOut'
   | 'onDidChangeCompassSetting'
-  | 'onDidChangeSpeedLimitSetting'
-  | 'id'
-> & { id: 'AndroidAutoCluster' };
+  | 'onDidChangeSpeedLimitSetting'>;
 
 export type OnClusterControllerConnectCallback = ({ id }: { id: string }) => void;
 

@@ -102,7 +102,7 @@ export class Cluster {
     this.clusterIds.add(id);
 
     if (Platform.OS === "android") {
-      // on Android Auto we have a single cluster that is set up on native side only
+      // on Android Auto we have a clusters that are set up on native side only
       return;
     }
 
