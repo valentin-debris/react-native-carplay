@@ -1,5 +1,5 @@
 import { AndroidRenderTemplates } from '../../interfaces/AndroidRenderTemplates';
-import { AndroidAction, CallbackAction } from '../../interfaces/Action';
+import { AndroidAction } from '../../interfaces/Action';
 import {
   AndroidNavigationBaseTemplate,
   AndroidNavigationBaseTemplateConfig,

@@ -32,6 +32,11 @@ class RCTListTemplate(
       // Loading
       setLoading(props.isLoading())
 
+      if (props.isLoading()) {
+        // templates in a loading state can not have items/sections
+        return@apply
+      }
+
       // Sections
       val sections = props.getArray("sections")
       val items = props.getArray("items")
@@ -71,7 +76,6 @@ class RCTListTemplate(
 
     }.build()
   }
-
 
   companion object {
     const val TAG = "RCTListTemplate"
