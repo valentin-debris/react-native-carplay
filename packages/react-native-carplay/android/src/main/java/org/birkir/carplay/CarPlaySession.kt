@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Build
-import android.os.Bundle
 import android.util.Log
 import androidx.car.app.Screen
 import androidx.car.app.Session
@@ -144,6 +143,11 @@ class CarPlaySession(
 
       catalystInstance.getJSModule(AppRegistry::class.java)
         ?.runApplication(jsAppModuleName, appParams)
+
+      if (isCluster) {
+        // cluster displays hold only a single navigation template that is linked to the main navigation template for updates
+        return
+      }
 
       val carModule = reactContext.getNativeModule(CarPlayModule::class.java)
       carModule!!.setCarContext(carContext, screen)

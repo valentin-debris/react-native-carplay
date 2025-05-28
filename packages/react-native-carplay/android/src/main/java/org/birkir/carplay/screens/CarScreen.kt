@@ -7,12 +7,8 @@ import androidx.car.app.model.Action
 import androidx.car.app.model.ActionStrip
 import androidx.car.app.model.CarIcon
 import androidx.car.app.model.MessageTemplate
-import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.Template
-import androidx.car.app.navigation.model.MapTemplate
 import androidx.car.app.navigation.model.NavigationTemplate
-import androidx.car.app.navigation.model.PlaceListNavigationTemplate
-import androidx.car.app.navigation.model.RoutePreviewNavigationTemplate
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
