@@ -29,23 +29,8 @@ export class MapWithListTemplate extends AndroidNavigationBaseTemplate<MapWithLi
 
   constructor(public config: ListTemplateConfig) {
       super(config);
-  
+      
       let subscription = CarPlay.emitter.addListener(
-        'didSelectListItem',
-        (e: { templateId: string; index: number; id: string }) => {
-          if (config.onItemSelect && e.templateId === this.id) {
-            void Promise.resolve(config.onItemSelect(e)).then(() => {
-              if (Platform.OS === 'ios') {
-                CarPlay.bridge.reactToSelectedResult(true);
-              }
-            });
-          }
-        },
-      );
-  
-      this.listenerSubscriptions.push(subscription);
-  
-      subscription = CarPlay.emitter.addListener(
         'didSelectListItemRowImage',
         (e: { templateId: string; index: number; imageIndex: number }) => {
           if (config.onImageRowItemSelect && e.templateId === this.id) {
