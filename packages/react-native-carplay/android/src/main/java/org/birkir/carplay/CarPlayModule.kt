@@ -241,10 +241,10 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
               AlertCallback.REASON_NOT_SUPPORTED -> "notSupported"
               else -> "unknown"
             }
-            eventEmitter.alertActionPressed("cancel", reasonString)
+            eventEmitter.alertActionPressed(id, "cancel", reasonString)
           }
           override fun onDismiss() {
-            eventEmitter.alertActionPressed("dismiss" )
+            eventEmitter.alertActionPressed(id, "dismiss" )
           }
         })
         props.getString("subtitle")?.let { setSubtitle(parser.parseCarText(it, props)) }

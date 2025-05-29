@@ -132,8 +132,9 @@ class EventEmitter(
     })
   }
 
-  fun alertActionPressed(type: String, reason: String? = null) {
+  fun alertActionPressed(id: Int, type: String, reason: String? = null) {
     emit(AlertActionPressed, Arguments.createMap().apply {
+      putInt("id", id)
       putString("type", type)
       reason?.let { putString("reason", reason) }
     })

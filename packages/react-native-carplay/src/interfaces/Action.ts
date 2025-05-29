@@ -17,3 +17,7 @@ export type HeaderAction = Action<'appIcon' | 'back'>;
 export type CallbackAction = Omit<Action, 'id'> & { onPress: () => void };
 
 export type AndroidAction = CallbackAction | (Action & { type: 'appIcon' | 'back' | 'pan' });
+
+export function getCallbackActionId() {
+  return `${performance.now()}-${Math.round(Math.random() * Number.MAX_SAFE_INTEGER)}`;
+}

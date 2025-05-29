@@ -1,4 +1,4 @@
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import { ImageSourcePropType, NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import { ActionSheetTemplate } from './templates/ActionSheetTemplate';
 import { AlertTemplate } from './templates/AlertTemplate';
 import { ContactTemplate } from './templates/ContactTemplate';
@@ -25,6 +25,7 @@ import { Cluster } from './scenes/Cluster';
 import registerHeadlessTask from './CarPlayHeadlessJsTask';
 import { MapWithListTemplate } from './templates/android/MapWithListTemplate';
 import { MapWithPaneTemplate } from './templates/android/MapWithPaneTemplate';
+import { CallbackAction, getCallbackActionId } from './interfaces/Action';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -78,6 +79,16 @@ export interface SafeAreaInsetsEvent {
 }
 
 export type OnSafeAreaInsetsDidChangeCallback = (safeAreaInsets: SafeAreaInsetsEvent) => void;
+
+export type AndroidAutoAlertConfig = {
+  id: number;
+  title: string;
+  duration: number;
+  subtitle?: string;
+  image?: ImageSourcePropType;
+  actions?: CallbackAction[];
+};
+
 /**
  * A controller that manages all user interface elements appearing on your map displayed on the CarPlay screen.
  */
@@ -103,6 +114,7 @@ export class CarPlayInterface {
   private onClusterConnectCallbacks = new Set<OnClusterControllerConnectCallback>();
   private onAppearanceDidChangeCallbacks = new Set<OnAppearanceDidChangeCallback>();
   private onOnSafeAreaInsetsDidChangeCallbacks = new Set<OnSafeAreaInsetsDidChangeCallback>();
+  private alertCallbacks: { [key: string]: () => void } = {};
 
   constructor() {
     registerHeadlessTask();
@@ -141,6 +153,20 @@ export class CarPlayInterface {
     this.emitter.addListener('safeAreaInsetsDidChange', (props: SafeAreaInsetsEvent) => {
       this.onOnSafeAreaInsetsDidChangeCallbacks.forEach(callback => callback(props));
     });
+
+    this.emitter.addListener(
+      'buttonPressed',
+      ({ buttonId, templateId }: { buttonId: string; templateId?: string }) => {
+        if (templateId != null) {
+          // we listen to alert actions only in here, these do not have a templateId
+          return;
+        }
+        const callback = this.alertCallbacks[buttonId];
+        callback?.();
+
+        this.alertCallbacks = {};
+      },
+    );
 
     // check if already connected this will fire any 'didConnect' events
     // if a connected is already present.
@@ -286,6 +312,34 @@ export class CarPlayInterface {
    */
   public enableNowPlaying(enable = true) {
     return this.bridge.enableNowPlaying(enable);
+  }
+
+  /**
+   * brings up an alert
+   * @namespace Android
+   */
+  public alert(alert: AndroidAutoAlertConfig) {
+    this.alertCallbacks = {};
+    const { actions, ...config } = alert;
+
+    const updatedActions = actions?.map(action => {
+      const id = getCallbackActionId();
+      const { onPress, ...rest } = action;
+      this.alertCallbacks[id] = onPress;
+      return { ...rest, id };
+    });
+
+    CarPlay.bridge.alert({ ...config, actions: updatedActions });
+  }
+
+  /**
+   * dismisses ongoing alert, no-op in case the alert is not shown anymore
+   * clears all alert action callbacks
+   * @namespace Android
+   */
+  public dismissAlert(id: number) {
+    this.alertCallbacks = {};
+    CarPlay.bridge.dismissAlert(id);
   }
 }
 

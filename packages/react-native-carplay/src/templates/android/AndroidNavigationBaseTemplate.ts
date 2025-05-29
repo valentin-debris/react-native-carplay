@@ -7,12 +7,8 @@ import {
   PinchGestureEvent,
   PressEvent,
 } from 'src/interfaces/GestureEvent';
-import { Action, AndroidAction } from 'src/interfaces/Action';
+import { Action, AndroidAction, getCallbackActionId } from '../../interfaces/Action';
 import { Pane } from 'src/interfaces/Pane';
-
-function getId() {
-  return `${performance.now()}-${Math.round(Math.random() * Number.MAX_SAFE_INTEGER)}`;
-}
 
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
   /**
@@ -125,7 +121,7 @@ export class AndroidNavigationBaseTemplate<
       ? {
           ...pane,
           actions: pane?.actions?.map(action => {
-            const id = 'id' in action ? action.id : getId();
+            const id = 'id' in action ? action.id : getCallbackActionId();
             if (id == null) {
               return action;
             }
@@ -152,7 +148,7 @@ export class AndroidNavigationBaseTemplate<
 
     if (actions != null) {
       updatedConfig.actions = actions.map(action => {
-        const id = 'id' in action ? action.id : getId();
+        const id = 'id' in action ? action.id : getCallbackActionId();
         if (id == null) {
           return action;
         }
@@ -170,7 +166,7 @@ export class AndroidNavigationBaseTemplate<
 
     if (mapButtons) {
       updatedConfig.mapButtons = mapButtons.map(mapButton => {
-        const id = 'id' in mapButton ? mapButton.id : getId();
+        const id = 'id' in mapButton ? mapButton.id : getCallbackActionId();
         if (id == null) {
           return mapButton;
         }
@@ -187,7 +183,7 @@ export class AndroidNavigationBaseTemplate<
     }
 
     if (navigateAction) {
-      const id = 'id' in navigateAction ? navigateAction.id : getId();
+      const id = 'id' in navigateAction ? navigateAction.id : getCallbackActionId();
 
       if (id != null) {
         callbackIds.push(id);
