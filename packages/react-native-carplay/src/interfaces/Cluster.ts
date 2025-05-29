@@ -32,7 +32,8 @@ export type AndroidClusterConfig = Omit<
   | 'onZoomIn'
   | 'onZoomOut'
   | 'onDidChangeCompassSetting'
-  | 'onDidChangeSpeedLimitSetting'>;
+  | 'onDidChangeSpeedLimitSetting'
+>;
 
 export type OnClusterControllerConnectCallback = ({ id }: { id: string }) => void;
 

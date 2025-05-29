@@ -45,7 +45,7 @@ export interface GridTemplateConfig extends TemplateConfig {
    * Title to be shown on the back button, defaults to no text so only the < icon is shown
    */
   backButtonTitle?: string;
-  
+
   /**
    * Sets the Action that will be displayed in the header of the template.
    * @namespace Android

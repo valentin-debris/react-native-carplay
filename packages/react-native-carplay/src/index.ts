@@ -21,6 +21,7 @@ export * from './templates/android/PlaceListMapTemplate';
 export * from './templates/android/PlaceListNavigationTemplate';
 export * from './templates/android/RoutePreviewNavigationTemplate';
 export * from './templates/android/MapWithListTemplate';
+export * from './templates/android/MapWithPaneTemplate';
 
 // Others
 export * from './CarPlay';

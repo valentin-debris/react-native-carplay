@@ -101,7 +101,7 @@ export class Cluster {
     AppRegistry.registerComponent(id, () => component);
     this.clusterIds.add(id);
 
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       // on Android Auto we have a clusters that are set up on native side only
       return;
     }

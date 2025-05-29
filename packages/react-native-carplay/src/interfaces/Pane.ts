@@ -21,7 +21,7 @@ export interface Pane {
    * Actions to display alongside the rows in the pane.
    * By default, no actions are displayed.
    */
-  actions?: Action[];
+  actions?: [Action, Action] | [Action];
   /**
    * Rows to display in the list.
    */

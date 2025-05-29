@@ -4,4 +4,5 @@ export enum AndroidRenderTemplates {
   PlaceNavigationMap = 'place-navigation-map',
   Navigation = 'navigation',
   MapWithList = 'map-with-list',
+  MapWithPane = 'map-with-pane',
 }

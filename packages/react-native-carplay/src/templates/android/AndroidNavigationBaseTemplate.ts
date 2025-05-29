@@ -8,6 +8,7 @@ import {
   PressEvent,
 } from 'src/interfaces/GestureEvent';
 import { Action, AndroidAction } from 'src/interfaces/Action';
+import { Pane } from 'src/interfaces/Pane';
 
 function getId() {
   return `${performance.now()}-${Math.round(Math.random() * Number.MAX_SAFE_INTEGER)}`;
@@ -113,17 +114,41 @@ export class AndroidNavigationBaseTemplate<
       actions?: Array<AndroidAction>;
       mapButtons?: Array<AndroidAction>;
       navigateAction?: AndroidAction;
+      pane?: Omit<Pane, 'actions'> & { actions?: Array<AndroidAction> };
     },
   ) {
-    const { actions, mapButtons, navigateAction, ...rest } = config;
+    const callbackIds: Array<string> = [];
+
+    const { actions, mapButtons, navigateAction, pane, ...rest } = config;
+
+    const updatedPane: (Omit<Pane, 'actions'> & { actions?: Array<Action> }) | undefined = pane
+      ? {
+          ...pane,
+          actions: pane?.actions?.map(action => {
+            const id = 'id' in action ? action.id : getId();
+            if (id == null) {
+              return action;
+            }
+
+            callbackIds.push(id);
+
+            if (!('onPress' in action)) {
+              return action;
+            }
+
+            const { onPress, ...actionRest } = action;
+            this.pressableCallbacks[id] = onPress;
+            return { ...actionRest, id };
+          }),
+        }
+      : undefined;
 
     const updatedConfig: TemplateConfig & {
       actions?: Array<Action>;
       mapButtons?: Array<Action>;
       navigateAction?: Action;
-    } = { ...rest };
-
-    const callbackIds = new Array<string>();
+      pane?: Omit<Pane, 'actions'> & { actions?: Array<Action> };
+    } = { ...rest, pane: updatedPane };
 
     if (actions != null) {
       updatedConfig.actions = actions.map(action => {
@@ -137,9 +162,9 @@ export class AndroidNavigationBaseTemplate<
         if (!('onPress' in action)) {
           return action;
         }
-        const { onPress, ...rest } = action;
+        const { onPress, ...actionRest } = action;
         this.pressableCallbacks[id] = onPress;
-        return { ...rest, id };
+        return { ...actionRest, id };
       });
     }
 
@@ -155,9 +180,9 @@ export class AndroidNavigationBaseTemplate<
         if (!('onPress' in mapButton)) {
           return mapButton;
         }
-        const { onPress, ...rest } = mapButton;
+        const { onPress, ...actionRest } = mapButton;
         this.pressableCallbacks[id] = onPress;
-        return { ...rest, id };
+        return { ...actionRest, id };
       });
     }
 
@@ -168,9 +193,9 @@ export class AndroidNavigationBaseTemplate<
         callbackIds.push(id);
 
         if ('onPress' in navigateAction) {
-          const { onPress, ...rest } = navigateAction;
+          const { onPress, ...actionRest } = navigateAction;
           this.pressableCallbacks[id] = onPress;
-          updatedConfig.navigateAction = { ...rest, id };
+          updatedConfig.navigateAction = { ...actionRest, id };
         } else {
           updatedConfig.navigateAction = navigateAction;
         }
