@@ -221,7 +221,8 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   // pragma: Android Auto only stuff
 
   @ReactMethod
-  fun toast(text: String, duration: Int) {
+  fun toast(text: String, isLongDurationToast: Boolean) {
+    val duration = if (isLongDurationToast) CarToast.LENGTH_LONG else CarToast.LENGTH_SHORT
     CarToast.makeText(carContext, text, duration).show()
   }
 

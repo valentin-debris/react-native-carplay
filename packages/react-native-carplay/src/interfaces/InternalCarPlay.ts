@@ -66,7 +66,7 @@ export interface InternalCarPlay extends NativeModule {
   getTopTemplate(callback: (templateId: string) => void): void;
   // Android
   reload(): void;
-  toast(message: string, duration: number): void;
+  toast(message: string, isLongDurationToast: boolean): void;
   alert(config: {
     id: number;
     title: string;
