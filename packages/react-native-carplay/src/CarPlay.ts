@@ -26,6 +26,7 @@ import registerHeadlessTask from './CarPlayHeadlessJsTask';
 import { MapWithListTemplate } from './templates/android/MapWithListTemplate';
 import { MapWithPaneTemplate } from './templates/android/MapWithPaneTemplate';
 import { CallbackAction, getCallbackActionId } from './interfaces/Action';
+import { MapWithGridTemplate } from './templates/android/MapWithGridTemplate';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -45,7 +46,8 @@ export type PushableTemplates =
   | PlaceListNavigationTemplate
   | RoutePreviewNavigationTemplate
   | MapWithListTemplate
-  | MapWithPaneTemplate;
+  | MapWithPaneTemplate
+  | MapWithGridTemplate;
 
 export type PresentableTemplates = AlertTemplate | ActionSheetTemplate | VoiceControlTemplate;
 

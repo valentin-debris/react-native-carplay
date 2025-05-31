@@ -5,4 +5,5 @@ export enum AndroidRenderTemplates {
   Navigation = 'navigation',
   MapWithList = 'map-with-list',
   MapWithPane = 'map-with-pane',
+  MapWithGrid = 'map-with-grid',
 }

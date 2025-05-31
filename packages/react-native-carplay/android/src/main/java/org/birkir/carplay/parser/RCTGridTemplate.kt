@@ -7,7 +7,8 @@ import org.birkir.carplay.screens.CarScreenContext
 
 class RCTGridTemplate(
   context: CarContext,
-  carScreenContext: CarScreenContext
+  carScreenContext: CarScreenContext,
+  private val isMapWithContentTemplate: Boolean = false,
 ) : RCTTemplate(context, carScreenContext) {
 
   override fun parse(props: ReadableMap): GridTemplate {
@@ -17,7 +18,7 @@ class RCTGridTemplate(
       props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
       this.setSingleList(
-        parseItemList(props.getArray("buttons"), ItemListType.Grid)
+        parseItemList(props.getArray("buttons"), ItemListType.Grid, isMapWithContentTemplate)
       )
     }.build()
   }

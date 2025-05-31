@@ -152,7 +152,8 @@ abstract class RCTTemplate(
 
   protected fun parseItemList(
     items: ReadableArray?,
-    type: ItemListType = ItemListType.Row
+    type: ItemListType = ItemListType.Row,
+    isMapWithContentTemplate: Boolean = false
   ): ItemList {
     return ItemList.Builder().apply {
       var selectedIndex: Int? = null
@@ -182,7 +183,7 @@ abstract class RCTTemplate(
           if (type == ItemListType.Row || type == ItemListType.RouteList || type == ItemListType.PlaceListNavigation) {
             addItem(parseRowItem(item, i))
           } else if (type == ItemListType.Grid) {
-            addItem(parseGridItem(item, i))
+            addItem(parseGridItem(item, i, isMapWithContentTemplate))
           }
         }
       }
@@ -246,7 +247,11 @@ abstract class RCTTemplate(
     }.build()
   }
 
-  protected fun parseGridItem(item: ReadableMap, index: Int): GridItem {
+  protected fun parseGridItem(
+    item: ReadableMap,
+    index: Int,
+    isMapWithContentTemplate: Boolean = false
+  ): GridItem {
     val id = item.getString("id") ?: index.toString()
     return GridItem.Builder().apply {
       val titleVariants = item.getArray("titleVariants")
@@ -254,10 +259,12 @@ abstract class RCTTemplate(
 
       if (titleVariants != null) {
         if (titleVariants.size() > 0) {
-          setTitle(parseCarText(
-            titleVariants.getString(0),
-            metadata
-          ))
+          setTitle(
+            parseCarText(
+              titleVariants.getString(0),
+              metadata
+            )
+          )
         }
         if (titleVariants.size() > 1) {
           setText(titleVariants.getString(1))
@@ -266,7 +273,10 @@ abstract class RCTTemplate(
       item.getMap("image")?.let { setImage(parseCarIcon(it)) }
       setLoading(item.isLoading())
       setOnClickListener {
-        eventEmitter.gridButtonPressed(id, index)
+        if (isMapWithContentTemplate) eventEmitter.buttonPressed(id) else eventEmitter.gridButtonPressed(
+          id,
+          index
+        )
       }
     }.build()
   }

@@ -9,6 +9,7 @@ import {
 } from 'src/interfaces/GestureEvent';
 import { Action, AndroidAction, getCallbackActionId } from '../../interfaces/Action';
 import { Pane } from 'src/interfaces/Pane';
+import { AndroidGridButton, GridButton } from 'src/interfaces/GridButton';
 
 export interface AndroidNavigationBaseTemplateConfig extends TemplateConfig {
   /**
@@ -111,11 +112,12 @@ export class AndroidNavigationBaseTemplate<
       mapButtons?: Array<AndroidAction>;
       navigateAction?: AndroidAction;
       pane?: Omit<Pane, 'actions'> & { actions?: Array<AndroidAction> };
+      buttons?: Array<AndroidGridButton & { id?: string }>;
     },
   ) {
     const callbackIds: Array<string> = [];
 
-    const { actions, mapButtons, navigateAction, pane, ...rest } = config;
+    const { actions, mapButtons, navigateAction, pane, buttons, ...rest } = config;
 
     const updatedPane: (Omit<Pane, 'actions'> & { actions?: Array<Action> }) | undefined = pane
       ? {
@@ -139,12 +141,28 @@ export class AndroidNavigationBaseTemplate<
         }
       : undefined;
 
+    const updatedButtons: Array<GridButton> | undefined = buttons
+      ? buttons.map(button => {
+          const id = button.id ?? getCallbackActionId();
+          callbackIds.push(id);
+
+          if (!('onPress' in button)) {
+            return button;
+          }
+
+          const { onPress, ...buttonRest } = button;
+          this.pressableCallbacks[id] = onPress;
+          return { ...buttonRest, id };
+        })
+      : undefined;
+
     const updatedConfig: TemplateConfig & {
       actions?: Array<Action>;
       mapButtons?: Array<Action>;
       navigateAction?: Action;
       pane?: Omit<Pane, 'actions'> & { actions?: Array<Action> };
-    } = { ...rest, pane: updatedPane };
+      buttons?: Array<GridButton>;
+    } = { ...rest, pane: updatedPane, buttons: updatedButtons };
 
     if (actions != null) {
       updatedConfig.actions = actions.map(action => {
