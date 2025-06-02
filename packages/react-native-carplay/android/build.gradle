@@ -70,6 +70,8 @@ android {
     minSdkVersion getExtOrIntegerDefault("minSdkVersion")
     targetSdkVersion getExtOrIntegerDefault("targetSdkVersion")
     buildConfigField "float", "CARPLAY_SCALE_FACTOR", "1.5f"
+    buildConfigField "long", "CARPLAY_CLUSTER_SPLASH_DELAY_MS", "1000"
+    buildConfigField "long", "CARPLAY_CLUSTER_SPLASH_DURATION_MS", "500"
   }
 
   buildTypes {

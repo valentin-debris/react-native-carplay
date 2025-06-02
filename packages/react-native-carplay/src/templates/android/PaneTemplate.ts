@@ -5,7 +5,7 @@ import { Pane } from '../../interfaces/Pane';
 export interface PaneTemplateConfig extends TemplateConfig {
   pane: Pane;
   headerAction?: HeaderAction;
-  actions?: Action[];
+  actions?: [Action, Action] | [Action];
   title?: string;
 
   /**

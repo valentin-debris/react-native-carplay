@@ -32,8 +32,34 @@ class RCTListTemplate(
       // Loading
       setLoading(props.isLoading())
 
+      if (props.isLoading()) {
+        // templates in a loading state can not have items/sections
+        return@apply
+      }
+
       // Sections
-      props.getArray("sections")?.let {
+      val sections = props.getArray("sections")
+      val items = props.getArray("items")
+
+      if (sections != null && items != null) {
+        throw IllegalArgumentException("invalid template configuration, use either sections or items, not both!")
+      }
+
+      // in case we get a section list that has only on section and no title we treat it as single list similar to items
+      val singleListItems =
+        if (sections?.size() == 1 && !sections.getMap(0).hasKey("header")) sections.getMap(0)
+          .getArray("items") else items
+
+      // Single List
+      singleListItems?.let {
+        setSingleList(
+          parseItemList(it)
+        )
+        return@apply
+      }
+
+      // Sections
+      sections?.let {
         for (i in 0 until it.size()) {
           val section = it.getMap(i)
           val header = section.getString("header")
@@ -46,17 +72,10 @@ class RCTListTemplate(
         }
       }
 
-      // Single List
-      // @todo handle when sections and items are defined at once.
-      props.getArray("items")?.let {
-        setSingleList(
-          parseItemList(it)
-        )
-      }
+
 
     }.build()
   }
-
 
   companion object {
     const val TAG = "RCTListTemplate"

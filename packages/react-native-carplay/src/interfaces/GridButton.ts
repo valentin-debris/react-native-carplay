@@ -23,3 +23,5 @@ export interface GridButton {
 
   disabled?: boolean;
 }
+
+export type AndroidGridButton = Omit<GridButton, 'id'> & { onPress: () => void };

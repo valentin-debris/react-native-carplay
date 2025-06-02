@@ -122,6 +122,20 @@ class RCTMapTemplate(
         }.build()
       }
 
+      "map-with-pane" -> {
+        return MapWithContentTemplate.Builder().apply {
+          setMapController(mapController)
+          setContentTemplate(RCTPaneTemplate(context, carScreenContext).parse(props))
+        }.build()
+      }
+
+      "map-with-grid" -> {
+        return MapWithContentTemplate.Builder().apply {
+          setMapController(mapController)
+          setContentTemplate(RCTGridTemplate(context, carScreenContext, true).parse(props))
+        }.build()
+      }
+
       else -> {
         return MapTemplate.Builder().apply {
           header?.let { setHeader(it) }

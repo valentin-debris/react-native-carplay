@@ -1,3 +1,4 @@
+import { Action } from 'src/interfaces/Action';
 import { GridButton } from '../interfaces/GridButton';
 import { BaseEvent, Template, TemplateConfig } from './Template';
 
@@ -10,10 +11,6 @@ export interface ButtonPressedEvent extends BaseEvent {
    * Button Index
    */
   index: number;
-  /**
-   * template ID
-   */
-  templateId: string;
 }
 
 export interface GridTemplateConfig extends TemplateConfig {
@@ -44,6 +41,18 @@ export interface GridTemplateConfig extends TemplateConfig {
    * Title to be shown on the back button, defaults to no text so only the < icon is shown
    */
   backButtonTitle?: string;
+
+  /**
+   * Sets the Action that will be displayed in the header of the template.
+   * @namespace Android
+   */
+  headerAction?: Action<'appIcon' | 'back'>;
+
+  /**
+   * Sets the ActionStrip for this template or null to not display any.
+   * This template allows up to 2 Actions. Of the 2 allowed Actions, one of them can contain a title as set via setTitle. Otherwise, only Actions with icons are allowed.
+   */
+  actions?: [Action<'custom'>] | [Action<'custom'>, Action<'custom'>];
 }
 
 export class GridTemplate extends Template<GridTemplateConfig> {

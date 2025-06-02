@@ -2,13 +2,21 @@ package org.birkir.carplay.utils
 
 import android.app.Presentation
 import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.Rect
 import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.util.Log
 import android.view.Display
+import android.view.Gravity
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.car.app.AppManager
 import androidx.car.app.CarContext
 import androidx.car.app.SurfaceCallback
@@ -21,6 +29,7 @@ import org.birkir.carplay.BuildConfig
 /**
  * Renders the view tree into a surface using VirtualDisplay. It runs the ReactNative component registered
  */
+
 class VirtualRenderer(
   private val context: CarContext,
   private val moduleName: String,
@@ -111,50 +120,130 @@ class VirtualRenderer(
     private val context: CarContext,
     display: Display,
     private val moduleName: String,
-    private val container: SurfaceContainer
+    private val surfaceContainer: SurfaceContainer
   ) : Presentation(context, display) {
     override fun onCreate(savedInstanceState: Bundle?) {
       super.onCreate(savedInstanceState)
       val instanceManager =
         (context.applicationContext as ReactApplication).reactNativeHost.reactInstanceManager
+
+
+      var splashView: ViewGroup? = null
+
       if (rootView == null) {
+        splashView = if (!isCluster) null else getSplashView(context, surfaceContainer.height, surfaceContainer.width)
+
         Log.d(TAG, "onCreate: rootView is null, initializing rootView")
         val initialProperties = Bundle().apply {
           putString("id", moduleName)
           putString("colorScheme", if (context.isDarkMode) "dark" else "light")
           putBundle("window", Bundle().apply {
-            putInt("height", (container.height / BuildConfig.CARPLAY_SCALE_FACTOR).toInt())
-            putInt("width", (container.width / BuildConfig.CARPLAY_SCALE_FACTOR).toInt())
+            putInt("height", (surfaceContainer.height / BuildConfig.CARPLAY_SCALE_FACTOR).toInt())
+            putInt("width", (surfaceContainer.width / BuildConfig.CARPLAY_SCALE_FACTOR).toInt())
             putFloat("scale", context.resources.displayMetrics.density)
           })
         }
 
         rootView = ReactRootView(context.applicationContext).apply {
           layoutParams = FrameLayout.LayoutParams(
-            (container.width / scale).toInt(), (container.height / scale).toInt()
+            (surfaceContainer.width / scale).toInt(), (surfaceContainer.height / scale).toInt()
           )
           scaleX = scale
           scaleY = scale
           pivotX = 0f
           pivotY = 0f
+          setBackgroundColor(Color.DKGRAY)
+
           startReactApplication(instanceManager, moduleName, initialProperties)
           runApplication()
+
+          splashView?.let {
+            var splashWillDisappear = false
+
+            // register a layout listener to remove the splash screen when the react component is mounted
+            viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+              override fun onGlobalLayout() {
+                addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+                  if (!splashWillDisappear) {
+                    splashWillDisappear = true
+                    it.animate()
+                      .alpha(0f)
+                      .setStartDelay(BuildConfig.CARPLAY_CLUSTER_SPLASH_DELAY_MS)
+                      .setDuration(BuildConfig.CARPLAY_CLUSTER_SPLASH_DURATION_MS)
+                      .withEndAction {
+                        (it.parent as ViewGroup).removeView(it)
+                        splashView = null
+                      }
+                  }
+
+                  // Remove this listener to avoid repeated calls
+                  viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+              }
+            })
+          }
         }
       } else {
         (rootView?.parent as? ViewGroup)?.removeView(rootView)
       }
       rootView?.let {
-        val container = FrameLayout(context).apply {
+        val rootContainer = FrameLayout(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
           )
           clipChildren = false // Allow content to extend beyond bounds
         }
 
-        container.addView(it)
+        // add the react root view
+        rootContainer.addView(it)
 
-        setContentView(container)
+        splashView?.let {
+          // and the splash screen above the react root view
+          rootContainer.addView(it, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        }
+
+        setContentView(rootContainer)
       }
+    }
+  }
+
+  private fun getSplashView(context: CarContext, containerHeight: Int, containerWidth: Int): LinearLayout {
+    val applicationIcon = AppInfo.getApplicationIcon(context)
+    val appName = AppInfo.getApplicationLabel(context)
+
+    val maxIconSize = (0.25 * maxOf(containerHeight, containerWidth)).toInt()
+
+    return LinearLayout(context).apply {
+      orientation = LinearLayout.VERTICAL
+      gravity = Gravity.CENTER
+      layoutParams = FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams.MATCH_PARENT,
+        FrameLayout.LayoutParams.MATCH_PARENT
+      )
+      setBackgroundColor(Color.DKGRAY)
+
+      val iconView = ImageView(context).apply {
+        setImageDrawable(applicationIcon)
+        layoutParams = LinearLayout.LayoutParams(
+          maxIconSize,
+          maxIconSize
+        ).also {
+          it.bottomMargin = 16
+        }
+      }
+
+      val appNameView = TextView(context).apply {
+        text = appName
+        setTextColor(Color.WHITE)
+        textSize = 20f
+        layoutParams = LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.WRAP_CONTENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+      }
+
+      addView(iconView)
+      addView(appNameView)
     }
   }
 

@@ -1,11 +1,11 @@
-import type { ImageSourcePropType, NativeModule } from 'react-native';
+import type { NativeModule } from 'react-native';
 import type { Maneuver } from './Maneuver';
 import type { TravelEstimates } from './TravelEstimates';
 import type { PauseReason } from './PauseReason';
 import type { TripConfig } from 'src/navigation/Trip';
 import type { TimeRemainingColor } from './TimeRemainingColor';
 import type { TextConfiguration } from './TextConfiguration';
-import type { ImageSize } from 'src/CarPlay';
+import type { AndroidAutoAlertConfig, ImageSize } from 'src/CarPlay';
 import type { Action } from './Action';
 
 export interface InternalCarPlay extends NativeModule {
@@ -64,22 +64,27 @@ export interface InternalCarPlay extends NativeModule {
   activateVoiceControlState(id: string, identifier: string): void;
   getRootTemplate(callback: (templateId: string) => void): void;
   getTopTemplate(callback: (templateId: string) => void): void;
-  // Android
-  reload(): void;
-  toast(message: string, duration: number): void;
-  alert(config: {
-    id: number;
-    title: string;
-    duration: number;
-    subtitle?: string;
-    image?: ImageSourcePropType;
-    actions?: Action[];
-  }): void;
   createDashboard(id: string, config: unknown): void;
   checkForDashboardConnection(): void;
   updateDashboardShortcutButtons(config: unknown): void;
   initCluster(clusterId: string, config: unknown): void;
   checkForClusterConnection(clusterId: string): void;
+  /**
+   * @namespace Android
+   */
+  reload(): void;
+  /**
+   * @namespace Android
+   */
+  toast(message: string, isLongDurationToast: boolean): void;
+  /**
+   * @namespace Android
+   */
+  alert(config: Omit<AndroidAutoAlertConfig, 'actions'> & { actions?: Action[] }): void;
+  /**
+   * @namespace Android
+   */
+  dismissAlert(id: number): void;
   /**
    * @namespace Android
    */
