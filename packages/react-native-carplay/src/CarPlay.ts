@@ -1,4 +1,10 @@
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import {
+  NativeEventEmitter,
+  NativeModules,
+  Permission,
+  PermissionsAndroid,
+  Platform,
+} from 'react-native';
 import { ActionSheetTemplate } from './templates/ActionSheetTemplate';
 import { AlertTemplate } from './templates/AlertTemplate';
 import { ContactTemplate } from './templates/ContactTemplate';
@@ -27,6 +33,16 @@ import { MapWithListTemplate } from './templates/android/MapWithListTemplate';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
+// Android Auto Telemetry Permissions
+export const CarFuelPermission = 'com.google.android.gms.permission.CAR_FUEL';
+export const CarSpeedPermission = 'com.google.android.gms.permission.CAR_SPEED';
+export const CarMileagePermission = 'com.google.android.gms.permission.CAR_MILEAGE';
+
+type TelemetryPermission =
+  | typeof CarFuelPermission
+  | typeof CarSpeedPermission
+  | typeof CarMileagePermission;
+
 export type PushableTemplates =
   | MapTemplate
   | SearchTemplate
@@ -53,6 +69,26 @@ export type ImageSize = {
 
 export type OnConnectCallback = (window: WindowInformation) => void;
 export type OnDisconnectCallback = () => void;
+
+type TelemetryItem = {
+  value: number | string;
+  timestamp: number;
+};
+
+type Telemetry = {
+  speed?: TelemetryItem;
+  fuelLevel?: TelemetryItem;
+  batteryLevel?: TelemetryItem;
+  range?: TelemetryItem;
+  odometer?: TelemetryItem;
+  vehicle?: {
+    name?: TelemetryItem;
+    year?: TelemetryItem;
+    manufacturer?: TelemetryItem;
+  };
+};
+
+export type OnTelemetryCallback = (telemetry: Telemetry) => void;
 
 type AppearanceInformation = {
   colorScheme: 'dark' | 'light';
@@ -96,6 +132,7 @@ export class CarPlayInterface {
    */
   public emitter = new NativeEventEmitter(RNCarPlay);
 
+  private onTelemetryCallbacks = new Set<OnTelemetryCallback>();
   private onConnectCallbacks = new Set<OnConnectCallback>();
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
   private onClusterConnectCallbacks = new Set<OnClusterControllerConnectCallback>();
@@ -140,12 +177,73 @@ export class CarPlayInterface {
       this.onOnSafeAreaInsetsDidChangeCallbacks.forEach(callback => callback(props));
     });
 
+    if (Platform.OS === 'android') {
+      this.emitter.addListener('telemetry', (telemetry: Telemetry) => {
+        this.onTelemetryCallbacks.forEach(callback => callback(telemetry));
+      });
+    }
+
     // check if already connected this will fire any 'didConnect' events
     // if a connected is already present.
     if (Platform.OS === 'ios') {
       this.bridge.checkForConnection();
     }
   }
+
+  /**
+   * Checks and requests permissions for telemetry data at the same time.
+   * @param requestedPermissions A list of permissions to request for telemetry data.
+   *
+   * This is only available on Android Auto.
+   * @returns
+   */
+  public async requestTelemetryPermissions(
+    requestedPermissions: TelemetryPermission[],
+  ): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      // no-op on iOS
+      return Promise.resolve(false);
+    }
+
+    return PermissionsAndroid.requestMultiple(requestedPermissions as unknown as Permission[]).then(
+      permissionResult => {
+        const fuelGranted =
+          permissionResult[CarFuelPermission as Permission] === PermissionsAndroid.RESULTS.GRANTED;
+        const speedGranted =
+          permissionResult[CarSpeedPermission as Permission] === PermissionsAndroid.RESULTS.GRANTED;
+        const mileageGranted =
+          permissionResult[CarMileagePermission as Permission] ===
+          PermissionsAndroid.RESULTS.GRANTED;
+
+        return fuelGranted && speedGranted && mileageGranted;
+      },
+    );
+  }
+
+  /**
+   * Fired when CarPlay gets telemetry data from the car.
+   *
+   * This is only available on Android Auto.
+   */
+  public registerTelemetryListener = (callback: OnTelemetryCallback) => {
+    if (Platform.OS !== 'android') {
+      // no-op on iOS
+      return;
+    }
+    this.onTelemetryCallbacks.add(callback);
+    this.bridge.startTelemetryObserver();
+  };
+
+  public unregisterTelemetryListener = (callback: OnTelemetryCallback) => {
+    if (Platform.OS !== 'android') {
+      // no-op on iOS
+      return;
+    }
+    this.onTelemetryCallbacks.delete(callback);
+    if (this.onTelemetryCallbacks.size === 0) {
+      this.bridge.stopTelemetryObserver();
+    }
+  };
 
   /**
    * Fired when CarPlay is connected to the device.
