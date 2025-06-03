@@ -34,18 +34,9 @@ import { MapWithListTemplate } from './templates/android/MapWithListTemplate';
 import { MapWithPaneTemplate } from './templates/android/MapWithPaneTemplate';
 import { CallbackAction, getCallbackActionId } from './interfaces/Action';
 import { MapWithGridTemplate } from './templates/android/MapWithGridTemplate';
+import { OnTelemetryCallback, Telemetry, TelemetryPermission } from './interfaces/Telemetry';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
-
-// Android Auto Telemetry Permissions
-export const CarFuelPermission = 'com.google.android.gms.permission.CAR_FUEL';
-export const CarSpeedPermission = 'com.google.android.gms.permission.CAR_SPEED';
-export const CarMileagePermission = 'com.google.android.gms.permission.CAR_MILEAGE';
-
-type TelemetryPermission =
-  | typeof CarFuelPermission
-  | typeof CarSpeedPermission
-  | typeof CarMileagePermission;
 
 export type PushableTemplates =
   | MapTemplate
@@ -75,26 +66,6 @@ export type ImageSize = {
 
 export type OnConnectCallback = (window: WindowInformation) => void;
 export type OnDisconnectCallback = () => void;
-
-type TelemetryItem = {
-  value: number | string;
-  timestamp: number;
-};
-
-type Telemetry = {
-  speed?: TelemetryItem;
-  fuelLevel?: TelemetryItem;
-  batteryLevel?: TelemetryItem;
-  range?: TelemetryItem;
-  odometer?: TelemetryItem;
-  vehicle?: {
-    name?: TelemetryItem;
-    year?: TelemetryItem;
-    manufacturer?: TelemetryItem;
-  };
-};
-
-export type OnTelemetryCallback = (telemetry: Telemetry) => void;
 
 type AppearanceInformation = {
   colorScheme: 'dark' | 'light';
@@ -222,6 +193,22 @@ export class CarPlayInterface {
   }
 
   /**
+   * Silently checks permissions without requesting them from the user
+   * @param requestedPermissions TelemetryPermission you want to check
+   * @returns
+   */
+  public async checkTelemetryPermissions(
+    requestedPermissions: TelemetryPermission[],
+  ): Promise<boolean> {
+    const state = await Promise.all(
+      requestedPermissions.map(permission =>
+        PermissionsAndroid.check(permission as Permission).catch(() => false),
+      ),
+    );
+    return state.every(granted => granted);
+  }
+
+  /**
    * Checks and requests permissions for telemetry data at the same time.
    * @param requestedPermissions A list of permissions to request for telemetry data.
    *
@@ -236,35 +223,32 @@ export class CarPlayInterface {
       return Promise.resolve(false);
     }
 
-    return PermissionsAndroid.requestMultiple(requestedPermissions as unknown as Permission[]).then(
-      permissionResult => {
-        const fuelGranted =
-          permissionResult[CarFuelPermission as Permission] === PermissionsAndroid.RESULTS.GRANTED;
-        const speedGranted =
-          permissionResult[CarSpeedPermission as Permission] === PermissionsAndroid.RESULTS.GRANTED;
-        const mileageGranted =
-          permissionResult[CarMileagePermission as Permission] ===
-          PermissionsAndroid.RESULTS.GRANTED;
+    const permissionStatus = await PermissionsAndroid.requestMultiple(
+      requestedPermissions as unknown as Permission[],
+    );
 
-        return fuelGranted && speedGranted && mileageGranted;
-      },
+    return Object.values(permissionStatus).every(
+      status => status === PermissionsAndroid.RESULTS.GRANTED,
     );
   }
 
   /**
    * Fired when CarPlay gets telemetry data from the car.
-   *
-   * This is only available on Android Auto.
+   * make sure to call CarPlay.requestTelemetryPermissions first
+   * @namespace Android
    */
   public registerTelemetryListener = (callback: OnTelemetryCallback) => {
     if (Platform.OS !== 'android') {
-      // no-op on iOS
-      return;
+      return Promise.reject('unsupported platform');
     }
     this.onTelemetryCallbacks.add(callback);
-    this.bridge.startTelemetryObserver();
+    return this.bridge.startTelemetryObserver();
   };
 
+  /**
+   * @param callback that was registered first using CarPlay.registerTelemetryListener
+   * @namespace Android
+   */
   public unregisterTelemetryListener = (callback: OnTelemetryCallback) => {
     if (Platform.OS !== 'android') {
       // no-op on iOS

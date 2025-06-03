@@ -53,7 +53,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
 
   // Global event emitter (no templateId's)
   private var eventEmitter = EventEmitter(reactContext)
-  private lateinit var telemetryObserver: CarPlayTelemetryObserver
 
   init {
     reactContext.addLifecycleEventListener(object : LifecycleEventListener {
@@ -92,7 +91,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
       }
     })
     eventEmitter.didConnect()
-    telemetryObserver = CarPlayTelemetryObserver(carContext, eventEmitter)
   }
 
   private fun parseTemplate(
@@ -378,17 +376,13 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   }
 
   @ReactMethod
-  fun startTelemetryObserver() {
-    if (telemetryObserver != null) {
-      telemetryObserver.startTelemetryObserver()
-    }
+  fun startTelemetryObserver(promise: Promise) {
+    CarPlayTelemetryObserver.startTelemetryObserver(carContext, eventEmitter, promise)
   }
 
   @ReactMethod
   fun stopTelemetryObserver() {
-    if (telemetryObserver != null) {
-        telemetryObserver.stopTelemetryObserver()
-    }
+    CarPlayTelemetryObserver.stopTelemetryObserver()
   }
 
   private fun createCarScreenContext(screen: CarScreen, emitter: EventEmitter): CarScreenContext {
