@@ -1,4 +1,11 @@
-import { ImageSourcePropType, NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import {
+  ImageSourcePropType,
+  NativeEventEmitter,
+  NativeModules,
+  Permission,
+  PermissionsAndroid,
+  Platform,
+} from 'react-native';
 import { ActionSheetTemplate } from './templates/ActionSheetTemplate';
 import { AlertTemplate } from './templates/AlertTemplate';
 import { ContactTemplate } from './templates/ContactTemplate';
@@ -27,6 +34,7 @@ import { MapWithListTemplate } from './templates/android/MapWithListTemplate';
 import { MapWithPaneTemplate } from './templates/android/MapWithPaneTemplate';
 import { CallbackAction, getCallbackActionId } from './interfaces/Action';
 import { MapWithGridTemplate } from './templates/android/MapWithGridTemplate';
+import { OnTelemetryCallback, Telemetry, TelemetryPermission } from './interfaces/Telemetry';
 
 const { RNCarPlay } = NativeModules as { RNCarPlay: InternalCarPlay };
 
@@ -111,6 +119,7 @@ export class CarPlayInterface {
    */
   public emitter = new NativeEventEmitter(RNCarPlay);
 
+  private onTelemetryCallbacks = new Set<OnTelemetryCallback>();
   private onConnectCallbacks = new Set<OnConnectCallback>();
   private onDisconnectCallbacks = new Set<OnDisconnectCallback>();
   private onClusterConnectCallbacks = new Set<OnClusterControllerConnectCallback>();
@@ -156,6 +165,12 @@ export class CarPlayInterface {
       this.onOnSafeAreaInsetsDidChangeCallbacks.forEach(callback => callback(props));
     });
 
+    if (Platform.OS === 'android') {
+      this.emitter.addListener('telemetry', (telemetry: Telemetry) => {
+        this.onTelemetryCallbacks.forEach(callback => callback(telemetry));
+      });
+    }
+
     this.emitter.addListener(
       'buttonPressed',
       ({ buttonId, templateId }: { buttonId: string; templateId?: string }) => {
@@ -176,6 +191,74 @@ export class CarPlayInterface {
       this.bridge.checkForConnection();
     }
   }
+
+  /**
+   * Silently checks permissions without requesting them from the user
+   * @param requestedPermissions TelemetryPermission you want to check
+   * @returns
+   */
+  public async checkTelemetryPermissions(
+    requestedPermissions: TelemetryPermission[],
+  ): Promise<boolean> {
+    const state = await Promise.all(
+      requestedPermissions.map(permission =>
+        PermissionsAndroid.check(permission as Permission).catch(() => false),
+      ),
+    );
+    return state.every(granted => granted);
+  }
+
+  /**
+   * Checks and requests permissions for telemetry data at the same time.
+   * @param requestedPermissions A list of permissions to request for telemetry data.
+   *
+   * This is only available on Android Auto.
+   * @returns
+   */
+  public async requestTelemetryPermissions(
+    requestedPermissions: TelemetryPermission[],
+  ): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      // no-op on iOS
+      return Promise.resolve(false);
+    }
+
+    const permissionStatus = await PermissionsAndroid.requestMultiple(
+      requestedPermissions as unknown as Permission[],
+    );
+
+    return Object.values(permissionStatus).every(
+      status => status === PermissionsAndroid.RESULTS.GRANTED,
+    );
+  }
+
+  /**
+   * Fired when CarPlay gets telemetry data from the car.
+   * make sure to call CarPlay.requestTelemetryPermissions first
+   * @namespace Android
+   */
+  public registerTelemetryListener = (callback: OnTelemetryCallback) => {
+    if (Platform.OS !== 'android') {
+      return Promise.reject('unsupported platform');
+    }
+    this.onTelemetryCallbacks.add(callback);
+    return this.bridge.startTelemetryObserver();
+  };
+
+  /**
+   * @param callback that was registered first using CarPlay.registerTelemetryListener
+   * @namespace Android
+   */
+  public unregisterTelemetryListener = (callback: OnTelemetryCallback) => {
+    if (Platform.OS !== 'android') {
+      // no-op on iOS
+      return;
+    }
+    this.onTelemetryCallbacks.delete(callback);
+    if (this.onTelemetryCallbacks.size === 0) {
+      this.bridge.stopTelemetryObserver();
+    }
+  };
 
   /**
    * Fired when CarPlay is connected to the device.

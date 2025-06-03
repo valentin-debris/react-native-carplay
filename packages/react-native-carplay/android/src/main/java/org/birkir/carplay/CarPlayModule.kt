@@ -375,6 +375,16 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
     promise.resolve(null)
   }
 
+  @ReactMethod
+  fun startTelemetryObserver(promise: Promise) {
+    CarPlayTelemetryObserver.startTelemetryObserver(carContext, eventEmitter, promise)
+  }
+
+  @ReactMethod
+  fun stopTelemetryObserver() {
+    CarPlayTelemetryObserver.stopTelemetryObserver()
+  }
+
   private fun createCarScreenContext(screen: CarScreen, emitter: EventEmitter): CarScreenContext {
     val templateId = screen.marker!!
     return CarScreenContext(templateId, emitter, carScreens)

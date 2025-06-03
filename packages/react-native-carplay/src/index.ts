@@ -27,6 +27,7 @@ export * from './templates/android/MapWithGridTemplate';
 // Others
 export * from './CarPlay';
 export * from './navigation/Trip';
+export * from './interfaces/Telemetry';
 
 // Types
 export * from './interfaces/Action';

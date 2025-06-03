@@ -12,6 +12,7 @@ class EventEmitter(
 ) {
 
   companion object {
+    const val Telemetry = "telemetry"
     const val DidConnect = "didConnect"
     const val DidDisconnect = "didDisconnect"
     const val DidFinish = "didFinish" //CarPlayService finished/killed
@@ -74,6 +75,10 @@ class EventEmitter(
     const val AlertActionPressed = "alertActionPressed"
     const val SelectedPreviewForTrip = "selectedPreviewForTrip"
     const val StartedTrip = "startedTrip"
+  }
+
+  fun telemetry(data: WritableMap) {
+    emit(Telemetry, data)
   }
 
   fun didConnect() {
