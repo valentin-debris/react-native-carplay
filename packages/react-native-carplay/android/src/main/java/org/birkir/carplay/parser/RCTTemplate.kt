@@ -504,9 +504,16 @@ abstract class RCTTemplate(
   }
 
   protected fun parseRoutingInfo(map: ReadableMap): RoutingInfo {
+    val isLoading = map.isLoading()
+
+    if (isLoading) {
+      return RoutingInfo.Builder().apply {
+        setLoading(true)
+      }.build()
+    }
+
     return RoutingInfo.Builder()
       .apply {
-        setLoading(map.isLoading())
         setCurrentStep(
           parseStep(map.getMap("step")!!),
           parseDistance(map)

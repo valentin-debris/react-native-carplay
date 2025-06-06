@@ -2,15 +2,17 @@ import { ImageResolvedAssetSource } from 'react-native';
 import { NavigationStep } from './NavigationStep';
 import { DistanceUnits } from './TravelEstimates';
 
-export type NavigationRoutingInfo = {
-  type: 'routingInfo';
-  loading?: boolean;
-  junctionImage?: ImageResolvedAssetSource;
-  nextStep?: NavigationStep;
-  distance: number;
-  distanceUnits: DistanceUnits;
-  step: NavigationStep;
-};
+export type NavigationRoutingInfo =
+  | {
+      type: 'routingInfo';
+      loading?: false;
+      junctionImage?: ImageResolvedAssetSource;
+      nextStep?: NavigationStep;
+      distance: number;
+      distanceUnits: DistanceUnits;
+      step: NavigationStep;
+    }
+  | { type: 'routingInfo'; loading: true };
 
 export type NavigationMessageInfo = {
   type: 'messageInfo';
