@@ -41,6 +41,7 @@ export interface NavigationTemplateConfig
       timeSinceEpochMillis: number;
       id: string;
     };
+    tripText?: string;
   };
   /**
    * Sets an ActionStrip with a list of map-control related actions for this template, such as pan or zoom.

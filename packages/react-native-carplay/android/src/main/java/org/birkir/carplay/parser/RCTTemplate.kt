@@ -499,6 +499,9 @@ abstract class RCTTemplate(
     map.getString("timeRemainingColor")?.let {
       builder.setRemainingTimeColor(parseColor(it))
     }
+    map.getString("tripText")?.let {
+      builder.setTripText(CarText.Builder(it).build())
+    }
     builder.setRemainingTimeSeconds(map.getDouble("timeRemaining").toLong())
     return builder.build()
   }
