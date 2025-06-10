@@ -22,7 +22,7 @@ class RCTSearchTemplate(
       }
     }).apply {
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
-      props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
+      props.getMap("headerAction")?.let { setHeaderAction(Parser.parseAction(it, context, eventEmitter)) }
       props.getString("initialSearchText")?.let {
         setInitialSearchText(it)
       }

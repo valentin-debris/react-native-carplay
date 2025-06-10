@@ -2,12 +2,12 @@ import { AndroidRenderTemplates } from '../../interfaces/AndroidRenderTemplates'
 import { AndroidAction } from '../../interfaces/Action';
 import { CarColor } from '../../interfaces/CarColor';
 import { NavigationInfo } from '../../interfaces/NavigationInfo';
-import { TravelEstimates } from '../../interfaces/TravelEstimates';
 import {
   AndroidNavigationBaseTemplate,
   AndroidNavigationBaseTemplateConfig,
 } from './AndroidNavigationBaseTemplate';
 import { CarPlay } from '../../CarPlay';
+import { AndroidTravelEstimates, NavigationTrip } from '../../interfaces/NavigationStep';
 
 export interface NavigationTemplateConfig
   extends Omit<AndroidNavigationBaseTemplateConfig, 'component'> {
@@ -32,17 +32,11 @@ export interface NavigationTemplateConfig
   /**
    * Sets the TravelEstimate to the final destination.
    */
-  travelEstimate?: TravelEstimates & {
-    /**
-     * Destination time
-     * @namespace Android
-     */
-    destinationTime: {
-      timeSinceEpochMillis: number;
-      id: string;
-    };
-    tripText?: string;
-  };
+  travelEstimate?: AndroidTravelEstimates;
+  /**
+   *
+   */
+  trip?: NavigationTrip;
   /**
    * Sets an ActionStrip with a list of map-control related actions for this template, such as pan or zoom.
    * The host will draw the buttons in an area that is associated with map controls.

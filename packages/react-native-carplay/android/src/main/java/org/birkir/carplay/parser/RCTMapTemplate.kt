@@ -1,7 +1,6 @@
 package org.birkir.carplay.parser
 
 import androidx.car.app.CarContext
-import androidx.car.app.model.ListTemplate
 import androidx.car.app.model.PlaceListMapTemplate
 import androidx.car.app.model.Template
 import androidx.car.app.navigation.model.MapController
@@ -28,7 +27,7 @@ class RCTMapTemplate(
       parseHeader(it)
     }
     val headerAction = props.getMap("headerAction")?.let {
-      parseAction(it)
+      Parser.parseAction(it, context, eventEmitter)
     }
     val pane = props.getMap("pane")?.let {
       parsePane(it)
@@ -52,10 +51,10 @@ class RCTMapTemplate(
         return NavigationTemplate.Builder().apply {
           actionStrip?.let { setActionStrip(it) }
           props.getString("backgroundColor")?.let {
-            setBackgroundColor(parseColor(it))
+            setBackgroundColor(Parser.parseColor(it))
           }
           props.getMap("travelEstimate")?.let {
-            setDestinationTravelEstimate(parseTravelEstimate(it))
+            setDestinationTravelEstimate(Parser.parseTravelEstimate(it))
           }
           props.getMap("navigationInfo")?.let {
             setNavigationInfo(parseNavigationInfo(it))
@@ -110,7 +109,7 @@ class RCTMapTemplate(
           }
           setLoading(props.isLoading())
           mapActionStrip?.let { setMapActionStrip(it) }
-          props.getMap("navigateAction")?.let { setNavigateAction(parseAction(it)) }
+          props.getMap("navigateAction")?.let { setNavigateAction(Parser.parseAction(it, context, eventEmitter)) }
           setPanModeListener(panModeListener)
         }.build()
       }

@@ -25,7 +25,7 @@ class RCTListTemplate(
       // Header Action
       props.getMap("headerAction")?.let {
         setHeaderAction(
-          parseAction(it)
+          Parser.parseAction(it, context, eventEmitter)
         )
       }
 

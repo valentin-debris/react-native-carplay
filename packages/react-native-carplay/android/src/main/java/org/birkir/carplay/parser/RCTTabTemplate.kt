@@ -29,7 +29,7 @@ class RCTTabTemplate(
           setActiveTabContentId(it1)
         }
       }
-      props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
+      props.getMap("headerAction")?.let { setHeaderAction(Parser.parseAction(it, context, eventEmitter)) }
     }.build()
   }
 
@@ -37,7 +37,7 @@ class RCTTabTemplate(
     return Tab.Builder().apply {
       props.getString("id")?.let { setContentId(it) }
       props.getString("title")?.let { setTitle(it) }
-      props.getMap("image")?.let { setIcon(parseCarIcon(it)) }
+      props.getMap("image")?.let { setIcon(Parser.parseCarIcon(it, context)) }
     }.build()
   }
 

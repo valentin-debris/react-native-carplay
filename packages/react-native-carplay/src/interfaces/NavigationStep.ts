@@ -1,10 +1,28 @@
-import { ImageSourcePropType } from 'react-native';
+import { ImageResolvedAssetSource, ImageSourcePropType } from 'react-native';
+import { TravelEstimates } from './TravelEstimates';
 
 export enum CarIconSpanAlignment {
   ALIGN_BOTTOM = 0,
   ALIGN_BASELINE = 1,
   ALIGN_CENTER = 2,
 }
+
+export type NavigationTrip = {
+  steps?: Array<NavigationStep & { stepTravelEstimate: AndroidTravelEstimates }>;
+  destinations?: Array<NavigationDestination>;
+};
+
+export type AndroidTravelEstimates = TravelEstimates & {
+  /**
+   * Destination time
+   * @namespace Android
+   */
+  destinationTime: {
+    timeSinceEpochMillis: number;
+    id: string;
+  };
+  tripText?: string;
+};
 
 export type NavigationStep = {
   lanes?: Array<{
@@ -23,6 +41,13 @@ export type NavigationStep = {
   lanesImage?: ImageSourcePropType;
   maneuver?: Maneuver;
   road?: string;
+};
+
+export type NavigationDestination = {
+  address?: string;
+  name: string;
+  image?: ImageResolvedAssetSource;
+  destinationTravelEstimate: AndroidTravelEstimates;
 };
 
 type BaseManeuver = {

@@ -16,7 +16,7 @@ class RCTPaneTemplate(
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
       setHeader(Header.Builder().apply {
         props.getString("title")?.let { setTitle(it) }
-        props.getMap("headerAction")?.let { setStartHeaderAction(parseAction(it)) }
+        props.getMap("headerAction")?.let { setStartHeaderAction(Parser.parseAction(it, context, eventEmitter)) }
       }.build())
     }.build()
   }

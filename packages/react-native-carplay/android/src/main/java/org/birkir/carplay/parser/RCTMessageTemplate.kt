@@ -11,11 +11,11 @@ class RCTMessageTemplate(
 ) : RCTTemplate(context, carScreenContext) {
   override fun parse(props: ReadableMap): MessageTemplate {
     val message = props.getString("message") ?: "No message"
-    val messageText = parseCarText(message, props)
+    val messageText = Parser.parseCarText(message, props)
     return MessageTemplate.Builder(messageText).apply {
       props.getArray("actions")?.let { setActionStrip(parseActionStrip(it)) }
-      props.getMap("headerAction")?.let { setHeaderAction(parseAction(it)) }
-      props.getMap("image")?.let { setIcon(parseCarIcon(it)) }
+      props.getMap("headerAction")?.let { setHeaderAction(Parser.parseAction(it, context, eventEmitter)) }
+      props.getMap("image")?.let { setIcon(Parser.parseCarIcon(it, context)) }
       props.getString("title")?.let { setTitle(it) }
       props.getString("debugMessage")?.let { setDebugMessage(it) }
       setLoading(props.isLoading())

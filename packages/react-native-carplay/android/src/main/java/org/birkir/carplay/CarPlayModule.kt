@@ -42,8 +42,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   ReactContextBaseJavaModule(reactContext) {
 
   private lateinit var carContext: CarContext
-  private lateinit var parser: Parser
-
   private var screenManager: ScreenManager? = null
   private val carScreens: WeakHashMap<String, CarScreen> = WeakHashMap()
   private val carScreenContexts: WeakHashMap<CarScreen, CarScreenContext> =
@@ -71,7 +69,6 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   }
 
   fun setCarContext(carContext: CarContext, currentCarScreen: CarScreen) {
-    parser = Parser(carContext, CarScreenContext("", eventEmitter, carScreens))
     this.carContext = carContext
     screenManager = currentCarScreen.screenManager
     carScreens["root"] = currentCarScreen
@@ -132,6 +129,9 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
           screen.setTemplate(template = template, invalidate = true, isSurfaceTemplate = isSurfaceTemplate)
 
           if (template is NavigationTemplate) {
+            config.getMap("trip")?.let {
+              CarNavigationManager.updateTrip(it)
+            }
             clusterScreens.filter { it.key.template is NavigationTemplate }.forEach{
               val clusterTemplate = parseTemplate(config, it.value)
               // cluster can hold NavigationTemplate only and always has a surface to render to
@@ -230,7 +230,7 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
   fun alert(props: ReadableMap) {
     handler.post {
       val id = props.getInt("id")
-      val title = parser.parseCarText(props.getString("title")!!, props)
+      val title = Parser.parseCarText(props.getString("title")!!, props)
       val duration = props.getInt("duration").toLong()
       val alert = Alert.Builder(id, title, duration).apply {
         setCallback(object : AlertCallback {
@@ -247,11 +247,11 @@ class CarPlayModule internal constructor(private val reactContext: ReactApplicat
             eventEmitter.alertActionPressed(id, "dismiss" )
           }
         })
-        props.getString("subtitle")?.let { setSubtitle(parser.parseCarText(it, props)) }
-        props.getMap("image")?.let { setIcon(parser.parseCarIcon(it)) }
+        props.getString("subtitle")?.let { setSubtitle(Parser.parseCarText(it, props)) }
+        props.getMap("image")?.let { setIcon(Parser.parseCarIcon(it, carContext)) }
         props.getArray("actions")?.let {
           for (i in 0 until it.size()) {
-            addAction(parser.parseAction(it.getMap(i)))
+            addAction(Parser.parseAction(map = it.getMap(i), context = carContext, eventEmitter = eventEmitter))
           }
         }
       }.build()
