@@ -1,5 +1,6 @@
 {
-  "name": "root",
+  "name": "@g4rb4g3/react-native-carplay",
+  "version": "2.6.0-beta35",
   "private": true,
   "scripts": {
     "deps:check": "yarn dlx npm-check-updates@latest --deep --mergeConfig",
